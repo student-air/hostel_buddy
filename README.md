@@ -1,2 +1,3 @@
 # hostel_buddy
-A new hostel finding and managing flutter application
+
+A new Flutter project.
