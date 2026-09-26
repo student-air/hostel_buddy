@@ -1,6 +1,6 @@
 name: hostel_buddy
-description: "A new Flutter project."
-publish_to: 'none'
+description: "Hostel Buddy - Find your fit. Fill your rooms."
+publish_to: "none"
 version: 0.1.0+1
 
 environment:
@@ -13,12 +13,23 @@ dependencies:
   get: ^4.7.3
   get_storage: ^2.1.1
   image_picker: ^1.2.3
-  permission_handler: ^13.0.2
+  permission_handler: ^12.0.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.14.4
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/images/
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/app_logo.png"
+  adaptive_icon_background: "#6B0E24"
+  adaptive_icon_foreground: "assets/images/app_logo.png"
+  remove_alpha_ios: true
