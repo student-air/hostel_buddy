@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../../core/constants/app_constants.dart';
 import '../../../core/utils/app_snackbar.dart';
+import '../../../routes/app_routes.dart';
 
 class HostelSetupController extends GetxController {
   final pageController = PageController();
@@ -226,12 +228,15 @@ class HostelSetupController extends GetxController {
     isLoading.value = true;
     await Future.delayed(const Duration(milliseconds: 900));
     isLoading.value = false;
-
+    final box = GetStorage();
+    await box.write('hostel_name', nameController.text.trim());
+    await box.write('hostel_type', selectedHostelType.value);
+    Get.offAllNamed(AppRoutes.managerHome);
     AppSnackbar.success(
       'Published',
       '${nameController.text.trim()} is now live!',
     );
-    // TODO: Navigate to manager home / dashboard
+    Get.offAllNamed(AppRoutes.managerHome);
   }
 
   @override

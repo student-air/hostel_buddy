@@ -12,6 +12,11 @@ import '../presentation/hostel_setup/bindings/hostel_setup_binding.dart';
 import '../presentation/hostel_setup/views/hostel_setup_view.dart';
 import '../presentation/seeker_home/bindings/seeker_home_binding.dart';
 import '../presentation/seeker_home/views/seeker_home_view.dart';
+import '../presentation/manager_home/bindings/manager_home_binding.dart';
+import '../presentation/manager_home/views/manager_home_view.dart';
+
+// in pages list
+
 import 'app_routes.dart';
 
 class AppPages {
@@ -47,6 +52,11 @@ class AppPages {
       name: AppRoutes.seekerHome,
       page: () => const SeekerHomeView(),
       binding: SeekerHomeBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.managerHome,
+      page: () => const ManagerHomeView(),
+      binding: ManagerHomeBinding(),
     ),
   ];
 }
