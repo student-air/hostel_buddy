@@ -6,6 +6,8 @@ import '../presentation/profile_setup/bindings/profile_setup_binding.dart';
 import '../presentation/profile_setup/views/profile_setup_view.dart';
 import '../presentation/splash/bindings/splash_binding.dart';
 import '../presentation/splash/views/splash_view.dart';
+import '../presentation/role_selection/bindings/role_selection_binding.dart';
+import '../presentation/role_selection/views/role_selection_view.dart';
 import 'app_routes.dart';
 
 class AppPages {
@@ -26,6 +28,11 @@ class AppPages {
       name: AppRoutes.profileSetup,
       page: () => const ProfileSetupView(),
       binding: ProfileSetupBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.roleSelection,
+      page: () => const RoleSelectionView(),
+      binding: RoleSelectionBinding(),
     ),
   ];
 }

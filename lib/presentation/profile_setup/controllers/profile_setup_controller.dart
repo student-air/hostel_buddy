@@ -8,6 +8,7 @@ import 'package:permission_handler/permission_handler.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/utils/app_snackbar.dart';
+import '../../../routes/app_routes.dart';
 
 class ProfileSetupController extends GetxController {
   final formKey = GlobalKey<FormState>();
@@ -178,6 +179,7 @@ class ProfileSetupController extends GetxController {
       'Profile saved',
       'Welcome, ${nameController.text.trim()}!',
     );
+    Get.offNamed(AppRoutes.roleSelection);
   }
 
   void goBack() => Get.back();
