@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 
 import '../../../core/constants/app_constants.dart';
 import '../../../core/utils/app_snackbar.dart';
+import '../../../routes/app_routes.dart';
 
 /// Role selection: seeker or manager — nothing selected until user taps.
 class RoleSelectionController extends GetxController {
@@ -26,14 +27,12 @@ class RoleSelectionController extends GetxController {
     await Future.delayed(const Duration(milliseconds: 400));
     isLoading.value = false;
 
-    // TODO: Persist role and navigate to seeker/manager home
-    final isSeeker = selectedRole.value == AppConstants.roleSeeker;
-    AppSnackbar.success(
-      'Role selected',
-      isSeeker
-          ? 'You are set up to find hostels'
-          : 'You are set up to manage a hostel',
-    );
+    if (selectedRole.value == AppConstants.roleManager) {
+      Get.offNamed(AppRoutes.hostelSetup);
+    } else {
+      // TODO: Seeker home / dashboard
+      AppSnackbar.success('Role selected', 'You are set up to find hostels');
+    }
   }
 
   void goBack() => Get.back();

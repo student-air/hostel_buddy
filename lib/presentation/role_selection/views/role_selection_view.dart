@@ -123,9 +123,9 @@ class RoleSelectionView extends GetView<RoleSelectionController> {
                               ),
                             ),
                           ),
-                          const SizedBox(height: 48),
+                          const SizedBox(height: 28),
                           const Text(
-                            'How will you use\nHostel Buddy?',
+                            'How will you use\nHostelBuddy?',
                             style: TextStyle(
                               fontFamily: 'Inter',
                               fontSize: 30,
@@ -137,7 +137,7 @@ class RoleSelectionView extends GetView<RoleSelectionController> {
                           ),
                           const SizedBox(height: 12),
                           Text(
-                            'You can always switch role later in settings',
+                            'You can always switch later in settings',
                             style: TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.w400,
@@ -145,12 +145,12 @@ class RoleSelectionView extends GetView<RoleSelectionController> {
                               height: 1.35,
                             ),
                           ),
-                          const SizedBox(height: 56),
+                          const SizedBox(height: 36),
                           Obx(
                             () => Column(
                               children: [
                                 _RoleCard(
-                                  icon: Icons.search_sharp,
+                                  icon: Icons.search_rounded,
                                   title: 'Looking for a\nhostel',
                                   subtitle: 'Compare places and\nfind your fit',
                                   selected:
@@ -162,7 +162,7 @@ class RoleSelectionView extends GetView<RoleSelectionController> {
                                 ),
                                 const SizedBox(height: 16),
                                 _RoleCard(
-                                  icon: Icons.home_rounded,
+                                  icon: Icons.apartment_rounded,
                                   title: 'Managing a\nhostel',
                                   subtitle:
                                       'Fill rooms and find\ngood residents',
