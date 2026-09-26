@@ -100,9 +100,36 @@ class _Header extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // Top bar: initials → profile | city | menu → drawer | notification → alerts
         Row(
           children: [
-            _RoundIcon(icon: Icons.menu_rounded, onTap: controller.openDrawer),
+            // Initials → profile
+            GestureDetector(
+              onTap: controller.onProfile,
+              child: Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: AppColors.accent.withValues(alpha: 0.3),
+                  border: Border.all(
+                    color: AppColors.accent.withValues(alpha: 0.6),
+                  ),
+                ),
+                alignment: Alignment.center,
+                child: Obx(() {
+                  final _ = controller.userName.value;
+                  return Text(
+                    controller.initials,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 13,
+                    ),
+                  );
+                }),
+              ),
+            ),
             const SizedBox(width: 10),
             Expanded(
               child: GestureDetector(
@@ -137,42 +164,68 @@ class _Header extends StatelessWidget {
                 ),
               ),
             ),
-            _RoundIcon(
-              icon: Icons.notifications_none_rounded,
-              onTap: controller.onNotifications,
-              showDot: true,
-            ),
-            const SizedBox(width: 8),
+            // Notification → alerts
             GestureDetector(
-              onTap: controller.onProfile,
+              onTap: controller.onNotifications,
+              child: Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white.withValues(alpha: 0.1),
+                      border: Border.all(
+                        color: Colors.white.withValues(alpha: 0.12),
+                      ),
+                    ),
+                    child: const Icon(
+                      Icons.notifications_none_rounded,
+                      color: Colors.white,
+                      size: 20,
+                    ),
+                  ),
+                  Positioned(
+                    top: 8,
+                    right: 9,
+                    child: Container(
+                      width: 7,
+                      height: 7,
+                      decoration: const BoxDecoration(
+                        color: AppColors.notificationDot,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            GestureDetector(
+              onTap: controller.openDrawer,
               child: Container(
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: AppColors.accent.withValues(alpha: 0.3),
+                  color: Colors.white.withValues(alpha: 0.1),
                   border: Border.all(
-                    color: AppColors.accent.withValues(alpha: 0.6),
+                    color: Colors.white.withValues(alpha: 0.12),
                   ),
                 ),
-                alignment: Alignment.center,
-                child: Obx(() {
-                  // read .obs so GetX is satisfied
-                  final _ = controller.userName.value;
-                  return Text(
-                    controller.initials,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w700,
-                      fontSize: 13,
-                    ),
-                  );
-                }),
+                child: const Icon(
+                  Icons.menu_rounded,
+                  color: Colors.white,
+                  size: 20,
+                ),
               ),
             ),
+            const SizedBox(width: 8),
           ],
         ),
         const SizedBox(height: 22),
+
+        // Greeting + date card
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -305,54 +358,6 @@ class _Header extends StatelessWidget {
     );
   }
 }
-
-class _RoundIcon extends StatelessWidget {
-  const _RoundIcon({
-    required this.icon,
-    required this.onTap,
-    this.showDot = false,
-  });
-
-  final IconData icon;
-  final VoidCallback onTap;
-  final bool showDot;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: Colors.white.withValues(alpha: 0.1),
-              border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
-            ),
-            child: Icon(icon, color: Colors.white, size: 20),
-          ),
-          if (showDot)
-            Positioned(
-              top: 8,
-              right: 9,
-              child: Container(
-                width: 7,
-                height: 7,
-                decoration: const BoxDecoration(
-                  color: AppColors.notificationDot,
-                  shape: BoxShape.circle,
-                ),
-              ),
-            ),
-        ],
-      ),
-    );
-  }
-}
-
 // ═══════════════════════════════════════════
 // BIDS GLANCE
 // ═══════════════════════════════════════════
@@ -417,6 +422,7 @@ class _BidsGlance extends StatelessWidget {
                       child: _StatCell(
                         value: '${controller.pendingBids.value}',
                         label: 'Pending',
+                        valueColor: AppColors.warning,
                       ),
                     ),
                     _VDivider(),
@@ -424,6 +430,7 @@ class _BidsGlance extends StatelessWidget {
                       child: _StatCell(
                         value: '${controller.acceptedBids.value}',
                         label: 'Accepted',
+                        valueColor: AppColors.success,
                       ),
                     ),
                     _VDivider(),
@@ -445,9 +452,11 @@ class _BidsGlance extends StatelessWidget {
 }
 
 class _StatCell extends StatelessWidget {
-  const _StatCell({required this.value, required this.label});
+  const _StatCell({required this.value, required this.label, this.valueColor});
+
   final String value;
   final String label;
+  final Color? valueColor;
 
   @override
   Widget build(BuildContext context) {
@@ -455,8 +464,8 @@ class _StatCell extends StatelessWidget {
       children: [
         Text(
           value,
-          style: const TextStyle(
-            color: Colors.white,
+          style: TextStyle(
+            color: valueColor ?? Colors.white,
             fontSize: 26,
             fontWeight: FontWeight.w700,
             letterSpacing: -0.5,
@@ -875,7 +884,7 @@ class _BottomNav extends StatelessWidget {
 }
 
 // ═══════════════════════════════════════════
-// DRAWER (right)
+// SIDE DRAWER (opened by notification icon)
 // ═══════════════════════════════════════════
 
 class _SeekerDrawer extends StatelessWidget {
