@@ -198,6 +198,7 @@ class AppTheme {
 
       inputDecorationTheme: InputDecorationTheme(
         filled: false,
+        prefixIconColor: AppColors.accentLight,
         contentPadding: const EdgeInsets.symmetric(
           horizontal: AppDimens.space14,
         ),

@@ -37,6 +37,11 @@ class HostelSetupController extends GetxController {
   final selectedFacilities = <String>{}.obs;
   final customFacilityController = TextEditingController();
 
+  /// Hostel type: 'Boys Hostel' | 'Girls Hostel' | ''
+  final selectedHostelType = ''.obs;
+
+  static const List<String> hostelTypeOptions = ['Boys Hostel', 'Girls Hostel'];
+
   static const List<Map<String, dynamic>> facilityOptions = [
     {'label': 'WiFi', 'icon': Icons.wifi_rounded},
     {'label': 'AC', 'icon': Icons.ac_unit_rounded},
@@ -148,12 +153,31 @@ class HostelSetupController extends GetxController {
     customRoomTypeController.clear();
   }
 
+  void selectHostelType(String type) {
+    selectedHostelType.value = type;
+  }
+
   void toggleFacility(String label) {
     if (selectedFacilities.contains(label)) {
       selectedFacilities.remove(label);
     } else {
       selectedFacilities.add(label);
     }
+  }
+
+  void toggleSelectAllFacilities() {
+    final allLabels = facilityOptions.map((e) => e['label'] as String).toSet();
+    final allSelected = allLabels.every(selectedFacilities.contains);
+    if (allSelected) {
+      selectedFacilities.removeAll(allLabels);
+    } else {
+      selectedFacilities.addAll(allLabels);
+    }
+  }
+
+  bool get allFacilitiesSelected {
+    final allLabels = facilityOptions.map((e) => e['label'] as String).toSet();
+    return allLabels.isNotEmpty && allLabels.every(selectedFacilities.contains);
   }
 
   void addCustomFacility() {
@@ -194,6 +218,11 @@ class HostelSetupController extends GetxController {
   }
 
   Future<void> publishListing() async {
+    if (selectedHostelType.value.isEmpty) {
+      AppSnackbar.warning('Hostel type', 'Select Boys or Girls hostel.');
+      return;
+    }
+
     isLoading.value = true;
     await Future.delayed(const Duration(milliseconds: 900));
     isLoading.value = false;
