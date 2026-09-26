@@ -748,7 +748,7 @@ class _HostelCard extends StatelessWidget {
                 ),
               ),
               child: const Icon(
-                Icons.apartment_rounded,
+                Icons.verified_outlined,
                 color: Colors.white,
                 size: 26,
               ),
