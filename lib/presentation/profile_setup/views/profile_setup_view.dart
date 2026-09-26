@@ -118,7 +118,7 @@ class ProfileSetupView extends GetView<ProfileSetupController> {
                               _GlassField(
                                 controller: controller.nameController,
                                 label: 'Full name',
-                                hint: 'Ayesha Raza',
+                                hint: 'John Doe',
                                 validator: Validators.name,
                                 prefixIcon: Icons.person_outline_rounded,
                                 textInputAction: TextInputAction.next,
@@ -144,7 +144,7 @@ class ProfileSetupView extends GetView<ProfileSetupController> {
                                 label: 'City',
                                 hint: 'e.g. Lahore, Karachi, Islamabad',
                                 validator: Validators.city,
-                                prefixIcon: Icons.location_city_outlined,
+                                prefixIcon: Icons.location_on,
                                 textInputAction: TextInputAction.done,
                                 textCapitalization: TextCapitalization.words,
                               ),

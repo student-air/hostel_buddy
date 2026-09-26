@@ -162,7 +162,7 @@ class RoleSelectionView extends GetView<RoleSelectionController> {
                                 ),
                                 const SizedBox(height: 16),
                                 _RoleCard(
-                                  icon: Icons.apartment_rounded,
+                                  icon: Icons.home_outlined,
                                   title: 'Managing a\nhostel',
                                   subtitle:
                                       'Fill rooms and find\ngood residents',

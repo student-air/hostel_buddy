@@ -1,11 +1,20 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 
 import '../../../core/utils/app_snackbar.dart';
+import '../../../routes/app_routes.dart';
 
 class SeekerHomeController extends GetxController {
-  final userName = 'Ayesha'.obs;
-  final userRoleLabel = 'Student · Finding a hostel'.obs;
+  final _box = GetStorage();
+
+  /// Stable key for endDrawer — do not create in build()
+  final scaffoldKey = GlobalKey<ScaffoldState>();
+
+  final userName = 'there'.obs;
+  final userRoleLabel = 'Finding a hostel'.obs;
   final currentCity = 'Islamabad'.obs;
+  final occupation = 'student'.obs;
 
   final pendingBids = 2.obs;
   final acceptedBids = 1.obs;
@@ -43,14 +52,86 @@ class SeekerHomeController extends GetxController {
     },
   ].obs;
 
+  @override
+  void onInit() {
+    super.onInit();
+    _loadProfile();
+  }
+
+  void _loadProfile() {
+    final name = _box.read('profile_name')?.toString().trim();
+    final city = _box.read('profile_city')?.toString().trim();
+    final occ = _box.read('profile_occupation')?.toString().trim();
+
+    if (name != null && name.isNotEmpty) {
+      userName.value = name.split(' ').first;
+    }
+    if (city != null && city.isNotEmpty) {
+      currentCity.value = city;
+    }
+    if (occ != null && occ.isNotEmpty) {
+      occupation.value = occ;
+    }
+    // Always plain label — no "Student ·"
+    userRoleLabel.value = 'Finding a hostel';
+  }
+
+  void openDrawer() => scaffoldKey.currentState?.openEndDrawer();
+
   String get initials {
-    final parts = userName.value.trim().split(RegExp(r'\s+'));
-    if (parts.isEmpty) return '?';
+    final full = _box.read('profile_name')?.toString().trim() ?? userName.value;
+    final parts = full.trim().split(RegExp(r'\s+'));
+    if (parts.isEmpty || parts.first.isEmpty) return '?';
     if (parts.length == 1) return parts.first[0].toUpperCase();
     return '${parts.first[0]}${parts.last[0]}'.toUpperCase();
   }
 
-  get isLoadingHostels => null;
+  String get greeting {
+    final h = DateTime.now().hour;
+    if (h < 12) return 'Good Morning,';
+    if (h < 17) return 'Good Afternoon,';
+    return 'Good Evening,';
+  }
+
+  String get dateLabel {
+    const months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
+    final n = DateTime.now();
+    return '${n.day} ${months[n.month - 1]} ${n.year}';
+  }
+
+  String get weekdayLabel {
+    const days = [
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday',
+      'Sunday',
+    ];
+    return days[DateTime.now().weekday - 1];
+  }
+
+  String get dayPart {
+    final h = DateTime.now().hour;
+    if (h >= 5 && h < 12) return 'Morning';
+    if (h >= 12 && h < 17) return 'Afternoon';
+    if (h >= 17 && h < 21) return 'Evening';
+    return 'Night';
+  }
 
   void onNavTap(int index) {
     selectedNavIndex.value = index;
@@ -74,9 +155,22 @@ class SeekerHomeController extends GetxController {
       AppSnackbar.info('Hostels', 'Full list coming next.');
 
   void onHostelTap(Map<String, dynamic> hostel) {
-    AppSnackbar.info(hostel['name'] as String, 'Details coming next.');
+    final name = hostel['name']?.toString() ?? 'Hostel';
+    AppSnackbar.info(name, 'Details coming next.');
   }
 
   void onOtherCities() =>
       AppSnackbar.info('Cities', 'City picker coming next.');
+
+  void onProfile() =>
+      AppSnackbar.info('Profile', 'Profile screen coming next.');
+
+  void onChat() => AppSnackbar.info('Chat', 'Chat coming next.');
+
+  void onSettings() => AppSnackbar.info('Settings', 'Settings coming next.');
+
+  void onLogout() {
+    AppSnackbar.info('Logged out', 'Session ended.');
+    Get.offAllNamed(AppRoutes.auth);
+  }
 }

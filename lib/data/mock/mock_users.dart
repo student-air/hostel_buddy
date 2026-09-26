@@ -10,14 +10,14 @@ class MockUsers {
   static final List<UserModel> _users = [
     const UserModel(
       id: 'u_seed_1',
-      name: 'Ayesha Khan',
-      email: 'ayesha@example.com',
+      name: 'John Doe',
+      email: 'user@example.com',
       phone: '03001234567',
     ),
   ];
 
   static final Map<String, String> _passwords = {
-    'ayesha@example.com': 'password123',
+    'user@example.com': 'password123',
   };
 
   static List<UserModel> get all => List.unmodifiable(_users);

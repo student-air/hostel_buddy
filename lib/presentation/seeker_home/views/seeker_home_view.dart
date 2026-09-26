@@ -17,9 +17,10 @@ class SeekerHomeView extends GetView<SeekerHomeController> {
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.light,
       child: Scaffold(
+        key: controller.scaffoldKey,
+        endDrawer: _SeekerDrawer(controller: controller),
         body: Stack(
           children: [
-            // Background
             Container(
               width: double.infinity,
               height: double.infinity,
@@ -51,7 +52,6 @@ class SeekerHomeView extends GetView<SeekerHomeController> {
                 color: Colors.white.withValues(alpha: 0.03),
               ),
             ),
-
             SafeArea(
               bottom: false,
               child: Column(
@@ -87,7 +87,9 @@ class SeekerHomeView extends GetView<SeekerHomeController> {
   }
 }
 
-// ── Header ──────────────────────────────────
+// ═══════════════════════════════════════════
+// HEADER
+// ═══════════════════════════════════════════
 
 class _Header extends StatelessWidget {
   const _Header({required this.controller});
@@ -95,105 +97,265 @@ class _Header extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Container(
-          width: 48,
-          height: 48,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            gradient: LinearGradient(
-              colors: [
-                AppColors.accent.withValues(alpha: 0.9),
-                AppColors.accentDark,
-              ],
-            ),
-            border: Border.all(color: Colors.white.withValues(alpha: 0.25)),
-          ),
-          alignment: Alignment.center,
-          child: Obx(
-            () => Text(
-              controller.initials,
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.w700,
-                fontSize: 16,
-              ),
-            ),
-          ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Obx(
-                () => Text(
-                  'Hi, ${controller.userName.value} 👋',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: -0.3,
-                  ),
+        Row(
+          children: [
+            _RoundIcon(icon: Icons.menu_rounded, onTap: controller.openDrawer),
+            const SizedBox(width: 10),
+            Expanded(
+              child: GestureDetector(
+                onTap: controller.onOtherCities,
+                child: Row(
+                  children: [
+                    const Icon(
+                      Icons.location_on_rounded,
+                      size: 16,
+                      color: AppColors.accentLight,
+                    ),
+                    const SizedBox(width: 4),
+                    Flexible(
+                      child: Obx(
+                        () => Text(
+                          controller.currentCity.value,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                    ),
+                    Icon(
+                      Icons.keyboard_arrow_down_rounded,
+                      size: 18,
+                      color: Colors.white.withValues(alpha: 0.6),
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(height: 2),
-              Obx(
-                () => Text(
-                  controller.userRoleLabel.value,
-                  style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.55),
-                    fontSize: 13,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        GestureDetector(
-          onTap: controller.onNotifications,
-          child: Stack(
-            clipBehavior: Clip.none,
-            children: [
-              Container(
-                width: 42,
-                height: 42,
+            ),
+            _RoundIcon(
+              icon: Icons.notifications_none_rounded,
+              onTap: controller.onNotifications,
+              showDot: true,
+            ),
+            const SizedBox(width: 8),
+            GestureDetector(
+              onTap: controller.onProfile,
+              child: Container(
+                width: 40,
+                height: 40,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: Colors.white.withValues(alpha: 0.1),
+                  color: AppColors.accent.withValues(alpha: 0.3),
                   border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.12),
+                    color: AppColors.accent.withValues(alpha: 0.6),
                   ),
                 ),
-                child: Icon(
-                  Icons.notifications_none_rounded,
-                  color: Colors.white.withValues(alpha: 0.9),
-                  size: 22,
-                ),
+                alignment: Alignment.center,
+                child: Obx(() {
+                  // read .obs so GetX is satisfied
+                  final _ = controller.userName.value;
+                  return Text(
+                    controller.initials,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 13,
+                    ),
+                  );
+                }),
               ),
-              Positioned(
-                top: 8,
-                right: 10,
-                child: Container(
-                  width: 8,
-                  height: 8,
-                  decoration: const BoxDecoration(
-                    color: AppColors.notificationDot,
-                    shape: BoxShape.circle,
+            ),
+          ],
+        ),
+        const SizedBox(height: 22),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    controller.greeting,
+                    style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.65),
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
-                ),
+                  const SizedBox(height: 4),
+                  Obx(
+                    () => Text(
+                      '${controller.userName.value}.',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 32,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: -0.8,
+                        height: 1.1,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 5,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.accent.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: AppColors.accent.withValues(alpha: 0.45),
+                      ),
+                    ),
+                    child: Obx(
+                      () => Text(
+                        controller.userRoleLabel.value,
+                        style: const TextStyle(
+                          color: AppColors.accentLight,
+                          fontSize: 11.5,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+            const SizedBox(width: 12),
+            Container(
+              width: 118,
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.calendar_today_outlined,
+                        size: 12,
+                        color: Colors.white.withValues(alpha: 0.5),
+                      ),
+                      const SizedBox(width: 5),
+                      Text(
+                        "Today's Date",
+                        style: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.5),
+                          fontSize: 10,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    controller.dateLabel,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  Text(
+                    controller.weekdayLabel,
+                    style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.55),
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Icon(
+                        controller.dayPart == 'Night'
+                            ? Icons.nightlight_round
+                            : Icons.wb_sunny_outlined,
+                        size: 13,
+                        color: AppColors.accentLight,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        controller.dayPart,
+                        style: const TextStyle(
+                          color: AppColors.accentLight,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ],
     );
   }
 }
 
-// ── Bids at a glance ────────────────────────
+class _RoundIcon extends StatelessWidget {
+  const _RoundIcon({
+    required this.icon,
+    required this.onTap,
+    this.showDot = false,
+  });
+
+  final IconData icon;
+  final VoidCallback onTap;
+  final bool showDot;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Colors.white.withValues(alpha: 0.1),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
+            ),
+            child: Icon(icon, color: Colors.white, size: 20),
+          ),
+          if (showDot)
+            Positioned(
+              top: 8,
+              right: 9,
+              child: Container(
+                width: 7,
+                height: 7,
+                decoration: const BoxDecoration(
+                  color: AppColors.notificationDot,
+                  shape: BoxShape.circle,
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+// ═══════════════════════════════════════════
+// BIDS GLANCE
+// ═══════════════════════════════════════════
 
 class _BidsGlance extends StatelessWidget {
   const _BidsGlance({required this.controller});
@@ -204,7 +366,7 @@ class _BidsGlance extends StatelessWidget {
     return ClipRRect(
       borderRadius: BorderRadius.circular(22),
       child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+        filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
         child: Container(
           width: double.infinity,
           padding: const EdgeInsets.fromLTRB(18, 16, 18, 18),
@@ -214,27 +376,11 @@ class _BidsGlance extends StatelessWidget {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                Colors.white.withValues(alpha: 0.18),
-                Colors.white.withValues(alpha: 0.06),
-                AppColors.accent.withValues(alpha: 0.08),
+                Colors.white.withValues(alpha: 0.16),
+                Colors.white.withValues(alpha: 0.05),
               ],
             ),
-            border: Border.all(
-              color: Colors.white.withValues(alpha: 0.28),
-              width: 1.2,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.white.withValues(alpha: 0.08),
-                blurRadius: 24,
-                offset: const Offset(-4, -4),
-              ),
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.25),
-                blurRadius: 20,
-                offset: const Offset(0, 10),
-              ),
-            ],
+            border: Border.all(color: Colors.white.withValues(alpha: 0.22)),
           ),
           child: Column(
             children: [
@@ -252,7 +398,7 @@ class _BidsGlance extends StatelessWidget {
                   ),
                   GestureDetector(
                     onTap: controller.onViewAllBids,
-                    child: Text(
+                    child: const Text(
                       'View all',
                       style: TextStyle(
                         color: AppColors.accentLight,
@@ -341,7 +487,9 @@ class _VDivider extends StatelessWidget {
   }
 }
 
-// ── Location ────────────────────────────────
+// ═══════════════════════════════════════════
+// LOCATION
+// ═══════════════════════════════════════════
 
 class _LocationRow extends StatelessWidget {
   const _LocationRow({required this.controller});
@@ -355,7 +503,7 @@ class _LocationRow extends StatelessWidget {
           child: _GlassBox(
             child: Row(
               children: [
-                Icon(
+                const Icon(
                   Icons.location_on_rounded,
                   size: 18,
                   color: AppColors.accentLight,
@@ -393,7 +541,10 @@ class _LocationRow extends StatelessWidget {
     );
   }
 }
-// ── Quick actions ───────────────────────────
+
+// ═══════════════════════════════════════════
+// QUICK ACTIONS
+// ═══════════════════════════════════════════
 
 class _QuickActions extends StatelessWidget {
   const _QuickActions({required this.controller});
@@ -449,103 +600,51 @@ class _ActionTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (filled) {
-      return GestureDetector(
-        onTap: onTap,
-        child: Container(
-          height: 88,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(18),
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                AppColors.accentLight,
-                AppColors.accent,
-                AppColors.accentDark,
-              ],
-            ),
-            border: Border.all(
-              color: Colors.white.withValues(alpha: 0.35),
-              width: 1.2,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.accent.withValues(alpha: 0.45),
-                blurRadius: 18,
-                offset: const Offset(0, 8),
-              ),
-              BoxShadow(
-                color: Colors.white.withValues(alpha: 0.12),
-                blurRadius: 8,
-                offset: const Offset(0, -2),
-              ),
-            ],
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.add_rounded, color: Colors.white, size: 26),
-              const SizedBox(height: 8),
-              Text(
-                label,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
-        ),
-      );
-    }
-
     return GestureDetector(
       onTap: onTap,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(18),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
-          child: Container(
-            height: 88,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(18),
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  Colors.white.withValues(alpha: 0.16),
-                  Colors.white.withValues(alpha: 0.05),
-                ],
-              ),
-              border: Border.all(
-                color: Colors.white.withValues(alpha: 0.25),
-                width: 1.1,
-              ),
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(icon, color: Colors.white, size: 26),
-                const SizedBox(height: 8),
-                Text(
-                  label,
-                  style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.9),
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
+      child: Container(
+        height: 88,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(18),
+          color: filled
+              ? AppColors.accent
+              : Colors.white.withValues(alpha: 0.08),
+          border: filled
+              ? null
+              : Border.all(color: Colors.white.withValues(alpha: 0.1)),
+          boxShadow: filled
+              ? [
+                  BoxShadow(
+                    color: AppColors.accent.withValues(alpha: 0.35),
+                    blurRadius: 16,
+                    offset: const Offset(0, 6),
                   ),
-                ),
-              ],
+                ]
+              : null,
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, color: Colors.white, size: 26),
+            const SizedBox(height: 8),
+            Text(
+              label,
+              style: TextStyle(
+                color: Colors.white.withValues(alpha: filled ? 1 : 0.85),
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );
   }
 }
-// ── Hostels near you ────────────────────────
+
+// ═══════════════════════════════════════════
+// HOSTELS
+// ═══════════════════════════════════════════
 
 class _HostelsSection extends StatelessWidget {
   const _HostelsSection({required this.controller});
@@ -569,7 +668,7 @@ class _HostelsSection extends StatelessWidget {
             ),
             GestureDetector(
               onTap: controller.onSeeAllHostels,
-              child: Text(
+              child: const Text(
                 'See all',
                 style: TextStyle(
                   color: AppColors.accentLight,
@@ -604,9 +703,12 @@ class _HostelCard extends StatelessWidget {
   final Map<String, dynamic> hostel;
   final VoidCallback onTap;
 
+  String _str(String key, [String fallback = '']) =>
+      hostel[key]?.toString() ?? fallback;
+
   @override
   Widget build(BuildContext context) {
-    final color = Color(hostel['color'] as int);
+    final color = Color((hostel['color'] as int?) ?? 0xFF6B0E24);
 
     return GestureDetector(
       onTap: onTap,
@@ -648,7 +750,7 @@ class _HostelCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    hostel['name'] as String,
+                    _str('name', 'Hostel'),
                     style: const TextStyle(
                       color: AppColors.textPrimary,
                       fontSize: 15,
@@ -657,8 +759,8 @@ class _HostelCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 3),
                   Text(
-                    '${hostel['area']}, ${hostel['city']} · ${hostel['distance']}',
-                    style: TextStyle(
+                    '${_str('area')}, ${_str('city')} · ${_str('distance')}',
+                    style: const TextStyle(
                       color: AppColors.textSecondary,
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
@@ -666,7 +768,7 @@ class _HostelCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    hostel['price'] as String,
+                    _str('price'),
                     style: const TextStyle(
                       color: AppColors.primary,
                       fontSize: 13,
@@ -685,7 +787,7 @@ class _HostelCard extends StatelessWidget {
                 ),
                 const SizedBox(width: 3),
                 Text(
-                  '${hostel['rating']}',
+                  '${hostel['rating'] ?? '—'}',
                   style: const TextStyle(
                     color: AppColors.textPrimary,
                     fontSize: 13,
@@ -701,7 +803,9 @@ class _HostelCard extends StatelessWidget {
   }
 }
 
-// ── Bottom nav ──────────────────────────────
+// ═══════════════════════════════════════════
+// BOTTOM NAV
+// ═══════════════════════════════════════════
 
 class _BottomNav extends StatelessWidget {
   const _BottomNav({required this.controller, required this.bottomPad});
@@ -770,6 +874,257 @@ class _BottomNav extends StatelessWidget {
   }
 }
 
+// ═══════════════════════════════════════════
+// DRAWER (right)
+// ═══════════════════════════════════════════
+
+class _SeekerDrawer extends StatelessWidget {
+  const _SeekerDrawer({required this.controller});
+  final SeekerHomeController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    return Drawer(
+      backgroundColor: const Color(0xFF1F030E),
+      child: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 16, 12, 8),
+              child: Row(
+                children: [
+                  Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: AppColors.accent.withValues(alpha: 0.25),
+                      border: Border.all(
+                        color: AppColors.accent.withValues(alpha: 0.5),
+                      ),
+                    ),
+                    alignment: Alignment.center,
+                    child: Obx(() {
+                      final _ = controller.userName.value;
+                      return Text(
+                        controller.initials,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 16,
+                        ),
+                      );
+                    }),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Obx(
+                          () => Text(
+                            controller.userName.value,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 17,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Obx(
+                          () => Text(
+                            controller.userRoleLabel.value,
+                            style: TextStyle(
+                              color: Colors.white.withValues(alpha: 0.5),
+                              fontSize: 12,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () => Navigator.pop(context),
+                    icon: Icon(
+                      Icons.close_rounded,
+                      color: Colors.white.withValues(alpha: 0.7),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Divider(color: Colors.white.withValues(alpha: 0.08), height: 24),
+            Expanded(
+              child: ListView(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                children: [
+                  _DrawerItem(
+                    icon: Icons.home_rounded,
+                    label: 'Home',
+                    onTap: () => Navigator.pop(context),
+                  ),
+                  _DrawerItem(
+                    icon: Icons.gavel_rounded,
+                    label: 'My bids',
+                    onTap: () {
+                      Navigator.pop(context);
+                      controller.onViewAllBids();
+                    },
+                  ),
+                  _DrawerItem(
+                    icon: Icons.add_circle_outline_rounded,
+                    label: 'Create bid',
+                    onTap: () {
+                      Navigator.pop(context);
+                      controller.onCreateBid();
+                    },
+                  ),
+                  _DrawerItem(
+                    icon: Icons.map_outlined,
+                    label: 'Map view',
+                    onTap: () {
+                      Navigator.pop(context);
+                      controller.onMapView();
+                    },
+                  ),
+                  _DrawerItem(
+                    icon: Icons.favorite_border_rounded,
+                    label: 'Saved hostels',
+                    onTap: () {
+                      Navigator.pop(context);
+                      controller.onSaved();
+                    },
+                  ),
+                  _DrawerItem(
+                    icon: Icons.apartment_rounded,
+                    label: 'Hostels near you',
+                    onTap: () {
+                      Navigator.pop(context);
+                      controller.onSeeAllHostels();
+                    },
+                  ),
+                  _DrawerItem(
+                    icon: Icons.chat_bubble_outline_rounded,
+                    label: 'Chat',
+                    onTap: () {
+                      Navigator.pop(context);
+                      controller.onChat();
+                    },
+                  ),
+                  _DrawerItem(
+                    icon: Icons.notifications_none_rounded,
+                    label: 'Notifications',
+                    onTap: () {
+                      Navigator.pop(context);
+                      controller.onNotifications();
+                    },
+                  ),
+                  _DrawerItem(
+                    icon: Icons.person_outline_rounded,
+                    label: 'Profile',
+                    onTap: () {
+                      Navigator.pop(context);
+                      controller.onProfile();
+                    },
+                  ),
+                  _DrawerItem(
+                    icon: Icons.settings_outlined,
+                    label: 'Settings',
+                    onTap: () {
+                      Navigator.pop(context);
+                      controller.onSettings();
+                    },
+                  ),
+                  Divider(
+                    color: Colors.white.withValues(alpha: 0.08),
+                    height: 28,
+                  ),
+                  _DrawerItem(
+                    icon: Icons.logout_rounded,
+                    label: 'Log out',
+                    danger: true,
+                    onTap: () {
+                      Navigator.pop(context);
+                      controller.onLogout();
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _DrawerItem extends StatelessWidget {
+  const _DrawerItem({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+    this.danger = false,
+  });
+
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+  final bool danger;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = danger
+        ? AppColors.error
+        : Colors.white.withValues(alpha: 0.88);
+
+    return ListTile(
+      onTap: onTap,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      leading: Icon(icon, color: color, size: 22),
+      title: Text(
+        label,
+        style: TextStyle(
+          color: color,
+          fontSize: 14.5,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+      dense: true,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+    );
+  }
+}
+
+// ═══════════════════════════════════════════
+// SHARED
+// ═══════════════════════════════════════════
+
+class _GlassBox extends StatelessWidget {
+  const _GlassBox({required this.child});
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(16),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            color: Colors.white.withValues(alpha: 0.08),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.18)),
+          ),
+          child: child,
+        ),
+      ),
+    );
+  }
+}
+
 class _Blob extends StatelessWidget {
   const _Blob({required this.size, required this.color});
   final double size;
@@ -781,40 +1136,6 @@ class _Blob extends StatelessWidget {
       width: size,
       height: size,
       decoration: BoxDecoration(shape: BoxShape.circle, color: color),
-    );
-  }
-}
-
-class _GlassBox extends StatelessWidget {
-  const _GlassBox({required this.child});
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(16),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Colors.white.withValues(alpha: 0.16),
-                Colors.white.withValues(alpha: 0.05),
-              ],
-            ),
-            border: Border.all(
-              color: Colors.white.withValues(alpha: 0.25),
-              width: 1.1,
-            ),
-          ),
-          child: child,
-        ),
-      ),
     );
   }
 }

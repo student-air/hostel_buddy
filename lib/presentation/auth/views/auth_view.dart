@@ -132,7 +132,7 @@ class AuthView extends GetView<AuthController> {
                             _GlassTextField(
                               controller: controller.nameController,
                               label: 'Full name',
-                              hint: 'Ayesha Khan',
+                              hint: 'John Doe',
                               validator: Validators.name,
                               prefixIcon: Icons.person_outline_rounded,
                               textInputAction: TextInputAction.next,
