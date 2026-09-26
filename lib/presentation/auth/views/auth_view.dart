@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
+import '../../../core/utils/app_snackbar.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/utils/validators.dart';
 import '../controllers/auth_controller.dart';
@@ -201,14 +202,9 @@ class AuthView extends GetView<AuthController> {
                               alignment: Alignment.centerRight,
                               child: TextButton(
                                 onPressed: () {
-                                  Get.snackbar(
+                                  AppSnackbar.info(
                                     'Forgot password',
                                     'Password reset coming soon',
-                                    snackPosition: SnackPosition.TOP,
-                                    backgroundColor: AppColors.accent,
-                                    colorText: Colors.white,
-                                    margin: const EdgeInsets.all(16),
-                                    borderRadius: 12,
                                   );
                                 },
                                 style: TextButton.styleFrom(

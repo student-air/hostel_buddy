@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../core/utils/app_snackbar.dart';
+
 class AuthController extends GetxController {
-  final isLogin = false.obs; // false = Sign up, true = Log in
+  final isLogin = true.obs; // start on Login
 
   final nameController = TextEditingController();
   final emailController = TextEditingController();
@@ -15,7 +17,6 @@ class AuthController extends GetxController {
 
   void toggleMode() {
     isLogin.value = !isLogin.value;
-    // Clear fields when switching
     nameController.clear();
     emailController.clear();
     phoneController.clear();
@@ -34,21 +35,14 @@ class AuthController extends GetxController {
     isLoading.value = false;
 
     // TODO: Navigate to Role Selection / next screen
-    Get.snackbar(
+    AppSnackbar.success(
       'Success',
       isLogin.value ? 'Logged in successfully' : 'Account created successfully',
-      snackPosition: SnackPosition.TOP,
-      backgroundColor: const Color(0xFF6B0E24),
-      colorText: Colors.white,
     );
   }
 
   Future<void> continueWithGoogle() async {
-    Get.snackbar(
-      'Google',
-      'Google Sign-In coming soon',
-      snackPosition: SnackPosition.TOP,
-    );
+    AppSnackbar.info('Google', 'Google Sign-In coming soon');
   }
 
   @override
