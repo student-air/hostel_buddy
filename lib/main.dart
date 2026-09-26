@@ -9,11 +9,8 @@ import 'routes/app_routes.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  // Initialize local storage (for later session / preferences)
   await GetStorage.init();
 
-  // Status bar style (light icons on dark gradient)
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
@@ -37,7 +34,6 @@ class HostelBuddyApp extends StatelessWidget {
       initialRoute: AppRoutes.splash,
       getPages: AppPages.pages,
       defaultTransition: Transition.fadeIn,
-      transitionDuration: const Duration(milliseconds: 300),
     );
   }
 }

@@ -5,6 +5,7 @@ class AppRoutes {
 
   static const String splash = '/splash';
   static const String auth = '/auth';
-  // profileSetup, roleSelection, seeker/*, manager/*, profile
+  static const String profileSetup = '/profile-setup';
+  // roleSelection, seeker/*, manager/*, profile
   // will be appended here as those screens are built.
 }
