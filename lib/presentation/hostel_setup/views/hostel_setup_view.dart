@@ -686,7 +686,7 @@ class _StepFacilities extends StatelessWidget {
           ),
           const SizedBox(height: 28),
 
-          // Hostel type
+          // Hostel type — vertical high–low cards
           Text(
             'Hostel type',
             style: TextStyle(
@@ -695,7 +695,7 @@ class _StepFacilities extends StatelessWidget {
               color: AppColors.textSecondary.withValues(alpha: 0.95),
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 14),
           Obx(
             () => _HostelTypeSelector(
               selected: controller.selectedHostelType.value,
@@ -967,7 +967,7 @@ class _StepFacilities extends StatelessWidget {
   }
 }
 
-/// Animated pill: Boys Hostel | Girls Hostel
+/// Vertical high–low selector: selected card rises + glows.
 class _HostelTypeSelector extends StatelessWidget {
   const _HostelTypeSelector({required this.selected, required this.onSelect});
 
@@ -976,83 +976,39 @@ class _HostelTypeSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 52,
-      padding: const EdgeInsets.all(4),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(28),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
-      ),
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          final half = constraints.maxWidth / 2;
-          final isBoys = selected == 'Boys Hostel';
-          final isGirls = selected == 'Girls Hostel';
-          final hasSelection = isBoys || isGirls;
-
-          return Stack(
-            children: [
-              if (hasSelection)
-                AnimatedAlign(
-                  duration: const Duration(milliseconds: 280),
-                  curve: Curves.easeOutCubic,
-                  alignment: isBoys
-                      ? Alignment.centerLeft
-                      : Alignment.centerRight,
-                  child: Container(
-                    width: half,
-                    height: double.infinity,
-                    decoration: BoxDecoration(
-                      color: AppColors.accent,
-                      borderRadius: BorderRadius.circular(24),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.accent.withValues(alpha: 0.35),
-                          blurRadius: 12,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              Row(
-                children: [
-                  Expanded(
-                    child: _TypeOption(
-                      label: 'Boys Hostel',
-                      icon: Icons.male_rounded,
-                      selected: isBoys,
-                      onTap: () => onSelect('Boys Hostel'),
-                    ),
-                  ),
-                  Expanded(
-                    child: _TypeOption(
-                      label: 'Girls Hostel',
-                      icon: Icons.female_rounded,
-                      selected: isGirls,
-                      onTap: () => onSelect('Girls Hostel'),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          );
-        },
-      ),
+    return Column(
+      children: [
+        _HostelTypeCard(
+          label: 'Boys Hostel',
+          subtitle: 'Male residents only',
+          icon: Icons.male_rounded,
+          selected: selected == 'Boys Hostel',
+          onTap: () => onSelect('Boys Hostel'),
+        ),
+        const SizedBox(height: 12),
+        _HostelTypeCard(
+          label: 'Girls Hostel',
+          subtitle: 'Female residents only',
+          icon: Icons.female_rounded,
+          selected: selected == 'Girls Hostel',
+          onTap: () => onSelect('Girls Hostel'),
+        ),
+      ],
     );
   }
 }
 
-class _TypeOption extends StatelessWidget {
-  const _TypeOption({
+class _HostelTypeCard extends StatelessWidget {
+  const _HostelTypeCard({
     required this.label,
+    required this.subtitle,
     required this.icon,
     required this.selected,
     required this.onTap,
   });
 
   final String label;
+  final String subtitle;
   final IconData icon;
   final bool selected;
   final VoidCallback onTap;
@@ -1061,31 +1017,129 @@ class _TypeOption extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-      behavior: HitTestBehavior.opaque,
-      child: Center(
-        child: AnimatedDefaultTextStyle(
-          duration: const Duration(milliseconds: 200),
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 280),
+        curve: Curves.easeOutCubic,
+        transform: Matrix4.translationValues(0, selected ? -2 : 4, 0),
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          gradient: selected
+              ? LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    AppColors.accent.withValues(alpha: 0.95),
+                    AppColors.accentDark.withValues(alpha: 0.9),
+                  ],
+                )
+              : null,
+          color: selected ? null : Colors.white.withValues(alpha: 0.06),
+          border: Border.all(
             color: selected
-                ? Colors.white
-                : Colors.white.withValues(alpha: 0.65),
+                ? AppColors.accentLight.withValues(alpha: 0.8)
+                : Colors.white.withValues(alpha: 0.12),
+            width: selected ? 1.5 : 1,
           ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
+          boxShadow: selected
+              ? [
+                  BoxShadow(
+                    color: AppColors.accent.withValues(alpha: 0.4),
+                    blurRadius: 20,
+                    offset: const Offset(0, 8),
+                  ),
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.25),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                  ),
+                ]
+              : [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.15),
+                    blurRadius: 6,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+        ),
+        child: Row(
+          children: [
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 250),
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: selected
+                    ? Colors.white.withValues(alpha: 0.22)
+                    : Colors.white.withValues(alpha: 0.08),
+                border: Border.all(
+                  color: selected
+                      ? Colors.white.withValues(alpha: 0.35)
+                      : Colors.white.withValues(alpha: 0.1),
+                ),
+              ),
+              child: Icon(
                 icon,
-                size: 18,
+                size: 26,
                 color: selected
                     ? Colors.white
-                    : Colors.white.withValues(alpha: 0.65),
+                    : Colors.white.withValues(alpha: 0.55),
               ),
-              const SizedBox(width: 6),
-              Text(label),
-            ],
-          ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: TextStyle(
+                      fontSize: 17,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: -0.2,
+                      color: selected
+                          ? Colors.white
+                          : Colors.white.withValues(alpha: 0.8),
+                    ),
+                  ),
+                  const SizedBox(height: 3),
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: selected
+                          ? Colors.white.withValues(alpha: 0.75)
+                          : Colors.white.withValues(alpha: 0.4),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 220),
+              width: 26,
+              height: 26,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: selected ? Colors.white : Colors.transparent,
+                border: Border.all(
+                  color: selected
+                      ? Colors.white
+                      : Colors.white.withValues(alpha: 0.3),
+                  width: 2,
+                ),
+              ),
+              child: selected
+                  ? const Icon(
+                      Icons.check_rounded,
+                      size: 16,
+                      color: AppColors.accentDark,
+                    )
+                  : null,
+            ),
+          ],
         ),
       ),
     );
