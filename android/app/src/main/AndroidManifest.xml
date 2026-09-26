@@ -1,6 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application
-        android:label="hostel_buddy"
+        android:label="Hostel Buddy"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

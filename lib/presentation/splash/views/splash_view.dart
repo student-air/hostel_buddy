@@ -24,22 +24,31 @@ class SplashView extends GetView<SplashController> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
+                    // App Logo - tightly fitted in rounded box
                     Container(
-                      width: AppDimens.avatarLarge,
-                      height: AppDimens.avatarLarge,
+                      width: 110,
+                      height: 110,
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.18),
-                        borderRadius: BorderRadius.circular(
-                          AppDimens.radiusXLarge + 10,
-                        ),
-                        border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.35),
-                        ),
-                      ),
-                      child: const Icon(
-                        Icons.home_rounded,
-                        size: 48,
                         color: Colors.white,
+                        borderRadius: BorderRadius.circular(22),
+                        border: Border.all(
+                          color: Colors.white.withValues(alpha: 0.4),
+                          width: 1.5,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.15),
+                            blurRadius: 12,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      clipBehavior: Clip.antiAlias,
+                      child: Image.asset(
+                        'assets/images/app_logo.png',
+                        fit: BoxFit.cover,
+                        width: double.infinity,
+                        height: double.infinity,
                       ),
                     ),
                     const SizedBox(height: AppDimens.space22),
@@ -55,18 +64,11 @@ class SplashView extends GetView<SplashController> {
                   ],
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.only(bottom: 56),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    _Dot(width: 22, active: true),
-                    const SizedBox(width: AppDimens.space6),
-                    _Dot(width: 6, active: false),
-                    const SizedBox(width: AppDimens.space6),
-                    _Dot(width: 6, active: false),
-                  ],
-                ),
+
+              // Animated loading dots
+              const Padding(
+                padding: EdgeInsets.only(bottom: 56),
+                child: _LoadingDots(),
               ),
             ],
           ),
@@ -76,21 +78,70 @@ class SplashView extends GetView<SplashController> {
   }
 }
 
-class _Dot extends StatelessWidget {
-  const _Dot({required this.width, required this.active});
+/// Animated three dots loading indicator
+class _LoadingDots extends StatefulWidget {
+  const _LoadingDots();
 
-  final double width;
-  final bool active;
+  @override
+  State<_LoadingDots> createState() => _LoadingDotsState();
+}
+
+class _LoadingDotsState extends State<_LoadingDots>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1200),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: width,
-      height: 6,
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: active ? 1 : 0.45),
-        borderRadius: BorderRadius.circular(3),
-      ),
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: List.generate(3, (index) {
+            final delay = index * 0.2;
+            final value = (_controller.value - delay) % 1.0;
+            final opacity = (value < 0.5)
+                ? (value * 2).clamp(0.3, 1.0)
+                : ((1 - value) * 2).clamp(0.3, 1.0);
+            final scale = (value < 0.5)
+                ? 0.7 + (value * 0.6)
+                : 1.0 - ((value - 0.5) * 0.6);
+
+            return Padding(
+              padding: EdgeInsets.only(right: index < 2 ? 8 : 0),
+              child: Transform.scale(
+                scale: scale,
+                child: Opacity(
+                  opacity: opacity,
+                  child: Container(
+                    width: 8,
+                    height: 8,
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                ),
+              ),
+            );
+          }),
+        );
+      },
     );
   }
 }

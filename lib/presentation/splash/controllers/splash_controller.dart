@@ -2,12 +2,10 @@ import 'package:get/get.dart';
 
 import '../../../routes/app_routes.dart';
 
-/// Shows the splash screen briefly, then moves on.
-/// Once auth/session data exists, this is where you'd check for a
-/// logged-in user and skip straight past Auth — for now it always
-/// routes to Auth after the delay.
+/// Shows the splash screen briefly, then navigates to Auth.
+/// Later you can add session check logic here.
 class SplashController extends GetxController {
-  static const Duration displayDuration = Duration(seconds: 2);
+  static const Duration displayDuration = Duration(seconds: 60);
 
   @override
   void onInit() {
