@@ -1,16 +1,21 @@
 import 'package:flutter/material.dart';
 
-/// Hostel Buddy — Maroon / Burgundy palette.
-/// Values pulled directly from the approved UI mockup (Proton Vault–style theme).
+/// Hostel Buddy — Maroon / Burgundy palette + teal accent.
+/// Values pulled from the approved UI mockup.
 class AppColors {
   AppColors._();
 
-  // Primary
+  // Primary (maroon)
   static const Color primary = Color(0xFF6B0E24);
   static const Color primaryDark = Color(0xFF4A0A1E);
   static const Color primaryDeep = Color(0xFF3C0515);
 
-  // Gradient stops used on Splash / Role Selection headers
+  // Accent (teal / cyan — CTAs, links on dark screens)
+  static const Color accent = Color(0xFF0D9488);
+  static const Color accentDark = Color(0xFF0F766E);
+  static const Color accentLight = Color(0xFF14B8A6);
+
+  // Gradient stops used on Splash / Auth / Role Selection headers
   static const Color gradientStart = Color(0xFF8B1538);
   static const Color gradientMid = Color(0xFF5C0E24);
   static const Color gradientEnd = Color(0xFF4A0A1E);
@@ -54,4 +59,9 @@ class AppColors {
   static const Color success = Color(0xFF3EA66B);
   static const Color error = Color(0xFFD1435B);
   static const Color warning = Color(0xFFE0A33C);
+
+  // Auth dark-screen glass fields
+  static const Color glassFill = Color(0x33FFFFFF);
+  static const Color glassBorder = Color(0x40FFFFFF);
+  static const Color glassHint = Color(0x99FFFFFF);
 }

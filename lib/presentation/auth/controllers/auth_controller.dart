@@ -37,7 +37,7 @@ class AuthController extends GetxController {
     Get.snackbar(
       'Success',
       isLogin.value ? 'Logged in successfully' : 'Account created successfully',
-      snackPosition: SnackPosition.BOTTOM,
+      snackPosition: SnackPosition.TOP,
       backgroundColor: const Color(0xFF6B0E24),
       colorText: Colors.white,
     );
@@ -47,7 +47,7 @@ class AuthController extends GetxController {
     Get.snackbar(
       'Google',
       'Google Sign-In coming soon',
-      snackPosition: SnackPosition.BOTTOM,
+      snackPosition: SnackPosition.TOP,
     );
   }
 
