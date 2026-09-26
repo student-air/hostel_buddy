@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:image_cropper/image_cropper.dart';
@@ -20,7 +21,6 @@ class ProfileSetupController extends GetxController {
   final locationGranted = false.obs;
   final isLocating = false.obs;
 
-  /// 'student' | 'job_holder'
   final occupation = 'student'.obs;
 
   final ImagePicker _picker = ImagePicker();
@@ -31,7 +31,6 @@ class ProfileSetupController extends GetxController {
     _importFromAuth();
   }
 
-  /// Prefill name & phone from Auth (signup arguments).
   void _importFromAuth() {
     final args = Get.arguments;
     if (args is Map) {
@@ -44,7 +43,6 @@ class ProfileSetupController extends GetxController {
 
   void selectOccupation(String value) => occupation.value = value;
 
-  /// Pick image → crop to 1:1 → save path.
   Future<void> pickPhoto() async {
     try {
       final file = await _picker.pickImage(
@@ -64,7 +62,6 @@ class ProfileSetupController extends GetxController {
             activeControlsWidgetColor: AppColors.accent,
             initAspectRatio: CropAspectRatioPreset.square,
             lockAspectRatio: true,
-            hideBottomControls: false,
             statusBarColor: AppColors.primaryDark,
             backgroundColor: AppColors.primaryDeep,
           ),
@@ -89,7 +86,6 @@ class ProfileSetupController extends GetxController {
     }
   }
 
-  /// Request location permission.
   Future<void> requestLocation() async {
     isLocating.value = true;
     try {
@@ -131,10 +127,32 @@ class ProfileSetupController extends GetxController {
 
       locationGranted.value = true;
 
+      try {
+        final geocoding = Geocoding();
+        final placemarks = await geocoding.placemarkFromCoordinates(
+          position.latitude,
+          position.longitude,
+        );
+        if (placemarks.isNotEmpty) {
+          final p = placemarks.first;
+          final city = (p.locality != null && p.locality!.isNotEmpty)
+              ? p.locality!
+              : (p.subAdministrativeArea != null &&
+                    p.subAdministrativeArea!.isNotEmpty)
+              ? p.subAdministrativeArea!
+              : (p.administrativeArea ?? '');
+          if (city.isNotEmpty) {
+            cityController.text = city;
+          }
+        }
+      } catch (_) {
+        // User can type city manually
+      }
       AppSnackbar.success(
         'Location enabled',
-        'Lat ${position.latitude.toStringAsFixed(3)}, '
-            'Lng ${position.longitude.toStringAsFixed(3)}. Confirm your city below.',
+        cityController.text.isNotEmpty
+            ? 'City set to ${cityController.text}'
+            : 'Location found. Please confirm your city.',
       );
     } catch (_) {
       AppSnackbar.error('Location', 'Could not get your location.');

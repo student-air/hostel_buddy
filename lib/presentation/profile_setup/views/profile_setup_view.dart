@@ -108,8 +108,13 @@ class ProfileSetupView extends GetView<ProfileSetupController> {
                                 ),
                               ),
                               const SizedBox(height: 28),
+
+                              // Profile photo (gallery → 1:1 crop)
                               Center(child: _PhotoPicker()),
+
                               const SizedBox(height: 28),
+
+                              // Full name (from auth)
                               _GlassField(
                                 controller: controller.nameController,
                                 label: 'Full name',
@@ -120,6 +125,8 @@ class ProfileSetupView extends GetView<ProfileSetupController> {
                                 textCapitalization: TextCapitalization.words,
                               ),
                               const SizedBox(height: 18),
+
+                              // Phone (from auth)
                               _GlassField(
                                 controller: controller.phoneController,
                                 label: 'Phone number',
@@ -130,6 +137,8 @@ class ProfileSetupView extends GetView<ProfileSetupController> {
                                 textInputAction: TextInputAction.next,
                               ),
                               const SizedBox(height: 18),
+
+                              // City (user confirms)
                               _GlassField(
                                 controller: controller.cityController,
                                 label: 'City',
@@ -140,6 +149,8 @@ class ProfileSetupView extends GetView<ProfileSetupController> {
                                 textCapitalization: TextCapitalization.words,
                               ),
                               const SizedBox(height: 14),
+
+                              // Location permission
                               Obx(
                                 () => _LocationButton(
                                   granted: controller.locationGranted.value,
@@ -147,46 +158,9 @@ class ProfileSetupView extends GetView<ProfileSetupController> {
                                   onTap: controller.requestLocation,
                                 ),
                               ),
-                              const SizedBox(height: 24),
-                              Text(
-                                'I am a',
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w500,
-                                  color: AppColors.textSecondary.withValues(
-                                    alpha: 0.95,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 10),
-                              Obx(
-                                () => Row(
-                                  children: [
-                                    Expanded(
-                                      child: _ChoiceChip(
-                                        label: 'Student',
-                                        selected:
-                                            controller.occupation.value ==
-                                            'student',
-                                        onTap: () => controller
-                                            .selectOccupation('student'),
-                                      ),
-                                    ),
-                                    const SizedBox(width: 12),
-                                    Expanded(
-                                      child: _ChoiceChip(
-                                        label: 'Job holder',
-                                        selected:
-                                            controller.occupation.value ==
-                                            'job_holder',
-                                        onTap: () => controller
-                                            .selectOccupation('job_holder'),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
+
                               const SizedBox(height: 36),
+
                               Obx(
                                 () => _TealButton(
                                   label: 'Continue',

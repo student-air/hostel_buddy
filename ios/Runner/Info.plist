@@ -2,10 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>We need access to your photos so you can set a profile picture.</string>
-	<key>NSCameraUsageDescription</key>
-	<string>We need camera access so you can take a profile picture.</string>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>CFBundleDevelopmentRegion</key>
@@ -70,5 +66,17 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+
+	<!-- Photos (profile picture) -->
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>We need access to your photos so you can set a profile picture.</string>
+
+	<!-- Camera (optional – only if you allow take photo) -->
+	<key>NSCameraUsageDescription</key>
+	<string>We need camera access so you can take a profile picture.</string>
+
+	<!-- Location (city / nearby hostels) -->
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>We need your location to show nearby hostels and confirm your city.</string>
 </dict>
 </plist>
