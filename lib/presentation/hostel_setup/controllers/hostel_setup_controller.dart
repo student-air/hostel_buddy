@@ -23,6 +23,7 @@ class HostelSetupController extends GetxController {
   final totalRooms = 1.obs;
   late final TextEditingController roomsTextController;
   final selectedRoomTypes = <String>{}.obs;
+  final customRoomTypeController = TextEditingController();
 
   static const List<String> roomTypeOptions = [
     'Single',
@@ -140,6 +141,13 @@ class HostelSetupController extends GetxController {
     }
   }
 
+  void addCustomRoomType() {
+    final text = customRoomTypeController.text.trim();
+    if (text.isEmpty) return;
+    selectedRoomTypes.add(text);
+    customRoomTypeController.clear();
+  }
+
   void toggleFacility(String label) {
     if (selectedFacilities.contains(label)) {
       selectedFacilities.remove(label);
@@ -153,15 +161,6 @@ class HostelSetupController extends GetxController {
     if (text.isEmpty) return;
     selectedFacilities.add(text);
     customFacilityController.clear();
-  }
-
-  final customRoomTypeController = TextEditingController();
-
-  void addCustomRoomType() {
-    final text = customRoomTypeController.text.trim();
-    if (text.isEmpty) return;
-    selectedRoomTypes.add(text);
-    customRoomTypeController.clear();
   }
 
   Future<void> pickPhotos() async {
@@ -215,8 +214,8 @@ class HostelSetupController extends GetxController {
     contactController.dispose();
     descriptionController.dispose();
     roomsTextController.dispose();
-    customFacilityController.dispose();
     customRoomTypeController.dispose();
+    customFacilityController.dispose();
     super.onClose();
   }
 }
