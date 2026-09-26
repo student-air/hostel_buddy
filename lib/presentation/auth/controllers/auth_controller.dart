@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../routes/app_routes.dart';
 import '../../../core/utils/app_snackbar.dart';
 
 class AuthController extends GetxController {
@@ -34,10 +35,17 @@ class AuthController extends GetxController {
     await Future.delayed(const Duration(seconds: 1)); // simulate API
     isLoading.value = false;
 
-    // TODO: Navigate to Role Selection / next screen
     AppSnackbar.success(
       'Success',
       isLogin.value ? 'Logged in successfully' : 'Account created successfully',
+    );
+
+    Get.offNamed(
+      AppRoutes.profileSetup,
+      arguments: {
+        'name': nameController.text.trim(),
+        'phone': phoneController.text.trim(),
+      },
     );
   }
 
