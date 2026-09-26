@@ -30,8 +30,7 @@ class RoleSelectionController extends GetxController {
     if (selectedRole.value == AppConstants.roleManager) {
       Get.offNamed(AppRoutes.hostelSetup);
     } else {
-      // TODO: Seeker home / dashboard
-      AppSnackbar.success('Role selected', 'You are set up to find hostels');
+      Get.offNamed(AppRoutes.seekerHome);
     }
   }
 

@@ -10,6 +10,8 @@ import '../presentation/role_selection/bindings/role_selection_binding.dart';
 import '../presentation/role_selection/views/role_selection_view.dart';
 import '../presentation/hostel_setup/bindings/hostel_setup_binding.dart';
 import '../presentation/hostel_setup/views/hostel_setup_view.dart';
+import '../presentation/seeker_home/bindings/seeker_home_binding.dart';
+import '../presentation/seeker_home/views/seeker_home_view.dart';
 import 'app_routes.dart';
 
 class AppPages {
@@ -40,6 +42,11 @@ class AppPages {
       name: AppRoutes.hostelSetup,
       page: () => const HostelSetupView(),
       binding: HostelSetupBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.seekerHome,
+      page: () => const SeekerHomeView(),
+      binding: SeekerHomeBinding(),
     ),
   ];
 }

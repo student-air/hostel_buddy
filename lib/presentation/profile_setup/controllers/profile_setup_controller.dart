@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:get_storage/get_storage.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/utils/app_snackbar.dart';
@@ -173,6 +174,15 @@ class ProfileSetupController extends GetxController {
 
     isLoading.value = true;
     await Future.delayed(const Duration(milliseconds: 800));
+
+    final box = GetStorage();
+    await box.write('profile_name', nameController.text.trim());
+    await box.write('profile_city', cityController.text.trim());
+    await box.write('profile_occupation', occupation.value);
+    if (photoPath.value != null) {
+      await box.write('profile_photo', photoPath.value);
+    }
+
     isLoading.value = false;
 
     AppSnackbar.success(
