@@ -16,8 +16,11 @@ import '../presentation/manager_home/bindings/manager_home_binding.dart';
 import '../presentation/manager_home/views/manager_home_view.dart';
 import '../presentation/profile/bindings/profile_binding.dart';
 import '../presentation/profile/views/profile_view.dart';
+<<<<<<< HEAD
 
 // in pages list
+=======
+>>>>>>> 21ee6b3bd0f36105419eee6b3cb8b86a258513ea
 
 import 'app_routes.dart';
 
