@@ -1,6 +1,7 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
+
+import 'dart:ui';
+
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:image_cropper/image_cropper.dart';
@@ -9,7 +10,6 @@ import 'package:image_picker/image_picker.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/utils/app_snackbar.dart';
-import '../../../core/utils/validators.dart';
 import '../../../routes/app_routes.dart';
 
 class ProfileController extends GetxController {
@@ -25,6 +25,10 @@ class ProfileController extends GetxController {
   final photoPath = RxnString();
   final role = ''.obs;
   final occupation = ''.obs;
+
+  // Reactive display fields
+  final displayName = 'User'.obs;
+  final initials = '?'.obs;
 
   final ImagePicker _picker = ImagePicker();
 
@@ -48,30 +52,32 @@ class ProfileController extends GetxController {
     if (photo != null && photo.isNotEmpty) photoPath.value = photo;
     role.value = storedRole;
     occupation.value = occ;
+
+    _updateDisplayName(name);
   }
 
-  String get initials {
-    final full = nameController.text.trim();
-    final parts = full.split(RegExp(r'\s+'));
-    if (parts.isEmpty || parts.first.isEmpty) return '?';
-    if (parts.length == 1) return parts.first[0].toUpperCase();
-    return '${parts.first[0]}${parts.last[0]}'.toUpperCase();
+  void _updateDisplayName(String name) {
+    final trimmed = name.trim();
+    displayName.value = trimmed.isEmpty ? 'User' : trimmed;
+
+    final parts = trimmed.split(RegExp(r'\s+'));
+    if (parts.isEmpty || parts.first.isEmpty) {
+      initials.value = '?';
+    } else if (parts.length == 1) {
+      initials.value = parts.first[0].toUpperCase();
+    } else {
+      initials.value = '${parts.first[0]}${parts.last[0]}'.toUpperCase();
+    }
   }
 
   String get roleLabel {
-    if (role.value == AppConstants.roleManager) return 'Hostel Manager';
+    if (role.value == AppConstants.roleManager) return 'Listing hostels';
     if (role.value == AppConstants.roleSeeker) return 'Finding a hostel';
     return 'User';
   }
 
-  String get displayName {
-    final name = nameController.text.trim();
-    return name.isEmpty ? 'User' : name;
-  }
-
   void toggleEdit() {
     if (isEditing.value) {
-      // Cancel → reload original values
       _loadProfile();
     }
     isEditing.value = !isEditing.value;
@@ -126,12 +132,15 @@ class ProfileController extends GetxController {
     isLoading.value = true;
     await Future.delayed(const Duration(milliseconds: 600));
 
-    await _box.write('profile_name', nameController.text.trim());
+    final name = nameController.text.trim();
+    await _box.write('profile_name', name);
     await _box.write('profile_phone', phoneController.text.trim());
     await _box.write('profile_city', cityController.text.trim());
     if (photoPath.value != null) {
       await _box.write('profile_photo', photoPath.value);
     }
+
+    _updateDisplayName(name);
 
     isLoading.value = false;
     isEditing.value = false;
@@ -139,42 +148,170 @@ class ProfileController extends GetxController {
     AppSnackbar.success('Profile updated', 'Your changes have been saved.');
   }
 
+  // ── Menu actions ──
+
+  void onNotifications() {
+    AppSnackbar.info('Notifications', 'Coming next.');
+  }
+
+  void onSavedHostels() {
+    AppSnackbar.info('Saved hostels', 'Coming next.');
+  }
+
+  void onPaymentMethods() {
+    AppSnackbar.info('Payment methods', 'Coming next.');
+  }
+
+  void onPrivacy() {
+    AppSnackbar.info('Privacy and security', 'Coming next.');
+  }
+
+  void onHelp() {
+    AppSnackbar.info('Help and support', 'Coming next.');
+  }
+
+  void onTerms() {
+    AppSnackbar.info('Terms of service', 'Coming next.');
+  }
+
   void onLogout() {
     Get.dialog(
-      AlertDialog(
-        backgroundColor: const Color(0xFF2A0412),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text(
-          'Log out',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
-        ),
-        content: Text(
-          'Are you sure you want to log out?',
-          style: TextStyle(color: Colors.white.withValues(alpha: 0.75)),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Get.back(),
-            child: Text(
-              'Cancel',
-              style: TextStyle(color: Colors.white.withValues(alpha: 0.6)),
-            ),
-          ),
-          TextButton(
-            onPressed: () {
-              Get.back();
-              AppSnackbar.info('Logged out', 'Session ended.');
-              Get.offAllNamed(AppRoutes.auth);
-            },
-            child: const Text(
-              'Log out',
-              style: TextStyle(
-                color: AppColors.error,
-                fontWeight: FontWeight.w700,
+      Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: const EdgeInsets.symmetric(horizontal: 28),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(24),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+            child: Container(
+              padding: const EdgeInsets.fromLTRB(24, 28, 24, 20),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Colors.white.withValues(alpha: 0.12),
+                    Colors.white.withValues(alpha: 0.04),
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.18)),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.primary.withValues(alpha: 0.35),
+                    blurRadius: 28,
+                    spreadRadius: 2,
+                  ),
+                ],
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Icon
+                  Container(
+                    width: 64,
+                    height: 64,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: AppColors.error.withValues(alpha: 0.15),
+                      border: Border.all(
+                        color: AppColors.error.withValues(alpha: 0.4),
+                      ),
+                    ),
+                    child: const Icon(
+                      Icons.logout_rounded,
+                      size: 28,
+                      color: AppColors.error,
+                    ),
+                  ),
+                  const SizedBox(height: 18),
+
+                  // Title
+                  const Text(
+                    'Log out?',
+                    style: TextStyle(
+                      color: AppColors.accent,
+                      fontSize: 20,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: -0.3,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+
+                  // Subtitle
+                  Text(
+                    'Are you sure you want to log out of Hostel Buddy?',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: AppColors.accentLight.withValues(alpha: 0.85),
+                      fontSize: 14,
+                      height: 1.4,
+                    ),
+                  ),
+                  const SizedBox(height: 28),
+
+                  // Buttons
+                  Row(
+                    children: [
+                      Expanded(
+                        child: SizedBox(
+                          height: 48,
+                          child: OutlinedButton(
+                            onPressed: () => Get.back(),
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: Colors.white,
+                              side: BorderSide(
+                                color: Colors.white.withValues(alpha: 0.25),
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(24),
+                              ),
+                            ),
+                            child: const Text(
+                              'Cancel',
+                              style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: SizedBox(
+                          height: 48,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              Get.back();
+                              AppSnackbar.info('Logged out', 'Session ended.');
+                              Get.offAllNamed(AppRoutes.auth);
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.error,
+                              foregroundColor: Colors.white,
+                              elevation: 0,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(24),
+                              ),
+                            ),
+                            child: const Text(
+                              'Log out',
+                              style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
           ),
-        ],
+        ),
       ),
     );
   }
