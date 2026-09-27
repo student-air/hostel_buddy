@@ -139,8 +139,21 @@ class ManagerHomeController extends GetxController {
 
   void onNavTap(int index) {
     selectedNavIndex.value = index;
-    if (index != 0) {
-      AppSnackbar.info('Coming soon', 'This tab will open next.');
+    switch (index) {
+      case 0:
+        break;
+      case 1:
+        onViewBids();
+        break;
+      case 2:
+        onManageRooms();
+        break;
+      case 3:
+        onMessages();
+        break;
+      case 4:
+        onProfile();
+        break;
     }
   }
 

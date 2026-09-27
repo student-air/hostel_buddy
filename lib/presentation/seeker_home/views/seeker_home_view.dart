@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
 import '../../../core/constants/app_colors.dart';
+import '../../../core/widgets/bottom_navbar.dart';
 import '../controllers/seeker_home_controller.dart';
 
 class SeekerHomeView extends GetView<SeekerHomeController> {
@@ -76,7 +77,12 @@ class SeekerHomeView extends GetView<SeekerHomeController> {
                       ),
                     ),
                   ),
-                  _BottomNav(controller: controller, bottomPad: bottomPad),
+                  Obx(
+                    () => AppBottomNavBar(
+                      selectedIndex: controller.selectedNavIndex.value,
+                      onTap: controller.onNavTap,
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -814,83 +820,8 @@ class _HostelCard extends StatelessWidget {
 }
 
 // ═══════════════════════════════════════════
-// BOTTOM NAV
-// ═══════════════════════════════════════════
-
-class _BottomNav extends StatelessWidget {
-  const _BottomNav({required this.controller, required this.bottomPad});
-
-  final SeekerHomeController controller;
-  final double bottomPad;
-
-  static const _items = [
-    (Icons.home_rounded, 'Home'),
-    (Icons.gavel_rounded, 'Bids'),
-    (Icons.map_outlined, 'Map'),
-    (Icons.chat_bubble_outline_rounded, 'Chat'),
-    (Icons.person_outline_rounded, 'Profile'),
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.fromLTRB(8, 10, 8, 10 + bottomPad),
-      decoration: BoxDecoration(
-        color: const Color(0xFF1F030E).withValues(alpha: 0.95),
-        border: Border(
-          top: BorderSide(color: Colors.white.withValues(alpha: 0.08)),
-        ),
-      ),
-      child: Obx(
-        () => Row(
-          children: List.generate(_items.length, (i) {
-            final selected = controller.selectedNavIndex.value == i;
-            final item = _items[i];
-            return Expanded(
-              child: GestureDetector(
-                onTap: () => controller.onNavTap(i),
-                behavior: HitTestBehavior.opaque,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      item.$1,
-                      size: 22,
-                      color: selected
-                          ? AppColors.accentLight
-                          : Colors.white.withValues(alpha: 0.4),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      item.$2,
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: selected
-                            ? FontWeight.w700
-                            : FontWeight.w500,
-                        color: selected
-                            ? AppColors.accentLight
-                            : Colors.white.withValues(alpha: 0.4),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          }),
-        ),
-      ),
-    );
-  }
-}
-
-// ═══════════════════════════════════════════
-// SIDE DRAWER (opened by notification icon)
-// ═══════════════════════════════════════════
-
-// ═══════════════════════════════════════════
 // SIDE DRAWER
-// ═══════════════════════════════════════════
+// ══════════════════════════════════════════
 
 class _SeekerDrawer extends StatelessWidget {
   const _SeekerDrawer({required this.controller});
@@ -1066,7 +997,7 @@ class _SeekerDrawer extends StatelessWidget {
                     label: 'Profile',
                     onTap: () {
                       Navigator.pop(context);
-                      controller.onProfile;
+                      controller.onProfile();
                     },
                   ),
                   _DrawerItem(

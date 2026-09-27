@@ -138,8 +138,21 @@ class SeekerHomeController extends GetxController {
 
   void onNavTap(int index) {
     selectedNavIndex.value = index;
-    if (index != 0) {
-      AppSnackbar.info('Coming soon', 'This tab will open next.');
+    switch (index) {
+      case 0:
+        break; // Home
+      case 1:
+        onViewAllBids();
+        break;
+      case 2:
+        onSaved();
+        break;
+      case 3:
+        onChat();
+        break;
+      case 4:
+        onProfile();
+        break;
     }
   }
 
