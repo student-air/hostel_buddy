@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 
 import '../../../core/constants/app_constants.dart';
 import '../../../core/utils/app_snackbar.dart';
@@ -9,6 +10,7 @@ class RoleSelectionController extends GetxController {
   /// null until user selects; then AppConstants.roleSeeker | roleManager
   final selectedRole = RxnString();
   final isLoading = false.obs;
+  final _box = GetStorage();
 
   void selectRole(String role) {
     selectedRole.value = role;
@@ -25,6 +27,10 @@ class RoleSelectionController extends GetxController {
 
     isLoading.value = true;
     await Future.delayed(const Duration(milliseconds: 400));
+
+    // Persist role so Profile (and other screens) can read it
+    await _box.write('user_role', selectedRole.value);
+
     isLoading.value = false;
 
     if (selectedRole.value == AppConstants.roleManager) {
