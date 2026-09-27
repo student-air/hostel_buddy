@@ -201,6 +201,7 @@ class _Header extends StatelessWidget {
                 ],
               ),
             ),
+            const SizedBox(width: 8),
             GestureDetector(
               onTap: controller.openDrawer,
               child: Container(
@@ -1065,7 +1066,7 @@ class _SeekerDrawer extends StatelessWidget {
                     label: 'Profile',
                     onTap: () {
                       Navigator.pop(context);
-                      controller.onProfile();
+                      controller.onProfile;
                     },
                   ),
                   _DrawerItem(
