@@ -162,8 +162,7 @@ class SeekerHomeController extends GetxController {
   void onOtherCities() =>
       AppSnackbar.info('Cities', 'City picker coming next.');
 
-  void onProfile() =>
-      AppSnackbar.info('Profile', 'Profile screen coming next.');
+  void onProfile() => Get.toNamed(AppRoutes.profile);
 
   void onChat() => AppSnackbar.info('Chat', 'Chat coming next.');
 

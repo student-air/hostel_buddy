@@ -14,8 +14,8 @@ import '../presentation/seeker_home/bindings/seeker_home_binding.dart';
 import '../presentation/seeker_home/views/seeker_home_view.dart';
 import '../presentation/manager_home/bindings/manager_home_binding.dart';
 import '../presentation/manager_home/views/manager_home_view.dart';
-
-// in pages list
+import '../presentation/profile/bindings/profile_binding.dart';
+import '../presentation/profile/views/profile_view.dart';
 
 import 'app_routes.dart';
 
@@ -57,6 +57,11 @@ class AppPages {
       name: AppRoutes.managerHome,
       page: () => const ManagerHomeView(),
       binding: ManagerHomeBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.profile,
+      page: () => const ProfileView(),
+      binding: ProfileBinding(),
     ),
   ];
 }
