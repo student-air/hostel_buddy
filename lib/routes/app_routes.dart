@@ -8,4 +8,5 @@ class AppRoutes {
   static const String hostelSetup = '/hostel-setup';
   static const String seekerHome = '/seeker-home';
   static const String managerHome = '/manager-home';
+  static const String profile = '/profile';
 }

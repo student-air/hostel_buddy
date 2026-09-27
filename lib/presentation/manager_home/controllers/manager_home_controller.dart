@@ -146,8 +146,7 @@ class ManagerHomeController extends GetxController {
 
   void onNotifications() => AppSnackbar.info('Alerts', 'No new notifications.');
 
-  void onProfile() =>
-      AppSnackbar.info('Profile', 'Profile screen coming next.');
+  void onProfile() => Get.toNamed(AppRoutes.profile);
 
   void onViewBids() => AppSnackbar.info('Bids', 'All bids coming next.');
 
