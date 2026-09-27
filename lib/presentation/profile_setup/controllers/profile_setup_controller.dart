@@ -177,6 +177,7 @@ class ProfileSetupController extends GetxController {
 
     final box = GetStorage();
     await box.write('profile_name', nameController.text.trim());
+    await box.write('profile_phone', phoneController.text.trim());
     await box.write('profile_city', cityController.text.trim());
     await box.write('profile_occupation', occupation.value);
     if (photoPath.value != null) {
