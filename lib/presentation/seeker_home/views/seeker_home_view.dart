@@ -887,6 +887,10 @@ class _BottomNav extends StatelessWidget {
 // SIDE DRAWER (opened by notification icon)
 // ═══════════════════════════════════════════
 
+// ═══════════════════════════════════════════
+// SIDE DRAWER
+// ═══════════════════════════════════════════
+
 class _SeekerDrawer extends StatelessWidget {
   const _SeekerDrawer({required this.controller});
   final SeekerHomeController controller;
@@ -894,39 +898,60 @@ class _SeekerDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      backgroundColor: const Color(0xFF1F030E),
+      backgroundColor: const Color(0xFF1A050C),
       child: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 16, 12, 8),
+            // ── Header ──
+            Container(
+              padding: const EdgeInsets.fromLTRB(20, 20, 12, 20),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    AppColors.primary.withValues(alpha: 0.5),
+                    Colors.transparent,
+                  ],
+                ),
+              ),
               child: Row(
                 children: [
-                  Container(
-                    width: 48,
-                    height: 48,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: AppColors.accent.withValues(alpha: 0.25),
-                      border: Border.all(
-                        color: AppColors.accent.withValues(alpha: 0.5),
+                  // Avatar
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.pop(context);
+                      controller.onProfile();
+                    },
+                    child: Container(
+                      width: 56,
+                      height: 56,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white,
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.accent.withValues(alpha: 0.3),
+                            blurRadius: 12,
+                          ),
+                        ],
                       ),
+                      alignment: Alignment.center,
+                      child: Obx(() {
+                        final _ = controller.userName.value;
+                        return Text(
+                          controller.initials,
+                          style: const TextStyle(
+                            color: AppColors.primary,
+                            fontWeight: FontWeight.w800,
+                            fontSize: 18,
+                          ),
+                        );
+                      }),
                     ),
-                    alignment: Alignment.center,
-                    child: Obx(() {
-                      final _ = controller.userName.value;
-                      return Text(
-                        controller.initials,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w700,
-                          fontSize: 16,
-                        ),
-                      );
-                    }),
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: 14),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -936,18 +961,32 @@ class _SeekerDrawer extends StatelessWidget {
                             controller.userName.value,
                             style: const TextStyle(
                               color: Colors.white,
-                              fontSize: 17,
-                              fontWeight: FontWeight.w700,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w800,
                             ),
                           ),
                         ),
-                        const SizedBox(height: 2),
+                        const SizedBox(height: 3),
                         Obx(
-                          () => Text(
-                            controller.userRoleLabel.value,
-                            style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.5),
-                              fontSize: 12,
+                          () => Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 3,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColors.accent.withValues(alpha: 0.18),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: AppColors.accent.withValues(alpha: 0.4),
+                              ),
+                            ),
+                            child: Text(
+                              controller.userRoleLabel.value,
+                              style: const TextStyle(
+                                color: AppColors.accentLight,
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ),
                         ),
@@ -958,17 +997,21 @@ class _SeekerDrawer extends StatelessWidget {
                     onPressed: () => Navigator.pop(context),
                     icon: Icon(
                       Icons.close_rounded,
-                      color: Colors.white.withValues(alpha: 0.7),
+                      color: Colors.white.withValues(alpha: 0.6),
                     ),
                   ),
                 ],
               ),
             ),
-            Divider(color: Colors.white.withValues(alpha: 0.08), height: 24),
+
+            Divider(color: Colors.white.withValues(alpha: 0.08), height: 1),
+
+            // ── Menu ──
             Expanded(
               child: ListView(
-                padding: const EdgeInsets.symmetric(horizontal: 10),
+                padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
                 children: [
+                  _DrawerSectionLabel('Explore'),
                   _DrawerItem(
                     icon: Icons.home_rounded,
                     label: 'Home',
@@ -1014,6 +1057,17 @@ class _SeekerDrawer extends StatelessWidget {
                       controller.onSeeAllHostels();
                     },
                   ),
+
+                  const SizedBox(height: 8),
+                  _DrawerSectionLabel('Account'),
+                  _DrawerItem(
+                    icon: Icons.person_outline_rounded,
+                    label: 'Profile',
+                    onTap: () {
+                      Navigator.pop(context);
+                      controller.onProfile();
+                    },
+                  ),
                   _DrawerItem(
                     icon: Icons.chat_bubble_outline_rounded,
                     label: 'Chat',
@@ -1031,14 +1085,6 @@ class _SeekerDrawer extends StatelessWidget {
                     },
                   ),
                   _DrawerItem(
-                    icon: Icons.person_outline_rounded,
-                    label: 'Profile',
-                    onTap: () {
-                      Navigator.pop(context);
-                      controller.onProfile();
-                    },
-                  ),
-                  _DrawerItem(
                     icon: Icons.settings_outlined,
                     label: 'Settings',
                     onTap: () {
@@ -1046,10 +1092,12 @@ class _SeekerDrawer extends StatelessWidget {
                       controller.onSettings();
                     },
                   ),
-                  Divider(
-                    color: Colors.white.withValues(alpha: 0.08),
-                    height: 28,
-                  ),
+
+                  const SizedBox(height: 12),
+                  Divider(color: Colors.white.withValues(alpha: 0.08)),
+                  const SizedBox(height: 4),
+
+                  // Logout
                   _DrawerItem(
                     icon: Icons.logout_rounded,
                     label: 'Log out',
@@ -1062,7 +1110,42 @@ class _SeekerDrawer extends StatelessWidget {
                 ],
               ),
             ),
+
+            // ── Footer ──
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
+              child: Text(
+                'Hostel Buddy v1.0.0',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.3),
+                  fontSize: 11,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _DrawerSectionLabel extends StatelessWidget {
+  const _DrawerSectionLabel(this.label);
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(12, 8, 12, 6),
+      child: Text(
+        label.toUpperCase(),
+        style: TextStyle(
+          color: Colors.white.withValues(alpha: 0.35),
+          fontSize: 11,
+          fontWeight: FontWeight.w700,
+          letterSpacing: 0.8,
         ),
       ),
     );
@@ -1084,24 +1167,50 @@ class _DrawerItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = danger
-        ? AppColors.error
-        : Colors.white.withValues(alpha: 0.88);
+    final color = danger ? AppColors.error : Colors.white;
+    final iconColor = danger ? AppColors.error : AppColors.accentLight;
 
-    return ListTile(
-      onTap: onTap,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      leading: Icon(icon, color: color, size: 22),
-      title: Text(
-        label,
-        style: TextStyle(
-          color: color,
-          fontSize: 14.5,
-          fontWeight: FontWeight.w600,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(14),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+          child: Row(
+            children: [
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: danger
+                      ? AppColors.error.withValues(alpha: 0.12)
+                      : AppColors.accent.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(icon, size: 18, color: iconColor),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Text(
+                  label,
+                  style: TextStyle(
+                    color: color,
+                    fontSize: 14.5,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+              if (!danger)
+                Icon(
+                  Icons.chevron_right_rounded,
+                  size: 18,
+                  color: Colors.white.withValues(alpha: 0.25),
+                ),
+            ],
+          ),
         ),
       ),
-      dense: true,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
     );
   }
 }
