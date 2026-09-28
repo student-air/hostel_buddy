@@ -590,10 +590,10 @@ class _QuickActions extends StatelessWidget {
         const SizedBox(width: 10),
         Expanded(
           child: _ActionTile(
-            label: 'Saved',
-            icon: Icons.favorite_border_rounded,
+            label: 'Search',
+            icon: Icons.search_rounded,
             filled: false,
-            onTap: controller.onSaved,
+            onTap: controller.onSearch,
           ),
         ),
       ],
@@ -974,11 +974,11 @@ class _SeekerDrawer extends StatelessWidget {
                     },
                   ),
                   _DrawerItem(
-                    icon: Icons.favorite_border_rounded,
-                    label: 'Saved hostels',
+                    icon: Icons.search_rounded,
+                    label: 'Search hostels',
                     onTap: () {
                       Navigator.pop(context);
-                      controller.onSaved();
+                      controller.onSearch();
                     },
                   ),
                   _DrawerItem(

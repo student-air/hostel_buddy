@@ -145,7 +145,7 @@ class SeekerHomeController extends GetxController {
         onViewAllBids();
         break;
       case 2:
-        onSaved();
+        onSearch();
         break;
       case 3:
         onChat();
@@ -156,16 +156,17 @@ class SeekerHomeController extends GetxController {
     }
   }
 
+  void onHome() => Get.toNamed(AppRoutes.seekerHome);
+
   void onCreateBid() => AppSnackbar.info('Create bid', 'Bid flow coming next.');
 
   void onMapView() => AppSnackbar.info('Map', 'Map view coming next.');
 
-  void onSaved() => AppSnackbar.info('Saved', 'Saved hostels coming next.');
+  void onSearch() => AppSnackbar.info('Search', 'Search results coming next.');
 
   void onNotifications() => AppSnackbar.info('Alerts', 'No new notifications.');
 
-  void onViewAllBids() =>
-      AppSnackbar.info('Bids', 'Full bids list coming next.');
+  void onViewAllBids() => Get.toNamed(AppRoutes.seekerBids);
 
   void onSeeAllHostels() =>
       AppSnackbar.info('Hostels', 'Full list coming next.');

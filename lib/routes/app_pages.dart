@@ -16,6 +16,8 @@ import '../presentation/manager_home/bindings/manager_home_binding.dart';
 import '../presentation/manager_home/views/manager_home_view.dart';
 import '../presentation/profile/bindings/profile_binding.dart';
 import '../presentation/profile/views/profile_view.dart';
+import '../presentation/seeker_bids/bindings/seeker_bids_binding.dart';
+import '../presentation/seeker_bids/views/seeker_bids_view.dart';
 
 import 'app_routes.dart';
 
@@ -62,6 +64,11 @@ class AppPages {
       name: AppRoutes.profile,
       page: () => const ProfileView(),
       binding: ProfileBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.seekerBids,
+      page: () => const SeekerBidsView(),
+      binding: SeekerBidsBinding(),
     ),
   ];
 }

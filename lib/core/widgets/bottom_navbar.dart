@@ -40,9 +40,9 @@ class AppBottomNavBar extends StatelessWidget {
       label: 'Bids',
     ),
     AppBottomNavItem(
-      icon: Icons.bookmark_border_rounded,
-      activeIcon: Icons.bookmark_rounded,
-      label: 'Saved',
+      icon: Icons.search_outlined,
+      activeIcon: Icons.search_rounded,
+      label: 'Search',
     ),
     AppBottomNavItem(
       icon: Icons.chat_bubble_outline_rounded,
