@@ -1,6 +1,4 @@
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../../../core/utils/app_snackbar.dart';
 import '../../../routes/app_routes.dart';
@@ -8,13 +6,9 @@ import '../../../routes/app_routes.dart';
 class SeekerMapController extends GetxController {
   final selectedFilter = 'All'.obs;
   final searchQuery = ''.obs;
+  final selectedHostel = Rxn<Map<String, dynamic>>();
 
   final filters = ['All', 'Nearby', 'Under 10k', 'Shared', 'Private'];
-
-  GoogleMapController? mapController;
-
-  // Islamabad center
-  static const LatLng initialTarget = LatLng(33.6844, 73.0479);
 
   final hostels = <Map<String, dynamic>>[
     {
@@ -24,8 +18,6 @@ class SeekerMapController extends GetxController {
       'distance': '1.2 km',
       'price': 'Rs 12k/mo',
       'rating': 4.6,
-      'lat': 33.6938,
-      'lng': 73.0652,
     },
     {
       'name': 'Campus View Lodge',
@@ -34,8 +26,6 @@ class SeekerMapController extends GetxController {
       'distance': '2.4 km',
       'price': 'Rs 9.5k/mo',
       'rating': 4.3,
-      'lat': 33.6684,
-      'lng': 73.0745,
     },
     {
       'name': 'Scholar Nest',
@@ -44,8 +34,6 @@ class SeekerMapController extends GetxController {
       'distance': '3.1 km',
       'price': 'Rs 14k/mo',
       'rating': 4.8,
-      'lat': 33.7215,
-      'lng': 73.0570,
     },
     {
       'name': 'Al-Haram Hostel',
@@ -54,13 +42,8 @@ class SeekerMapController extends GetxController {
       'distance': '1.8 km',
       'price': 'Rs 11k/mo',
       'rating': 4.4,
-      'lat': 33.6690,
-      'lng': 72.9980,
     },
   ].obs;
-
-  final selectedHostel = Rxn<Map<String, dynamic>>();
-  final markers = <Marker>{}.obs;
 
   List<Map<String, dynamic>> get filtered {
     var list = hostels.toList();
@@ -72,68 +55,25 @@ class SeekerMapController extends GetxController {
         return name.contains(q) || area.contains(q);
       }).toList();
     }
+    if (selectedFilter.value == 'Under 10k') {
+      list = list.where((h) {
+        final p = (h['price'] ?? '').toString();
+        return p.contains('9') || p.contains('8') || p.contains('7');
+      }).toList();
+    }
     return list;
   }
 
-  @override
-  void onInit() {
-    super.onInit();
-    _buildMarkers();
-  }
+  void onFilterChanged(String f) => selectedFilter.value = f;
 
-  void _buildMarkers() {
-    markers.clear();
-    for (final h in filtered) {
-      final lat = (h['lat'] as num).toDouble();
-      final lng = (h['lng'] as num).toDouble();
-      final id = h['name'].toString();
-      markers.add(
-        Marker(
-          markerId: MarkerId(id),
-          position: LatLng(lat, lng),
-          infoWindow: InfoWindow(
-            title: h['name']?.toString(),
-            snippet: '${h['price']} · ${h['distance']}',
-          ),
-          onTap: () => selectHostel(h),
-          icon: BitmapDescriptor.defaultMarkerWithHue(
-            selectedHostel.value == h
-                ? BitmapDescriptor.hueAzure
-                : BitmapDescriptor.hueRose,
-          ),
-        ),
-      );
-    }
-    markers.refresh();
-  }
-
-  void onMapCreated(GoogleMapController c) {
-    mapController = c;
-  }
-
-  void selectHostel(Map<String, dynamic> h) {
-    selectedHostel.value = h;
-    _buildMarkers();
-    final lat = (h['lat'] as num).toDouble();
-    final lng = (h['lng'] as num).toDouble();
-    mapController?.animateCamera(
-      CameraUpdate.newLatLngZoom(LatLng(lat, lng), 14.5),
-    );
-  }
+  void onSearchChanged(String q) => searchQuery.value = q;
 
   void onHostelTap(Map<String, dynamic> h) {
-    selectHostel(h);
-    AppSnackbar.info(h['name']?.toString() ?? 'Hostel', 'Details coming next.');
-  }
-
-  void onFilterChanged(String f) {
-    selectedFilter.value = f;
-    _buildMarkers();
-  }
-
-  void onSearchChanged(String q) {
-    searchQuery.value = q;
-    _buildMarkers();
+    selectedHostel.value = h;
+    AppSnackbar.info(
+      h['name']?.toString() ?? 'Hostel',
+      'Details coming next.',
+    );
   }
 
   void onNavTap(int index) {

@@ -1,6 +1,8 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart' as geo;
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 
@@ -11,7 +13,6 @@ import '../../../routes/app_routes.dart';
 class SeekerHomeController extends GetxController {
   final _box = GetStorage();
 
-  /// Stable key for endDrawer — do not create in build()
   final scaffoldKey = GlobalKey<ScaffoldState>();
 
   final userName = 'there'.obs;
@@ -75,7 +76,6 @@ class SeekerHomeController extends GetxController {
     if (occ != null && occ.isNotEmpty) {
       occupation.value = occ;
     }
-    // Always plain label — no "Student ·"
     userRoleLabel.value = 'Finding a hostel';
   }
 
@@ -98,18 +98,8 @@ class SeekerHomeController extends GetxController {
 
   String get dateLabel {
     const months = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
+      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
     ];
     final n = DateTime.now();
     return '${n.day} ${months[n.month - 1]} ${n.year}';
@@ -117,13 +107,8 @@ class SeekerHomeController extends GetxController {
 
   String get weekdayLabel {
     const days = [
-      'Monday',
-      'Tuesday',
-      'Wednesday',
-      'Thursday',
-      'Friday',
-      'Saturday',
-      'Sunday',
+      'Monday', 'Tuesday', 'Wednesday', 'Thursday',
+      'Friday', 'Saturday', 'Sunday',
     ];
     return days[DateTime.now().weekday - 1];
   }
@@ -137,170 +122,316 @@ class SeekerHomeController extends GetxController {
   }
 
   void onNavTap(int index) {
-  selectedNavIndex.value = index;
-  switch (index) {
-    case 0:
-      break; // already on Home
-    case 1:
-      Get.toNamed(AppRoutes.seekerBids);
-      break;
-    case 2:
-      Get.toNamed(AppRoutes.seekerSearch); // ← Search
-      break;
-    case 3:
-      Get.toNamed(AppRoutes.profile);
-      break;
+    selectedNavIndex.value = index;
+    switch (index) {
+      case 0:
+        break;
+      case 1:
+        Get.toNamed(AppRoutes.seekerBids);
+        break;
+      case 2:
+        Get.toNamed(AppRoutes.seekerSearch);
+        break;
+      case 3:
+        Get.toNamed(AppRoutes.profile);
+        break;
+    }
   }
-} 
 
   void onOtherCities() {
-  final cities = [
-    'Islamabad',
-    'Rawalpindi',
-    'Lahore',
-    'Karachi',
-    'Faisalabad',
-    'Multan',
-    'Peshawar',
-    'Quetta',
-    'Sialkot',
-    'Gujranwala',
-    'Hyderabad',
-    'Abbottabad',
-  ];
+    final cities = [
+      'Islamabad',
+      'Rawalpindi',
+      'Lahore',
+      'Karachi',
+      'Faisalabad',
+      'Multan',
+      'Peshawar',
+      'Quetta',
+      'Sialkot',
+      'Gujranwala',
+      'Hyderabad',
+      'Abbottabad',
+    ];
 
-  Get.bottomSheet(
-    isScrollControlled: true,
-    Container(
-      constraints: BoxConstraints(
-        maxHeight: Get.height * 0.65,
-      ),
-      decoration: const BoxDecoration(
-        color: Color(0xFF2A0412),
-        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const SizedBox(height: 12),
-          Container(
-            width: 40,
-            height: 4,
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.25),
-              borderRadius: BorderRadius.circular(2),
+    final isLocating = false.obs;
+
+    Get.bottomSheet(
+      isScrollControlled: true,
+      Container(
+        constraints: BoxConstraints(maxHeight: Get.height * 0.72),
+        decoration: const BoxDecoration(
+          color: Color(0xFF2A0412),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 12),
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.25),
+                borderRadius: BorderRadius.circular(2),
+              ),
             ),
-          ),
-          const SizedBox(height: 16),
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 22),
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                'Select city',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 20,
-                  fontWeight: FontWeight.w800,
+            const SizedBox(height: 16),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 22),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'Select city',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w800,
+                  ),
                 ),
               ),
             ),
-          ),
-          const SizedBox(height: 6),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 22),
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                'Hostels will update for the selected city',
-                style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.45),
-                  fontSize: 13,
+            const SizedBox(height: 6),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 22),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'Hostels will update for the selected city',
+                  style: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.45),
+                    fontSize: 13,
+                  ),
                 ),
               ),
             ),
-          ),
-          const SizedBox(height: 14),
-          Flexible(
-            child: ListView.separated(
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
-              shrinkWrap: true,
-              itemCount: cities.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 6),
-              itemBuilder: (_, i) {
-                final city = cities[i];
-                return Obx(() {
-                  final selected = currentCity.value == city;
-                  return GestureDetector(
-                    onTap: () {
-                      currentCity.value = city;
-                      _box.write('profile_city', city);
-                      Get.back();
-                      AppSnackbar.success(
-                        'City updated',
-                        'Showing hostels in $city',
-                      );
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 14,
-                      ),
-                      decoration: BoxDecoration(
-                        color: selected
-                            ? AppColors.accent.withValues(alpha: 0.2)
-                            : Colors.white.withValues(alpha: 0.05),
-                        borderRadius: BorderRadius.circular(14),
-                        border: Border.all(
-                          color: selected
-                              ? AppColors.accent
-                              : Colors.white.withValues(alpha: 0.1),
-                        ),
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(
-                            selected
-                                ? Icons.location_on_rounded
-                                : Icons.location_on_outlined,
-                            size: 20,
-                            color: selected
-                                ? AppColors.accentLight
-                                : Colors.white.withValues(alpha: 0.5),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Text(
-                              city,
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 15,
-                                fontWeight: selected
-                                    ? FontWeight.w700
-                                    : FontWeight.w500,
-                              ),
-                            ),
-                          ),
-                          if (selected)
-                            const Icon(
-                              Icons.check_circle_rounded,
-                              size: 20,
-                              color: AppColors.accentLight,
-                            ),
-                        ],
+            const SizedBox(height: 14),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Obx(
+                () => SizedBox(
+                  width: double.infinity,
+                  height: 50,
+                  child: ElevatedButton(
+                    onPressed: isLocating.value
+                        ? null
+                        : () => _useMyLocation(isLocating),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.accent,
+                      foregroundColor: Colors.white,
+                      disabledBackgroundColor:
+                          AppColors.accent.withValues(alpha: 0.5),
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
                       ),
                     ),
-                  );
-                });
-              },
+                    child: isLocating.value
+                        ? const SizedBox(
+                            width: 22,
+                            height: 22,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2.2,
+                              color: Colors.white,
+                            ),
+                          )
+                        : const Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.my_location_rounded, size: 20),
+                              SizedBox(width: 10),
+                              Text(
+                                'Use my location',
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ],
+                          ),
+                  ),
+                ),
+              ),
             ),
-          ),
-        ],
+            const SizedBox(height: 12),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 22),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Divider(
+                      color: Colors.white.withValues(alpha: 0.12),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    child: Text(
+                      'or pick a city',
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.4),
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: Divider(
+                      color: Colors.white.withValues(alpha: 0.12),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 8),
+            Flexible(
+              child: ListView.separated(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+                shrinkWrap: true,
+                itemCount: cities.length,
+                separatorBuilder: (_, __) => const SizedBox(height: 6),
+                itemBuilder: (_, i) {
+                  final city = cities[i];
+                  return Obx(() {
+                    final selected = currentCity.value == city;
+                    return GestureDetector(
+                      onTap: () {
+                        currentCity.value = city;
+                        _box.write('profile_city', city);
+                        Get.back();
+                        AppSnackbar.success(
+                          'City updated',
+                          'Showing hostels in $city',
+                        );
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 14,
+                        ),
+                        decoration: BoxDecoration(
+                          color: selected
+                              ? AppColors.accent.withValues(alpha: 0.2)
+                              : Colors.white.withValues(alpha: 0.05),
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(
+                            color: selected
+                                ? AppColors.accent
+                                : Colors.white.withValues(alpha: 0.1),
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(
+                              selected
+                                  ? Icons.location_on_rounded
+                                  : Icons.location_on_outlined,
+                              size: 20,
+                              color: selected
+                                  ? AppColors.accentLight
+                                  : Colors.white.withValues(alpha: 0.5),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                city,
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 15,
+                                  fontWeight: selected
+                                      ? FontWeight.w700
+                                      : FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                            if (selected)
+                              const Icon(
+                                Icons.check_circle_rounded,
+                                size: 20,
+                                color: AppColors.accentLight,
+                              ),
+                          ],
+                        ),
+                      ),
+                    );
+                  });
+                },
+              ),
+            ),
+          ],
+        ),
       ),
-    ),
-  );
-}
+    );
+  }
 
+  Future<void> _useMyLocation(RxBool isLocating) async {
+  isLocating.value = true;
+  try {
+    final serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      AppSnackbar.warning(
+        'Location off',
+        'Please turn on location services.',
+      );
+      return;
+    }
+
+    var permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        AppSnackbar.warning(
+          'Permission denied',
+          'Location permission is required.',
+        );
+        return;
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      AppSnackbar.warning(
+        'Permission blocked',
+        'Enable location from app settings.',
+      );
+      return;
+    }
+
+    final position = await Geolocator.getCurrentPosition(
+      locationSettings: const LocationSettings(
+        accuracy: LocationAccuracy.high,
+      ),
+    );
+
+    // geocoding 5.x API
+    final geocoding = geo.Geocoding();
+    final placemarks = await geocoding.placemarkFromCoordinates(
+      position.latitude,
+      position.longitude,
+    );
+
+    if (placemarks.isEmpty) {
+      AppSnackbar.error('Failed', 'Could not detect city.');
+      return;
+    }
+
+    final place = placemarks.first;
+    final city = (place.locality != null && place.locality!.isNotEmpty)
+        ? place.locality!
+        : (place.subAdministrativeArea != null &&
+                place.subAdministrativeArea!.isNotEmpty)
+            ? place.subAdministrativeArea!
+            : (place.administrativeArea ?? 'Unknown');
+
+    currentCity.value = city;
+    _box.write('profile_city', city);
+
+    if (Get.isBottomSheetOpen ?? false) Get.back();
+
+    AppSnackbar.success('Location found', 'You are in $city');
+  } catch (e) {
+    AppSnackbar.error('Error', 'Could not get your location.');
+  } finally {
+    isLocating.value = false;
+  }
+}
   void onHome() => Get.toNamed(AppRoutes.seekerHome);
 
   void onCreateBid() => Get.toNamed(AppRoutes.placeBid);
@@ -309,22 +440,17 @@ class SeekerHomeController extends GetxController {
 
   void onMapView() => Get.toNamed(AppRoutes.seekerMap);
 
-
   void onSearch() => Get.toNamed(AppRoutes.seekerSearch);
 
   void onNotifications() => Get.toNamed(AppRoutes.notifications);
 
   void onViewAllBids() => Get.toNamed(AppRoutes.seekerBids);
 
-  void onSeeAllHostels() =>
-      AppSnackbar.info('Hostels', 'Full list coming next.');
+  void onSeeAllHostels() => Get.toNamed(AppRoutes.seekerMap);
 
   void onHostelTap(Map<String, dynamic> hostel) {
-    final name = hostel['name']?.toString() ?? 'Hostel';
-    AppSnackbar.info(name, 'Details coming next.');
+    Get.toNamed(AppRoutes.seekerMap);
   }
-
-  
 
   void onProfile() => Get.toNamed(AppRoutes.profile);
 
@@ -365,7 +491,6 @@ class SeekerHomeController extends GetxController {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // Icon
                   Container(
                     width: 64,
                     height: 64,
@@ -383,8 +508,6 @@ class SeekerHomeController extends GetxController {
                     ),
                   ),
                   const SizedBox(height: 18),
-
-                  // Title
                   const Text(
                     'Log out?',
                     style: TextStyle(
@@ -395,8 +518,6 @@ class SeekerHomeController extends GetxController {
                     ),
                   ),
                   const SizedBox(height: 8),
-
-                  // Subtitle
                   Text(
                     'Are you sure you want to log out of Hostel Buddy?',
                     textAlign: TextAlign.center,
@@ -407,8 +528,6 @@ class SeekerHomeController extends GetxController {
                     ),
                   ),
                   const SizedBox(height: 28),
-
-                  // Buttons
                   Row(
                     children: [
                       Expanded(

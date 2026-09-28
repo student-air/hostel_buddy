@@ -3,7 +3,6 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../controllers/seeker_map_controller.dart';
@@ -18,7 +17,7 @@ class SeekerMapView extends GetView<SeekerMapController> {
       child: Scaffold(
         body: Stack(
           children: [
-            // Same gradient background as Home / Bids
+            // Sample map placeholder (no real map SDK)
             Container(
               width: double.infinity,
               height: double.infinity,
@@ -27,51 +26,22 @@ class SeekerMapView extends GetView<SeekerMapController> {
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    Color(0xFF6B0E24),
-                    Color(0xFF4A0A1E),
-                    Color(0xFF2A0412),
+                    Color(0xFF2A1520),
+                    Color(0xFF1A0C14),
+                    Color(0xFF120810),
                   ],
                 ),
               ),
             ),
-            Positioned(
-              top: -60,
-              right: -40,
-              child: _Blob(
-                size: 220,
-                color: AppColors.accent.withValues(alpha: 0.08),
-              ),
+            // Fake map grid / roads feel
+            CustomPaint(
+              size: Size.infinite,
+              painter: _SampleMapPainter(),
             ),
-            Positioned(
-              bottom: 120,
-              left: -50,
-              child: _Blob(
-                size: 180,
-                color: Colors.white.withValues(alpha: 0.03),
-              ),
-            ),
+            // Sample pins
+            ..._samplePins(context),
 
-            // Real Google Map
-            Positioned.fill(
-              child: Obx(
-                () => GoogleMap(
-                  initialCameraPosition: const CameraPosition(
-                    target: SeekerMapController.initialTarget,
-                    zoom: 13,
-                  ),
-                  onMapCreated: controller.onMapCreated,
-                  markers: controller.markers.toSet(),
-                  myLocationEnabled: true,
-                  myLocationButtonEnabled: false,
-                  zoomControlsEnabled: false,
-                  mapToolbarEnabled: false,
-                  compassEnabled: false,
-                  // Optional dark style later via mapStyle
-                ),
-              ),
-            ),
-
-            // Top UI overlay
+            // Top UI
             SafeArea(
               child: Column(
                 children: [
@@ -95,7 +65,110 @@ class SeekerMapView extends GetView<SeekerMapController> {
       ),
     );
   }
+
+  List<Widget> _samplePins(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final positions = [
+      Offset(size.width * 0.28, size.height * 0.32),
+      Offset(size.width * 0.62, size.height * 0.28),
+      Offset(size.width * 0.45, size.height * 0.40),
+      Offset(size.width * 0.72, size.height * 0.38),
+    ];
+    return List.generate(positions.length, (i) {
+      return Positioned(
+        left: positions[i].dx - 18,
+        top: positions[i].dy - 36,
+        child: Column(
+          children: [
+            Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                color: i == 0 ? AppColors.accent : const Color(0xFF8B1538),
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.white, width: 2),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.35),
+                    blurRadius: 8,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: const Icon(
+                Icons.home_rounded,
+                color: Colors.white,
+                size: 18,
+              ),
+            ),
+            Container(
+              width: 2,
+              height: 10,
+              color: i == 0 ? AppColors.accent : const Color(0xFF8B1538),
+            ),
+          ],
+        ),
+      );
+    });
+  }
 }
+
+// ═══════════════════════════════════════════
+// SAMPLE MAP GRID PAINTER
+// ═══════════════════════════════════════════
+
+class _SampleMapPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final road = Paint()
+      ..color = Colors.white.withValues(alpha: 0.06)
+      ..strokeWidth = 2;
+    final roadBold = Paint()
+      ..color = Colors.white.withValues(alpha: 0.1)
+      ..strokeWidth = 4;
+
+    // Horizontal roads
+    for (var y = 80.0; y < size.height; y += 90) {
+      canvas.drawLine(Offset(0, y), Offset(size.width, y), road);
+    }
+    // Vertical roads
+    for (var x = 40.0; x < size.width; x += 70) {
+      canvas.drawLine(Offset(x, 0), Offset(x, size.height), road);
+    }
+    // Main roads
+    canvas.drawLine(
+      Offset(0, size.height * 0.35),
+      Offset(size.width, size.height * 0.35),
+      roadBold,
+    );
+    canvas.drawLine(
+      Offset(size.width * 0.4, 0),
+      Offset(size.width * 0.4, size.height),
+      roadBold,
+    );
+
+    // Blocks
+    final block = Paint()..color = Colors.white.withValues(alpha: 0.03);
+    for (var y = 100.0; y < size.height * 0.55; y += 90) {
+      for (var x = 50.0; x < size.width; x += 70) {
+        canvas.drawRRect(
+          RRect.fromRectAndRadius(
+            Rect.fromLTWH(x + 8, y + 8, 50, 60),
+            const Radius.circular(6),
+          ),
+          block,
+        );
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+// ═══════════════════════════════════════════
+// HEADER
+// ═══════════════════════════════════════════
 
 class _Header extends StatelessWidget {
   @override
@@ -133,19 +206,15 @@ class _Header extends StatelessWidget {
                     fontSize: 24,
                     fontWeight: FontWeight.w800,
                     letterSpacing: -0.5,
-                    shadows: [Shadow(blurRadius: 8, color: Colors.black54)],
                   ),
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  'Explore hostels nearby',
+                  'Sample map · hostels nearby',
                   style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.85),
+                    color: Colors.white.withValues(alpha: 0.7),
                     fontSize: 13,
                     fontWeight: FontWeight.w500,
-                    shadows: const [
-                      Shadow(blurRadius: 6, color: Colors.black45),
-                    ],
                   ),
                 ),
               ],
@@ -166,7 +235,7 @@ class _Header extends StatelessWidget {
                 Icon(Icons.map_rounded, size: 14, color: AppColors.accentLight),
                 SizedBox(width: 5),
                 Text(
-                  'Live',
+                  'Sample',
                   style: TextStyle(
                     color: AppColors.accentLight,
                     fontSize: 12,
@@ -181,6 +250,10 @@ class _Header extends StatelessWidget {
     );
   }
 }
+
+// ═══════════════════════════════════════════
+// SEARCH
+// ═══════════════════════════════════════════
 
 class _SearchBar extends StatelessWidget {
   const _SearchBar({required this.controller});
@@ -236,6 +309,10 @@ class _SearchBar extends StatelessWidget {
   }
 }
 
+// ═══════════════════════════════════════════
+// FILTERS
+// ═══════════════════════════════════════════
+
 class _Filters extends StatelessWidget {
   const _Filters({required this.controller});
   final SeekerMapController controller;
@@ -290,6 +367,10 @@ class _Filters extends StatelessWidget {
     );
   }
 }
+
+// ═══════════════════════════════════════════
+// BOTTOM SHEET
+// ═══════════════════════════════════════════
 
 class _BottomSheet extends StatelessWidget {
   const _BottomSheet({required this.controller});
@@ -383,12 +464,12 @@ class _BottomSheet extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: selected
                             ? AppColors.accent.withValues(alpha: 0.15)
-                            : Colors.white.withValues(alpha: 0.05),
-                        borderRadius: BorderRadius.circular(16),
+                            : Colors.white.withValues(alpha: 0.06),
+                        borderRadius: BorderRadius.circular(14),
                         border: Border.all(
                           color: selected
-                              ? AppColors.accent.withValues(alpha: 0.5)
-                              : Colors.white.withValues(alpha: 0.08),
+                              ? AppColors.accent
+                              : Colors.white.withValues(alpha: 0.1),
                         ),
                       ),
                       child: Row(
@@ -398,11 +479,16 @@ class _BottomSheet extends StatelessWidget {
                             height: 44,
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(12),
-                              color: AppColors.accent.withValues(alpha: 0.2),
+                              gradient: const LinearGradient(
+                                colors: [
+                                  Color(0xFF8B1538),
+                                  Color(0xFF6B0E24),
+                                ],
+                              ),
                             ),
                             child: const Icon(
                               Icons.verified_outlined,
-                              color: AppColors.accentLight,
+                              color: Colors.white,
                               size: 22,
                             ),
                           ),
@@ -412,14 +498,14 @@ class _BottomSheet extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  h['name']?.toString() ?? 'Hostel',
+                                  h['name']?.toString() ?? '',
                                   style: const TextStyle(
                                     color: Colors.white,
                                     fontSize: 14,
                                     fontWeight: FontWeight.w700,
                                   ),
                                 ),
-                                const SizedBox(height: 2),
+                                const SizedBox(height: 3),
                                 Text(
                                   '${h['area']}, ${h['city']} · ${h['distance']}',
                                   style: TextStyle(
@@ -451,11 +537,9 @@ class _BottomSheet extends StatelessWidget {
                                   ),
                                   const SizedBox(width: 2),
                                   Text(
-                                    '${h['rating'] ?? ''}',
-                                    style: TextStyle(
-                                      color: Colors.white.withValues(
-                                        alpha: 0.7,
-                                      ),
+                                    '${h['rating']}',
+                                    style: const TextStyle(
+                                      color: Colors.white70,
                                       fontSize: 12,
                                     ),
                                   ),
@@ -473,21 +557,6 @@ class _BottomSheet extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-}
-
-class _Blob extends StatelessWidget {
-  const _Blob({required this.size, required this.color});
-  final double size;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(shape: BoxShape.circle, color: color),
     );
   }
 }

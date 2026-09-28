@@ -293,9 +293,7 @@ class _Header extends StatelessWidget {
               decoration: BoxDecoration(
                 color: Colors.white.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                  color: Colors.white.withValues(alpha: 0.14),
-                ),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -957,7 +955,7 @@ class _SeekerDrawer extends StatelessWidget {
                     ),
                     _DrawerTile(
                       icon: Icons.gavel_rounded,
-                      label: 'My bids',
+                      label: 'All bids',
                       onTap: () {
                         Get.back();
                         controller.onViewAllBids();
@@ -996,7 +994,7 @@ class _SeekerDrawer extends StatelessWidget {
                       },
                     ),
                     _DrawerTile(
-                      icon: Icons.apartment_rounded,
+                      icon: Icons.verified_outlined,
                       label: 'Hostels near you',
                       onTap: () {
                         Get.back();
@@ -1024,14 +1022,6 @@ class _SeekerDrawer extends StatelessWidget {
                       onTap: () {
                         Get.back();
                         controller.onProfile();
-                      },
-                    ),
-                    _DrawerTile(
-                      icon: Icons.chat_bubble_rounded,
-                      label: 'Chat',
-                      onTap: () {
-                        Get.back();
-                        controller.onChat();
                       },
                     ),
                     _DrawerTile(
