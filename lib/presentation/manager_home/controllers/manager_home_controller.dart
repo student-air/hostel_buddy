@@ -157,7 +157,7 @@ class ManagerHomeController extends GetxController {
     }
   }
 
-  void onNotifications() => AppSnackbar.info('Alerts', 'No new notifications.');
+  void onNotifications() => Get.toNamed(AppRoutes.notifications);
 
   void onProfile() => Get.toNamed(AppRoutes.profile);
 

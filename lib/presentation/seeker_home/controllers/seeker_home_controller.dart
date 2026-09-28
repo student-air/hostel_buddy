@@ -164,7 +164,7 @@ class SeekerHomeController extends GetxController {
 
   void onSearch() => Get.toNamed(AppRoutes.seekerSearch);
 
-  void onNotifications() => AppSnackbar.info('Alerts', 'No new notifications.');
+  void onNotifications() => Get.toNamed(AppRoutes.notifications);
 
   void onViewAllBids() => Get.toNamed(AppRoutes.seekerBids);
 
