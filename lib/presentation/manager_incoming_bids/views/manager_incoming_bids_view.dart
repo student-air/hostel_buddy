@@ -174,7 +174,7 @@ class _Tabs extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const labels = ['All', 'Pending', 'Accepted', 'Rejected'];
+    const labels = ['All', 'Offered', 'Accepted'];
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Obx(() {
@@ -206,7 +206,7 @@ class _Tabs extends StatelessWidget {
                         color: sel
                             ? Colors.white
                             : Colors.white.withValues(alpha: 0.55),
-                        fontSize: 12,
+                        fontSize: 13,
                         fontWeight: sel ? FontWeight.w700 : FontWeight.w500,
                       ),
                     ),
@@ -247,7 +247,7 @@ class _Body extends StatelessWidget {
         separatorBuilder: (_, __) => const SizedBox(height: 12),
         itemBuilder: (_, i) => _BidCard(
           bid: list[i],
-          onAccept: () => controller.acceptBid(list[i]),
+          onAccept: () => controller.onAcceptTap(list[i]),
           onReject: () => controller.rejectBid(list[i]),
         ),
       );
@@ -270,12 +270,25 @@ class _BidCard extends StatelessWidget {
     switch (bid.status) {
       case 'pending':
         return AppColors.warning;
+      case 'offered':
+        return AppColors.accent;
       case 'accepted':
         return AppColors.success;
-      case 'rejected':
-        return AppColors.error;
       default:
         return Colors.white54;
+    }
+  }
+
+  String get statusLabel {
+    switch (bid.status) {
+      case 'pending':
+        return 'Pending';
+      case 'offered':
+        return 'Offered';
+      case 'accepted':
+        return 'Accepted';
+      default:
+        return bid.status;
     }
   }
 
@@ -352,7 +365,7 @@ class _BidCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
-                  bid.status[0].toUpperCase() + bid.status.substring(1),
+                  statusLabel,
                   style: TextStyle(
                     color: statusColor,
                     fontSize: 11,
@@ -363,6 +376,7 @@ class _BidCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
+          // Seeker offer
           Text(
             bid.offer,
             style: const TextStyle(
@@ -371,6 +385,19 @@ class _BidCard extends StatelessWidget {
               fontWeight: FontWeight.w800,
             ),
           ),
+          // Manager counter-offer (when offered / accepted)
+          if (bid.managerOffer != null &&
+              bid.managerOffer != bid.offer) ...[
+            const SizedBox(height: 4),
+            Text(
+              'Your offer: ${bid.managerOffer}',
+              style: const TextStyle(
+                color: AppColors.accentDark,
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ],
           if (bid.amenities.isNotEmpty) ...[
             const SizedBox(height: 10),
             Wrap(
@@ -396,6 +423,7 @@ class _BidCard extends StatelessWidget {
               }).toList(),
             ),
           ],
+          // Actions only while pending
           if (isPending) ...[
             const SizedBox(height: 14),
             Row(

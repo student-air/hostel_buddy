@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 
 import '../../../routes/app_routes.dart';
 import '../../../core/utils/app_snackbar.dart';
@@ -49,8 +50,23 @@ class AuthController extends GetxController {
     );
   }
 
-  Future<void> continueWithGoogle() async {
-    AppSnackbar.info('Google', 'Google Sign-In coming soon');
+   Future<void> continueWithGoogle() async {
+    isLoading.value = true;
+    await Future.delayed(const Duration(milliseconds: 600));
+
+    // Mock Google account → profile for dashboard
+    final box = GetStorage();
+    await box.write('profile_name', 'John Snow');
+    await box.write('profile_phone', '03032241758');
+    await box.write('profile_email', 'uqfj5678@gmail.com');
+    await box.write('auth_provider', 'google');
+
+    isLoading.value = false;
+
+    AppSnackbar.success('Welcome', 'Signed in as John Snow');
+
+    // Skip profile setup → go straight to role selection
+    Get.offNamed(AppRoutes.roleSelection);
   }
 
   @override

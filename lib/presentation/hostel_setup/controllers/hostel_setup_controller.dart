@@ -219,7 +219,7 @@ class HostelSetupController extends GetxController {
     }
   }
 
-  Future<void> publishListing() async {
+    Future<void> publishListing() async {
     if (selectedHostelType.value.isEmpty) {
       AppSnackbar.warning('Hostel type', 'Select Boys or Girls hostel.');
       return;
@@ -228,14 +228,56 @@ class HostelSetupController extends GetxController {
     isLoading.value = true;
     await Future.delayed(const Duration(milliseconds: 900));
     isLoading.value = false;
+
     final box = GetStorage();
-    await box.write('hostel_name', nameController.text.trim());
-    await box.write('hostel_type', selectedHostelType.value);
-    Get.offAllNamed(AppRoutes.managerHome);
-    AppSnackbar.success(
-      'Published',
-      '${nameController.text.trim()} is now live!',
+    final name = nameController.text.trim();
+    final city = cityController.text.trim().isNotEmpty
+        ? cityController.text.trim()
+        : (box.read('profile_city')?.toString() ?? 'Islamabad');
+    final type = selectedHostelType.value;
+    final area = areaController.text.trim();
+    final contact = contactController.text.trim();
+    final description = descriptionController.text.trim();
+
+    // Legacy single keys (used across app)
+    await box.write('hostel_name', name);
+    await box.write('hostel_type', type);
+    await box.write('hostel_area', area);
+    await box.write('hostel_description', description);
+    await box.write('hostel_contact', contact);
+    await box.write('hostel_rooms', totalRooms.value);
+    if (city.isNotEmpty) await box.write('profile_city', city);
+
+    // Multi-hostel list used by Manager Home dropdown
+    final existing = box.read('manager_hostels');
+    final List<Map<String, dynamic>> list = [];
+    if (existing is List) {
+      for (final e in existing) {
+        if (e is Map) list.add(Map<String, dynamic>.from(e));
+      }
+    }
+
+    final newHostel = {
+      'id': DateTime.now().millisecondsSinceEpoch.toString(),
+      'name': name,
+      'city': city,
+      'type': type,
+    };
+
+    // If editing same name, replace; else append
+    final sameIndex = list.indexWhere(
+      (h) => (h['name']?.toString() ?? '').toLowerCase() == name.toLowerCase(),
     );
+    if (sameIndex >= 0) {
+      list[sameIndex] = newHostel;
+      await box.write('selected_hostel_index', sameIndex);
+    } else {
+      list.add(newHostel);
+      await box.write('selected_hostel_index', list.length - 1);
+    }
+    await box.write('manager_hostels', list);
+
+    AppSnackbar.success('Published', '$name is now live!');
     Get.offAllNamed(AppRoutes.managerHome);
   }
 
