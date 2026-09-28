@@ -157,8 +157,8 @@ class SeekerHomeController extends GetxController {
 
   void onCreateBid() => Get.toNamed(AppRoutes.placeBid);
 
-  void onMapView() => AppSnackbar.info('Map', 'Map view coming next.');
-
+  void onMapView() => Get.toNamed(AppRoutes.seekerMap);
+  
   void onMyBids() => AppSnackbar.info('My Bids', 'My bids coming next.');
 
   void onSearch() => Get.toNamed(AppRoutes.seekerSearch);

@@ -22,6 +22,8 @@ import '../presentation/seeker_search/bindings/seeker_search_binding.dart';
 import '../presentation/seeker_search/views/seeker_search_view.dart';
 import '../presentation/place_bid/bindings/place_bid_binding.dart';
 import '../presentation/place_bid/views/place_bid_view.dart';
+import '../presentation/seeker_map/bindings/seeker_map_binding.dart';
+import '../presentation/seeker_map/views/seeker_map_view.dart';
 
 import 'app_routes.dart';
 
@@ -82,6 +84,12 @@ class AppPages {
   name: AppRoutes.placeBid,
   page: () => const PlaceBidView(),
   binding: PlaceBidBinding(),
+),
+
+GetPage(
+  name: AppRoutes.seekerMap,
+  page: () => const SeekerMapView(),
+  binding: SeekerMapBinding(),
 ),
   ];
 }
