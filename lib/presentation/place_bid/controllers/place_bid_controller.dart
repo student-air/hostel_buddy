@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/utils/app_snackbar.dart';
+import '../../../routes/app_routes.dart';
 
 class PlaceBidController extends GetxController {
   final selectedSeater = '3 Seater'.obs;
@@ -58,20 +60,37 @@ class PlaceBidController extends GetxController {
 
   void addAmount(int amount) => yourOffer.value += amount;
 
-  void placeBid() {
-    if (!isHighest) {
-      AppSnackbar.warning(
-        'Bid too low',
-        'Bid must be higher than Rs ${formatAmount(currentHighestBid.value)}',
-      );
-      return;
-    }
-    AppSnackbar.success(
-      'Bid placed',
-      'Your offer Rs ${formatAmount(yourOffer.value)} is live.',
+ void placeBid() {
+  if (!isHighest) {
+    AppSnackbar.warning(
+      'Bid too low',
+      'Bid must be higher than Rs ${formatAmount(currentHighestBid.value)}',
     );
-    Get.back();
+    return;
   }
+
+  final box = GetStorage();
+  final bid = {
+    'id': DateTime.now().millisecondsSinceEpoch.toString(),
+    'seater': selectedSeater.value,
+    'amenities': selectedAmenities.toList(),
+    'yourOffer': 'Rs ${formatAmount(yourOffer.value)}/mo',
+    'status': 'pending',
+    'createdAt': DateTime.now().toIso8601String(),
+    'location': '',
+  };
+
+  final existing = (box.read('seeker_my_bids') as List?) ?? [];
+  existing.insert(0, bid);
+  box.write('seeker_my_bids', existing);
+
+  AppSnackbar.success(
+    'Bid placed',
+    'Your offer Rs ${formatAmount(yourOffer.value)} is live.',
+  );
+
+  Get.offNamed(AppRoutes.seekerMyBids);
+}
 
   String formatAmount(int amount) {
     final s = amount.toString();

@@ -12,5 +12,7 @@ class AppRoutes {
   static const String seekerSearch = '/seeker-search';
   static const String placeBid = '/place-bid';
   static const String seekerMap = '/seeker-map';
+  static const String seekerMyBids = '/seeker-my-bids';
+  static const String seekerMyBidDetail = '/seeker-my-bid-detail';
   static const String profile = '/profile';
 }
