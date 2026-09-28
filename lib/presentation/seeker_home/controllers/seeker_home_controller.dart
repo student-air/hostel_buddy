@@ -151,6 +151,154 @@ class SeekerHomeController extends GetxController {
       Get.toNamed(AppRoutes.profile);
       break;
   }
+} 
+
+  void onOtherCities() {
+  final cities = [
+    'Islamabad',
+    'Rawalpindi',
+    'Lahore',
+    'Karachi',
+    'Faisalabad',
+    'Multan',
+    'Peshawar',
+    'Quetta',
+    'Sialkot',
+    'Gujranwala',
+    'Hyderabad',
+    'Abbottabad',
+  ];
+
+  Get.bottomSheet(
+    isScrollControlled: true,
+    Container(
+      constraints: BoxConstraints(
+        maxHeight: Get.height * 0.65,
+      ),
+      decoration: const BoxDecoration(
+        color: Color(0xFF2A0412),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const SizedBox(height: 12),
+          Container(
+            width: 40,
+            height: 4,
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.25),
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+          const SizedBox(height: 16),
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 22),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                'Select city',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 6),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 22),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                'Hostels will update for the selected city',
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.45),
+                  fontSize: 13,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 14),
+          Flexible(
+            child: ListView.separated(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+              shrinkWrap: true,
+              itemCount: cities.length,
+              separatorBuilder: (_, __) => const SizedBox(height: 6),
+              itemBuilder: (_, i) {
+                final city = cities[i];
+                return Obx(() {
+                  final selected = currentCity.value == city;
+                  return GestureDetector(
+                    onTap: () {
+                      currentCity.value = city;
+                      _box.write('profile_city', city);
+                      Get.back();
+                      AppSnackbar.success(
+                        'City updated',
+                        'Showing hostels in $city',
+                      );
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 14,
+                      ),
+                      decoration: BoxDecoration(
+                        color: selected
+                            ? AppColors.accent.withValues(alpha: 0.2)
+                            : Colors.white.withValues(alpha: 0.05),
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(
+                          color: selected
+                              ? AppColors.accent
+                              : Colors.white.withValues(alpha: 0.1),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            selected
+                                ? Icons.location_on_rounded
+                                : Icons.location_on_outlined,
+                            size: 20,
+                            color: selected
+                                ? AppColors.accentLight
+                                : Colors.white.withValues(alpha: 0.5),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              city,
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 15,
+                                fontWeight: selected
+                                    ? FontWeight.w700
+                                    : FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                          if (selected)
+                            const Icon(
+                              Icons.check_circle_rounded,
+                              size: 20,
+                              color: AppColors.accentLight,
+                            ),
+                        ],
+                      ),
+                    ),
+                  );
+                });
+              },
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
 }
 
   void onHome() => Get.toNamed(AppRoutes.seekerHome);
@@ -176,8 +324,7 @@ class SeekerHomeController extends GetxController {
     AppSnackbar.info(name, 'Details coming next.');
   }
 
-  void onOtherCities() =>
-      AppSnackbar.info('Cities', 'City picker coming next.');
+  
 
   void onProfile() => Get.toNamed(AppRoutes.profile);
 
