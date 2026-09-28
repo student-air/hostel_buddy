@@ -137,24 +137,21 @@ class SeekerHomeController extends GetxController {
   }
 
   void onNavTap(int index) {
-    selectedNavIndex.value = index;
-    switch (index) {
-      case 0:
-        break; // Home
-      case 1:
-        onViewAllBids();
-        break;
-      case 2:
-        onSearch();
-        break;
-      case 3:
-        onChat();
-        break;
-      case 4:
-        onProfile();
-        break;
-    }
+  selectedNavIndex.value = index;
+  switch (index) {
+    case 0:
+      break; // already on Home
+    case 1:
+      Get.toNamed(AppRoutes.seekerBids);
+      break;
+    case 2:
+      Get.toNamed(AppRoutes.seekerSearch); // ← Search
+      break;
+    case 3:
+      Get.toNamed(AppRoutes.profile);
+      break;
   }
+}
 
   void onHome() => Get.toNamed(AppRoutes.seekerHome);
 
@@ -162,7 +159,7 @@ class SeekerHomeController extends GetxController {
 
   void onMapView() => AppSnackbar.info('Map', 'Map view coming next.');
 
-  void onSearch() => AppSnackbar.info('Search', 'Search results coming next.');
+  void onSearch() => Get.toNamed(AppRoutes.seekerSearch);
 
   void onNotifications() => AppSnackbar.info('Alerts', 'No new notifications.');
 

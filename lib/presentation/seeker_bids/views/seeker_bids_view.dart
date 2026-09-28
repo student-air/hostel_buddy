@@ -16,8 +16,10 @@ class SeekerBidsView extends GetView<SeekerBidsController> {
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.light,
       child: Scaffold(
+        resizeToAvoidBottomInset: false, // keyboard won't push navbar
         body: Stack(
           children: [
+            // ── Background ──
             Container(
               width: double.infinity,
               height: double.infinity,
@@ -36,38 +38,47 @@ class SeekerBidsView extends GetView<SeekerBidsController> {
             Positioned(
               top: -60,
               right: -40,
-              child: _Blob(size: 220, color: AppColors.accent.withValues(alpha: 0.08)),
+              child: _Blob(
+                size: 220,
+                color: AppColors.accent.withValues(alpha: 0.08),
+              ),
             ),
             Positioned(
               bottom: 120,
               left: -50,
-              child: _Blob(size: 180, color: Colors.white.withValues(alpha: 0.03)),
+              child: _Blob(
+                size: 180,
+                color: Colors.white.withValues(alpha: 0.03),
+              ),
             ),
+
+            // ── Content ──
             SafeArea(
               bottom: false,
               child: Column(
                 children: [
-                  Expanded(
-                    child: Column(
-                      children: [
-                        const SizedBox(height: 8),
-                        _AppealingHeader(controller: controller),
-                        const SizedBox(height: 18),
-                        _CoinsBar(controller: controller),
-                        const SizedBox(height: 16),
-                        _Tabs(controller: controller),
-                        const SizedBox(height: 12),
-                        Expanded(child: _TabBody(controller: controller)),
-                      ],
-                    ),
-                  ),
-                  Obx(
-                    () => AppBottomNavBar(
-                      selectedIndex: controller.selectedNavIndex.value,
-                      onTap: controller.onNavTap,
-                    ),
-                  ),
+                  const SizedBox(height: 8),
+                  _AppealingHeader(controller: controller),
+                  const SizedBox(height: 18),
+                  _CoinsBar(controller: controller),
+                  const SizedBox(height: 16),
+                  _Tabs(controller: controller),
+                  const SizedBox(height: 12),
+                  Expanded(child: _TabBody(controller: controller)),
                 ],
+              ),
+            ),
+
+            // ── Floating navbar ──
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: Obx(
+                () => AppBottomNavBar(
+                  selectedIndex: controller.selectedNavIndex.value,
+                  onTap: controller.onNavTap,
+                ),
               ),
             ),
           ],
@@ -101,7 +112,11 @@ class _AppealingHeader extends StatelessWidget {
                 color: Colors.white.withValues(alpha: 0.1),
                 border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
               ),
-              child: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 18),
+              child: const Icon(
+                Icons.arrow_back_ios_new_rounded,
+                color: Colors.white,
+                size: 18,
+              ),
             ),
           ),
           const SizedBox(width: 14),
@@ -135,7 +150,9 @@ class _AppealingHeader extends StatelessWidget {
             decoration: BoxDecoration(
               color: AppColors.accent.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: AppColors.accent.withValues(alpha: 0.45)),
+              border: Border.all(
+                color: AppColors.accent.withValues(alpha: 0.45),
+              ),
             ),
             child: const Row(
               mainAxisSize: MainAxisSize.min,
@@ -144,7 +161,11 @@ class _AppealingHeader extends StatelessWidget {
                 SizedBox(width: 5),
                 Text(
                   'Live',
-                  style: TextStyle(color: AppColors.accentLight, fontSize: 12, fontWeight: FontWeight.w700),
+                  style: TextStyle(
+                    color: AppColors.accentLight,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
               ],
             ),
@@ -195,7 +216,11 @@ class _CoinsBar extends StatelessWidget {
                     shape: BoxShape.circle,
                     color: AppColors.accent.withValues(alpha: 0.25),
                   ),
-                  child: const Icon(Icons.monetization_on_rounded, color: AppColors.accentLight, size: 20),
+                  child: const Icon(
+                    Icons.monetization_on_rounded,
+                    color: AppColors.accentLight,
+                    size: 20,
+                  ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -230,11 +255,17 @@ class _CoinsBar extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: AppColors.accent.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: AppColors.accent.withValues(alpha: 0.4)),
+                    border: Border.all(
+                      color: AppColors.accent.withValues(alpha: 0.4),
+                    ),
                   ),
                   child: const Text(
                     '−100 / continue',
-                    style: TextStyle(color: AppColors.accentLight, fontSize: 11, fontWeight: FontWeight.w600),
+                    style: TextStyle(
+                      color: AppColors.accentLight,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               ],
@@ -270,9 +301,21 @@ class _Tabs extends StatelessWidget {
           ),
           child: Row(
             children: [
-              _TabChip(label: 'Received', selected: selected == 0, onTap: () => controller.onTabChanged(0)),
-              _TabChip(label: 'Pending', selected: selected == 1, onTap: () => controller.onTabChanged(1)),
-              _TabChip(label: 'Closed', selected: selected == 2, onTap: () => controller.onTabChanged(2)),
+              _TabChip(
+                label: 'Received',
+                selected: selected == 0,
+                onTap: () => controller.onTabChanged(0),
+              ),
+              _TabChip(
+                label: 'Pending',
+                selected: selected == 1,
+                onTap: () => controller.onTabChanged(1),
+              ),
+              _TabChip(
+                label: 'Closed',
+                selected: selected == 2,
+                onTap: () => controller.onTabChanged(2),
+              ),
             ],
           ),
         );
@@ -282,7 +325,11 @@ class _Tabs extends StatelessWidget {
 }
 
 class _TabChip extends StatelessWidget {
-  const _TabChip({required this.label, required this.selected, required this.onTap});
+  const _TabChip({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
 
   final String label;
   final bool selected;
@@ -301,13 +348,21 @@ class _TabChip extends StatelessWidget {
             color: selected ? AppColors.accent : Colors.transparent,
             borderRadius: BorderRadius.circular(18),
             boxShadow: selected
-                ? [BoxShadow(color: AppColors.accent.withValues(alpha: 0.35), blurRadius: 10, offset: const Offset(0, 3))]
+                ? [
+                    BoxShadow(
+                      color: AppColors.accent.withValues(alpha: 0.35),
+                      blurRadius: 10,
+                      offset: const Offset(0, 3),
+                    ),
+                  ]
                 : null,
           ),
           child: Text(
             label,
             style: TextStyle(
-              color: selected ? Colors.white : Colors.white.withValues(alpha: 0.55),
+              color: selected
+                  ? Colors.white
+                  : Colors.white.withValues(alpha: 0.55),
               fontSize: 13,
               fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
             ),
@@ -341,7 +396,8 @@ class _TabBody extends StatelessWidget {
       }
 
       return ListView.separated(
-        padding: const EdgeInsets.fromLTRB(20, 4, 20, 20),
+        // Extra bottom padding so last card isn't hidden under floating nav
+        padding: const EdgeInsets.fromLTRB(20, 4, 20, 110),
         physics: const BouncingScrollPhysics(),
         itemCount: list.length,
         separatorBuilder: (_, __) => const SizedBox(height: 12),
@@ -378,16 +434,28 @@ class _EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final labels = ['No received offers yet', 'No pending bids', 'No closed bids'];
+    final labels = [
+      'No received offers yet',
+      'No pending bids',
+      'No closed bids',
+    ];
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.inbox_outlined, size: 48, color: Colors.white.withValues(alpha: 0.25)),
+          Icon(
+            Icons.inbox_outlined,
+            size: 48,
+            color: Colors.white.withValues(alpha: 0.25),
+          ),
           const SizedBox(height: 12),
           Text(
             labels[tab],
-            style: TextStyle(color: Colors.white.withValues(alpha: 0.45), fontSize: 15, fontWeight: FontWeight.w500),
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.45),
+              fontSize: 15,
+              fontWeight: FontWeight.w500,
+            ),
           ),
         ],
       ),
@@ -396,7 +464,7 @@ class _EmptyState extends StatelessWidget {
 }
 
 // ═══════════════════════════════════════════
-// CARDS
+// RECEIVED CARD
 // ═══════════════════════════════════════════
 
 class _ReceivedCard extends StatelessWidget {
@@ -412,7 +480,13 @@ class _ReceivedCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
-        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.12), blurRadius: 16, offset: const Offset(0, 6))],
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.12),
+            blurRadius: 16,
+            offset: const Offset(0, 6),
+          ),
+        ],
       ),
       child: Row(
         children: [
@@ -428,18 +502,45 @@ class _ReceivedCard extends StatelessWidget {
               ),
             ),
             alignment: Alignment.center,
-            child: Text(item.initials, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 15)),
+            child: Text(
+              item.initials,
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w700,
+                fontSize: 15,
+              ),
+            ),
           ),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(item.hostelName, style: const TextStyle(color: AppColors.textPrimary, fontSize: 15, fontWeight: FontWeight.w700)),
+                Text(
+                  item.hostelName,
+                  style: const TextStyle(
+                    color: AppColors.textPrimary,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
                 const SizedBox(height: 3),
-                Text(item.location, style: const TextStyle(color: AppColors.textSecondary, fontSize: 12)),
+                Text(
+                  item.location,
+                  style: const TextStyle(
+                    color: AppColors.textSecondary,
+                    fontSize: 12,
+                  ),
+                ),
                 const SizedBox(height: 4),
-                Text(item.offeredPrice, style: const TextStyle(color: AppColors.primary, fontSize: 13, fontWeight: FontWeight.w700)),
+                Text(
+                  item.offeredPrice,
+                  style: const TextStyle(
+                    color: AppColors.primary,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
               ],
             ),
           ),
@@ -447,8 +548,18 @@ class _ReceivedCard extends StatelessWidget {
             onTap: onViewOffer,
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              decoration: BoxDecoration(color: AppColors.accent, borderRadius: BorderRadius.circular(20)),
-              child: const Text('View Offer', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w700)),
+              decoration: BoxDecoration(
+                color: AppColors.accent,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: const Text(
+                'View Offer',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
             ),
           ),
         ],
@@ -456,6 +567,10 @@ class _ReceivedCard extends StatelessWidget {
     );
   }
 }
+
+// ═══════════════════════════════════════════
+// PENDING CARD
+// ═══════════════════════════════════════════
 
 class _PendingCard extends StatelessWidget {
   const _PendingCard({
@@ -477,7 +592,13 @@ class _PendingCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
-        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.12), blurRadius: 16, offset: const Offset(0, 6))],
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.12),
+            blurRadius: 16,
+            offset: const Offset(0, 6),
+          ),
+        ],
       ),
       child: Column(
         children: [
@@ -495,20 +616,44 @@ class _PendingCard extends StatelessWidget {
                   ),
                 ),
                 alignment: Alignment.center,
-                child: Text(item.initials, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 15)),
+                child: Text(
+                  item.initials,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 15,
+                  ),
+                ),
               ),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(item.hostelName, style: const TextStyle(color: AppColors.textPrimary, fontSize: 15, fontWeight: FontWeight.w700)),
+                    Text(
+                      item.hostelName,
+                      style: const TextStyle(
+                        color: AppColors.textPrimary,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
                     const SizedBox(height: 3),
-                    Text(item.location, style: const TextStyle(color: AppColors.textSecondary, fontSize: 12)),
+                    Text(
+                      item.location,
+                      style: const TextStyle(
+                        color: AppColors.textSecondary,
+                        fontSize: 12,
+                      ),
+                    ),
                     const SizedBox(height: 4),
                     Text(
                       '${item.offeredPrice}  ·  ${item.roomType} · ${item.seater}',
-                      style: const TextStyle(color: AppColors.primary, fontSize: 12, fontWeight: FontWeight.w600),
+                      style: const TextStyle(
+                        color: AppColors.primary,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ],
                 ),
@@ -518,8 +663,15 @@ class _PendingCard extends StatelessWidget {
                 child: Container(
                   width: 40,
                   height: 40,
-                  decoration: BoxDecoration(shape: BoxShape.circle, color: AppColors.accent.withValues(alpha: 0.12)),
-                  child: const Icon(Icons.phone_rounded, color: AppColors.accent, size: 20),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: AppColors.accent.withValues(alpha: 0.12),
+                  ),
+                  child: const Icon(
+                    Icons.phone_rounded,
+                    color: AppColors.accent,
+                    size: 20,
+                  ),
                 ),
               ),
             ],
@@ -535,9 +687,14 @@ class _PendingCard extends StatelessWidget {
                     style: OutlinedButton.styleFrom(
                       foregroundColor: AppColors.error,
                       side: const BorderSide(color: AppColors.error),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
                     ),
-                    child: const Text('Reject', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+                    child: const Text(
+                      'Reject',
+                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                    ),
                   ),
                 ),
               ),
@@ -551,9 +708,14 @@ class _PendingCard extends StatelessWidget {
                       backgroundColor: AppColors.success,
                       foregroundColor: Colors.white,
                       elevation: 0,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
                     ),
-                    child: const Text('Accept', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
+                    child: const Text(
+                      'Accept',
+                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
+                    ),
                   ),
                 ),
               ),
@@ -564,6 +726,10 @@ class _PendingCard extends StatelessWidget {
     );
   }
 }
+
+// ═══════════════════════════════════════════
+// CLOSED CARD
+// ═══════════════════════════════════════════
 
 class _ClosedCard extends StatelessWidget {
   const _ClosedCard({
@@ -636,7 +802,10 @@ class _ClosedCard extends StatelessWidget {
                           ),
                         ),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 3,
+                          ),
                           decoration: BoxDecoration(
                             color: AppColors.success.withValues(alpha: 0.12),
                             borderRadius: BorderRadius.circular(12),
@@ -669,8 +838,6 @@ class _ClosedCard extends StatelessWidget {
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-
-                    // ── Overall rating shown after review ──
                     if (hasReview) ...[
                       const SizedBox(height: 8),
                       Row(
@@ -728,8 +895,6 @@ class _ClosedCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
-
-          // Show Review button only if not yet reviewed
           if (!hasReview)
             SizedBox(
               width: double.infinity,
@@ -751,7 +916,6 @@ class _ClosedCard extends StatelessWidget {
               ),
             )
           else
-            // Already reviewed chip
             Container(
               width: double.infinity,
               height: 42,
@@ -759,7 +923,9 @@ class _ClosedCard extends StatelessWidget {
               decoration: BoxDecoration(
                 color: AppColors.success.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: AppColors.success.withValues(alpha: 0.35)),
+                border: Border.all(
+                  color: AppColors.success.withValues(alpha: 0.35),
+                ),
               ),
               child: const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -782,11 +948,16 @@ class _ClosedCard extends StatelessWidget {
     );
   }
 }
+
 // ═══════════════════════════════════════════
 // OPEN SHEETS
 // ═══════════════════════════════════════════
 
-void _openOfferSheet(BuildContext context, BidItem item, SeekerBidsController controller) {
+void _openOfferSheet(
+  BuildContext context,
+  BidItem item,
+  SeekerBidsController controller,
+) {
   Get.bottomSheet(
     _OfferBottomSheet(item: item, controller: controller),
     isScrollControlled: true,
@@ -794,7 +965,11 @@ void _openOfferSheet(BuildContext context, BidItem item, SeekerBidsController co
   );
 }
 
-void _openReviewSheet(BuildContext context, BidItem item, SeekerBidsController controller) {
+void _openReviewSheet(
+  BuildContext context,
+  BidItem item,
+  SeekerBidsController controller,
+) {
   controller.resetReview();
   Get.bottomSheet(
     _ReviewBottomSheet(item: item, controller: controller),
@@ -847,23 +1022,49 @@ class _OfferBottomSheet extends StatelessWidget {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: AppColors.accent.withValues(alpha: 0.25),
-                    border: Border.all(color: AppColors.accent.withValues(alpha: 0.5)),
+                    border: Border.all(
+                      color: AppColors.accent.withValues(alpha: 0.5),
+                    ),
                   ),
                   alignment: Alignment.center,
-                  child: Text(item.initials, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 16)),
+                  child: Text(
+                    item.initials,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 16,
+                    ),
+                  ),
                 ),
                 const SizedBox(width: 14),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(item.hostelName, style: const TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w700)),
+                      Text(
+                        item.hostelName,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 17,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
                       const SizedBox(height: 4),
                       Row(
                         children: [
-                          Icon(Icons.location_on_rounded, size: 14, color: AppColors.accentLight.withValues(alpha: 0.8)),
+                          Icon(
+                            Icons.location_on_rounded,
+                            size: 14,
+                            color: AppColors.accentLight.withValues(alpha: 0.8),
+                          ),
                           const SizedBox(width: 4),
-                          Text(item.location, style: TextStyle(color: Colors.white.withValues(alpha: 0.65), fontSize: 13)),
+                          Text(
+                            item.location,
+                            style: TextStyle(
+                              color: Colors.white.withValues(alpha: 0.65),
+                              fontSize: 13,
+                            ),
+                          ),
                         ],
                       ),
                     ],
@@ -885,13 +1086,30 @@ class _OfferBottomSheet extends StatelessWidget {
               ),
               child: Column(
                 children: [
-                  _DetailRow(label: 'Phone', value: item.phone, icon: Icons.phone_rounded),
+                  _DetailRow(
+                    label: 'Phone',
+                    value: item.phone,
+                    icon: Icons.phone_rounded,
+                  ),
                   const SizedBox(height: 12),
-                  _DetailRow(label: 'Your bid', value: item.yourBid, icon: Icons.gavel_rounded),
+                  _DetailRow(
+                    label: 'Your bid',
+                    value: item.yourBid,
+                    icon: Icons.gavel_rounded,
+                  ),
                   const SizedBox(height: 12),
-                  _DetailRow(label: 'Hostel offer', value: item.offeredPrice, icon: Icons.local_offer_rounded, valueColor: AppColors.accentLight),
+                  _DetailRow(
+                    label: 'Hostel offer',
+                    value: item.offeredPrice,
+                    icon: Icons.local_offer_rounded,
+                    valueColor: AppColors.accentLight,
+                  ),
                   const SizedBox(height: 12),
-                  _DetailRow(label: 'Room', value: '${item.roomType} · ${item.seater}', icon: Icons.meeting_room_outlined),
+                  _DetailRow(
+                    label: 'Room',
+                    value: '${item.roomType} · ${item.seater}',
+                    icon: Icons.meeting_room_outlined,
+                  ),
                 ],
               ),
             ),
@@ -908,10 +1126,20 @@ class _OfferBottomSheet extends StatelessWidget {
                       onPressed: () => Get.back(),
                       style: OutlinedButton.styleFrom(
                         foregroundColor: Colors.white,
-                        side: BorderSide(color: Colors.white.withValues(alpha: 0.25)),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(26)),
+                        side: BorderSide(
+                          color: Colors.white.withValues(alpha: 0.25),
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(26),
+                        ),
                       ),
-                      child: const Text('Cancel', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
+                      child: const Text(
+                        'Cancel',
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
                     ),
                   ),
                 ),
@@ -925,9 +1153,17 @@ class _OfferBottomSheet extends StatelessWidget {
                         backgroundColor: AppColors.accent,
                         foregroundColor: Colors.white,
                         elevation: 0,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(26)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(26),
+                        ),
                       ),
-                      child: const Text('Continue', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700)),
+                      child: const Text(
+                        'Continue',
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
                     ),
                   ),
                 ),
@@ -941,7 +1177,12 @@ class _OfferBottomSheet extends StatelessWidget {
 }
 
 class _DetailRow extends StatelessWidget {
-  const _DetailRow({required this.label, required this.value, required this.icon, this.valueColor});
+  const _DetailRow({
+    required this.label,
+    required this.value,
+    required this.icon,
+    this.valueColor,
+  });
 
   final String label;
   final String value;
@@ -952,18 +1193,35 @@ class _DetailRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Icon(icon, size: 18, color: AppColors.accentLight.withValues(alpha: 0.7)),
+        Icon(
+          icon,
+          size: 18,
+          color: AppColors.accentLight.withValues(alpha: 0.7),
+        ),
         const SizedBox(width: 10),
-        Text(label, style: TextStyle(color: Colors.white.withValues(alpha: 0.5), fontSize: 13)),
+        Text(
+          label,
+          style: TextStyle(
+            color: Colors.white.withValues(alpha: 0.5),
+            fontSize: 13,
+          ),
+        ),
         const Spacer(),
-        Text(value, style: TextStyle(color: valueColor ?? Colors.white, fontSize: 14, fontWeight: FontWeight.w600)),
+        Text(
+          value,
+          style: TextStyle(
+            color: valueColor ?? Colors.white,
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
       ],
     );
   }
 }
 
 // ═══════════════════════════════════════════
-// REVIEW BOTTOM SHEET (final)
+// REVIEW BOTTOM SHEET
 // ═══════════════════════════════════════════
 
 class _ReviewBottomSheet extends StatelessWidget {
@@ -979,14 +1237,13 @@ class _ReviewBottomSheet extends StatelessWidget {
     return Container(
       height: MediaQuery.of(context).size.height * 0.88,
       decoration: const BoxDecoration(
-        // Gradient: lighter top → darker bottom
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [
-            Color(0xFF3C0A1A), // lighter top
-            Color(0xFF2A0412), // mid
-            Color(0xFF1A020A), // darker bottom
+            Color(0xFF3C0A1A),
+            Color(0xFF2A0412),
+            Color(0xFF1A020A),
           ],
         ),
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
@@ -1003,7 +1260,6 @@ class _ReviewBottomSheet extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
-
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Row(
@@ -1011,19 +1267,27 @@ class _ReviewBottomSheet extends StatelessWidget {
                 Expanded(
                   child: Text(
                     'Review ${item.hostelName}',
-                    style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w800),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w800,
+                    ),
                   ),
                 ),
                 GestureDetector(
                   onTap: () => Get.back(),
-                  child: Icon(Icons.close_rounded, color: Colors.white.withValues(alpha: 0.6), size: 22),
+                  child: Icon(
+                    Icons.close_rounded,
+                    color: Colors.white.withValues(alpha: 0.6),
+                    size: 22,
+                  ),
                 ),
               ],
             ),
           ),
           const SizedBox(height: 18),
 
-          // Overall rating box — green glow + green outline
+          // Overall rating box — green glow + green outline, yellow stars
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Obx(() {
@@ -1035,12 +1299,12 @@ class _ReviewBottomSheet extends StatelessWidget {
                   color: Colors.white.withValues(alpha: 0.06),
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
-                    color: AppColors.accent.withValues(alpha: 0.55), // green outline
+                    color: AppColors.accent.withValues(alpha: 0.55),
                     width: 1.4,
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: AppColors.accent.withValues(alpha: 0.25), // greenish glow
+                      color: AppColors.accent.withValues(alpha: 0.25),
                       blurRadius: 18,
                       spreadRadius: 1,
                     ),
@@ -1061,11 +1325,11 @@ class _ReviewBottomSheet extends StatelessWidget {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Stars stay YELLOW
                         Row(
                           children: List.generate(5, (i) {
                             final filled = overall >= (i + 1);
-                            final half = overall >= (i + 0.5) && overall < (i + 1);
+                            final half =
+                                overall >= (i + 0.5) && overall < (i + 1);
                             return Icon(
                               filled
                                   ? Icons.star_rounded
@@ -1074,15 +1338,20 @@ class _ReviewBottomSheet extends StatelessWidget {
                                       : Icons.star_outline_rounded,
                               size: 18,
                               color: filled || half
-                                  ? const Color(0xFFFFC107) // yellow
+                                  ? const Color(0xFFFFC107)
                                   : Colors.white.withValues(alpha: 0.3),
                             );
                           }),
                         ),
                         const SizedBox(height: 3),
                         Text(
-                          overall == 0 ? 'Overall · rate to see score' : 'Overall · updates as you rate',
-                          style: TextStyle(color: Colors.white.withValues(alpha: 0.5), fontSize: 12),
+                          overall == 0
+                              ? 'Overall · rate to see score'
+                              : 'Overall · updates as you rate',
+                          style: TextStyle(
+                            color: Colors.white.withValues(alpha: 0.5),
+                            fontSize: 12,
+                          ),
                         ),
                       ],
                     ),
@@ -1101,10 +1370,13 @@ class _ReviewBottomSheet extends StatelessWidget {
                 children: [
                   Text(
                     'Rate each category',
-                    style: TextStyle(color: Colors.white.withValues(alpha: 0.65), fontSize: 13, fontWeight: FontWeight.w600),
+                    style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.65),
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                   const SizedBox(height: 12),
-
                   Obx(() {
                     return Column(
                       children: controller.reviewRatings.keys.map((cat) {
@@ -1119,11 +1391,14 @@ class _ReviewBottomSheet extends StatelessWidget {
                       }).toList(),
                     );
                   }),
-
                   const SizedBox(height: 16),
                   Text(
                     'Your review',
-                    style: TextStyle(color: Colors.white.withValues(alpha: 0.65), fontSize: 13, fontWeight: FontWeight.w600),
+                    style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.65),
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                   const SizedBox(height: 10),
                   TextField(
@@ -1133,22 +1408,31 @@ class _ReviewBottomSheet extends StatelessWidget {
                     onChanged: (v) => controller.reviewText.value = v,
                     decoration: InputDecoration(
                       hintText: 'Share your experience...',
-                      hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.35)),
+                      hintStyle: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.35),
+                      ),
                       filled: true,
                       fillColor: Colors.white.withValues(alpha: 0.06),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(14),
-                        borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
+                        borderSide: BorderSide(
+                          color: Colors.white.withValues(alpha: 0.1),
+                        ),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(14),
-                        borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
+                        borderSide: BorderSide(
+                          color: Colors.white.withValues(alpha: 0.1),
+                        ),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(14),
                         borderSide: const BorderSide(color: AppColors.accent),
                       ),
-                      counterStyle: TextStyle(color: Colors.white.withValues(alpha: 0.35), fontSize: 11),
+                      counterStyle: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.35),
+                        fontSize: 11,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -1168,9 +1452,14 @@ class _ReviewBottomSheet extends StatelessWidget {
                   backgroundColor: AppColors.accent,
                   foregroundColor: Colors.white,
                   elevation: 0,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(26)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(26),
+                  ),
                 ),
-                child: const Text('Submit Review', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                child: const Text(
+                  'Submit Review',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                ),
               ),
             ),
           ),
@@ -1216,7 +1505,6 @@ class _CategoryRatingRow extends StatelessWidget {
             children: List.generate(5, (i) {
               final starValue = (i + 1).toDouble();
               final filled = rating >= starValue;
-
               return GestureDetector(
                 onTap: () => onRate(starValue),
                 behavior: HitTestBehavior.opaque,
@@ -1226,7 +1514,7 @@ class _CategoryRatingRow extends StatelessWidget {
                     filled ? Icons.star_rounded : Icons.star_outline_rounded,
                     size: 26,
                     color: filled
-                        ? const Color(0xFFFFC107) // yellow stars
+                        ? const Color(0xFFFFC107)
                         : Colors.white.withValues(alpha: 0.3),
                   ),
                 ),

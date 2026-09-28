@@ -82,24 +82,21 @@ class SeekerBidsController extends GetxController {
   void onTabChanged(int index) => selectedTab.value = index;
 
   void onNavTap(int index) {
-    selectedNavIndex.value = index;
-    switch (index) {
-      case 0:
-        Get.offAllNamed(AppRoutes.seekerHome);
-        break;
-      case 1:
-        break;
-      case 2:
-        AppSnackbar.info('Saved', 'Saved hostels coming next.');
-        break;
-      case 3:
-        AppSnackbar.info('Chat', 'Chat coming next.');
-        break;
-      case 4:
-        Get.toNamed(AppRoutes.profile);
-        break;
-    }
+  selectedNavIndex.value = index;
+  switch (index) {
+    case 0:
+      Get.offAllNamed(AppRoutes.seekerHome);
+      break;
+    case 1:
+      break; // already on Bids
+    case 2:
+      Get.toNamed(AppRoutes.seekerSearch); // ← Search
+      break;
+    case 3:
+      Get.toNamed(AppRoutes.profile);
+      break;
   }
+}
 
   void onContinue(BidItem item) {
     if (coins.value < 100) {

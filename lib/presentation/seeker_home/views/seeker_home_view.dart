@@ -13,15 +13,15 @@ class SeekerHomeView extends GetView<SeekerHomeController> {
 
   @override
   Widget build(BuildContext context) {
-    final bottomPad = MediaQuery.of(context).padding.bottom;
-
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.light,
       child: Scaffold(
         key: controller.scaffoldKey,
         endDrawer: _SeekerDrawer(controller: controller),
+        resizeToAvoidBottomInset: false, // keyboard won't push navbar
         body: Stack(
           children: [
+            // ── Background ──
             Container(
               width: double.infinity,
               height: double.infinity,
@@ -53,37 +53,41 @@ class SeekerHomeView extends GetView<SeekerHomeController> {
                 color: Colors.white.withValues(alpha: 0.03),
               ),
             ),
+
+            // ── Content ──
             SafeArea(
               bottom: false,
-              child: Column(
-                children: [
-                  Expanded(
-                    child: SingleChildScrollView(
-                      physics: const BouncingScrollPhysics(),
-                      padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          _Header(controller: controller),
-                          const SizedBox(height: 22),
-                          _BidsGlance(controller: controller),
-                          const SizedBox(height: 18),
-                          _LocationRow(controller: controller),
-                          const SizedBox(height: 18),
-                          _QuickActions(controller: controller),
-                          const SizedBox(height: 26),
-                          _HostelsSection(controller: controller),
-                        ],
-                      ),
-                    ),
-                  ),
-                  Obx(
-                    () => AppBottomNavBar(
-                      selectedIndex: controller.selectedNavIndex.value,
-                      onTap: controller.onNavTap,
-                    ),
-                  ),
-                ],
+              child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                // Extra bottom padding so content isn't hidden under floating nav
+                padding: const EdgeInsets.fromLTRB(20, 8, 20, 110),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _Header(controller: controller),
+                    const SizedBox(height: 22),
+                    _BidsGlance(controller: controller),
+                    const SizedBox(height: 18),
+                    _LocationRow(controller: controller),
+                    const SizedBox(height: 18),
+                    _QuickActions(controller: controller),
+                    const SizedBox(height: 26),
+                    _HostelsSection(controller: controller),
+                  ],
+                ),
+              ),
+            ),
+
+            // ── Floating navbar ──
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: Obx(
+                () => AppBottomNavBar(
+                  selectedIndex: controller.selectedNavIndex.value,
+                  onTap: controller.onNavTap,
+                ),
               ),
             ),
           ],
@@ -106,10 +110,8 @@ class _Header extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Top bar: initials → profile | city | menu → drawer | notification → alerts
         Row(
           children: [
-            // Initials → profile
             GestureDetector(
               onTap: controller.onProfile,
               child: Container(
@@ -170,7 +172,6 @@ class _Header extends StatelessWidget {
                 ),
               ),
             ),
-            // Notification → alerts
             GestureDetector(
               onTap: controller.onNotifications,
               child: Stack(
@@ -227,12 +228,9 @@ class _Header extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(width: 8),
           ],
         ),
         const SizedBox(height: 22),
-
-        // Greeting + date card
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -295,7 +293,9 @@ class _Header extends StatelessWidget {
               decoration: BoxDecoration(
                 color: Colors.white.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
+                border: Border.all(
+                  color: Colors.white.withValues(alpha: 0.14),
+                ),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -365,6 +365,7 @@ class _Header extends StatelessWidget {
     );
   }
 }
+
 // ═══════════════════════════════════════════
 // BIDS GLANCE
 // ═══════════════════════════════════════════
@@ -554,6 +555,30 @@ class _LocationRow extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _GlassBox extends StatelessWidget {
+  const _GlassBox({required this.child});
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(14),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(14),
+            color: Colors.white.withValues(alpha: 0.08),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
+          ),
+          child: child,
+        ),
+      ),
     );
   }
 }
@@ -779,38 +804,38 @@ class _HostelCard extends StatelessWidget {
                     style: const TextStyle(
                       color: AppColors.textSecondary,
                       fontSize: 12,
-                      fontWeight: FontWeight.w500,
                     ),
                   ),
                   const SizedBox(height: 6),
-                  Text(
-                    _str('price'),
-                    style: const TextStyle(
-                      color: AppColors.primary,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w700,
-                    ),
+                  Row(
+                    children: [
+                      Text(
+                        _str('price'),
+                        style: const TextStyle(
+                          color: AppColors.primary,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      const Icon(
+                        Icons.star_rounded,
+                        size: 14,
+                        color: Color(0xFFFFC107),
+                      ),
+                      const SizedBox(width: 3),
+                      Text(
+                        '${hostel['rating'] ?? ''}',
+                        style: const TextStyle(
+                          color: AppColors.textPrimary,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
-            ),
-            Row(
-              children: [
-                const Icon(
-                  Icons.star_rounded,
-                  size: 16,
-                  color: Color(0xFFE0A33C),
-                ),
-                const SizedBox(width: 3),
-                Text(
-                  '${hostel['rating'] ?? '—'}',
-                  style: const TextStyle(
-                    color: AppColors.textPrimary,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ],
             ),
           ],
         ),
@@ -820,8 +845,8 @@ class _HostelCard extends StatelessWidget {
 }
 
 // ═══════════════════════════════════════════
-// SIDE DRAWER
-// ══════════════════════════════════════════
+// DRAWER (keep your existing drawer logic)
+// ═══════════════════════════════════════════
 
 class _SeekerDrawer extends StatelessWidget {
   const _SeekerDrawer({required this.controller});
@@ -830,232 +855,37 @@ class _SeekerDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      backgroundColor: const Color(0xFF1A050C),
+      backgroundColor: const Color(0xFF1A0810),
       child: SafeArea(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // ── Header ──
-            Container(
-              padding: const EdgeInsets.fromLTRB(20, 20, 12, 20),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    AppColors.primary.withValues(alpha: 0.5),
-                    Colors.transparent,
-                  ],
-                ),
-              ),
-              child: Row(
-                children: [
-                  // Avatar
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.pop(context);
-                      controller.onProfile();
-                    },
-                    child: Container(
-                      width: 56,
-                      height: 56,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.white,
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppColors.accent.withValues(alpha: 0.3),
-                            blurRadius: 12,
-                          ),
-                        ],
-                      ),
-                      alignment: Alignment.center,
-                      child: Obx(() {
-                        final _ = controller.userName.value;
-                        return Text(
-                          controller.initials,
-                          style: const TextStyle(
-                            color: AppColors.primary,
-                            fontWeight: FontWeight.w800,
-                            fontSize: 18,
-                          ),
-                        );
-                      }),
-                    ),
-                  ),
-                  const SizedBox(width: 14),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Obx(
-                          () => Text(
-                            controller.userName.value,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w800,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 3),
-                        Obx(
-                          () => Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 3,
-                            ),
-                            decoration: BoxDecoration(
-                              color: AppColors.accent.withValues(alpha: 0.18),
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(
-                                color: AppColors.accent.withValues(alpha: 0.4),
-                              ),
-                            ),
-                            child: Text(
-                              controller.userRoleLabel.value,
-                              style: const TextStyle(
-                                color: AppColors.accentLight,
-                                fontSize: 11,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  IconButton(
-                    onPressed: () => Navigator.pop(context),
-                    icon: Icon(
-                      Icons.close_rounded,
-                      color: Colors.white.withValues(alpha: 0.6),
-                    ),
-                  ),
-                ],
-              ),
+            const SizedBox(height: 24),
+            ListTile(
+              leading: const Icon(Icons.person_rounded, color: Colors.white),
+              title: const Text('Profile', style: TextStyle(color: Colors.white)),
+              onTap: () {
+                Get.back();
+                controller.onProfile();
+              },
             ),
-
-            Divider(color: Colors.white.withValues(alpha: 0.08), height: 1),
-
-            // ── Menu ──
-            Expanded(
-              child: ListView(
-                padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
-                children: [
-                  _DrawerSectionLabel('Explore'),
-                  _DrawerItem(
-                    icon: Icons.home_rounded,
-                    label: 'Home',
-                    onTap: () => Navigator.pop(context),
-                  ),
-                  _DrawerItem(
-                    icon: Icons.gavel_rounded,
-                    label: 'My bids',
-                    onTap: () {
-                      Navigator.pop(context);
-                      controller.onViewAllBids();
-                    },
-                  ),
-                  _DrawerItem(
-                    icon: Icons.add_circle_outline_rounded,
-                    label: 'Create bid',
-                    onTap: () {
-                      Navigator.pop(context);
-                      controller.onCreateBid();
-                    },
-                  ),
-                  _DrawerItem(
-                    icon: Icons.map_outlined,
-                    label: 'Map view',
-                    onTap: () {
-                      Navigator.pop(context);
-                      controller.onMapView();
-                    },
-                  ),
-                  _DrawerItem(
-                    icon: Icons.search_rounded,
-                    label: 'Search hostels',
-                    onTap: () {
-                      Navigator.pop(context);
-                      controller.onSearch();
-                    },
-                  ),
-                  _DrawerItem(
-                    icon: Icons.apartment_rounded,
-                    label: 'Hostels near you',
-                    onTap: () {
-                      Navigator.pop(context);
-                      controller.onSeeAllHostels();
-                    },
-                  ),
-
-                  const SizedBox(height: 8),
-                  _DrawerSectionLabel('Account'),
-                  _DrawerItem(
-                    icon: Icons.person_outline_rounded,
-                    label: 'Profile',
-                    onTap: () {
-                      Navigator.pop(context);
-                      controller.onProfile();
-                    },
-                  ),
-                  _DrawerItem(
-                    icon: Icons.chat_bubble_outline_rounded,
-                    label: 'Chat',
-                    onTap: () {
-                      Navigator.pop(context);
-                      controller.onChat();
-                    },
-                  ),
-                  _DrawerItem(
-                    icon: Icons.notifications_none_rounded,
-                    label: 'Notifications',
-                    onTap: () {
-                      Navigator.pop(context);
-                      controller.onNotifications();
-                    },
-                  ),
-                  _DrawerItem(
-                    icon: Icons.settings_outlined,
-                    label: 'Settings',
-                    onTap: () {
-                      Navigator.pop(context);
-                      controller.onSettings();
-                    },
-                  ),
-
-                  const SizedBox(height: 12),
-                  Divider(color: Colors.white.withValues(alpha: 0.08)),
-                  const SizedBox(height: 4),
-
-                  // Logout
-                  _DrawerItem(
-                    icon: Icons.logout_rounded,
-                    label: 'Log out',
-                    danger: true,
-                    onTap: () {
-                      Navigator.pop(context);
-                      controller.onLogout();
-                    },
-                  ),
-                ],
-              ),
+            ListTile(
+              leading: const Icon(Icons.settings_rounded, color: Colors.white),
+              title: const Text('Settings', style: TextStyle(color: Colors.white)),
+              onTap: () {
+                Get.back();
+                controller.onSettings();
+              },
             ),
-
-            // ── Footer ──
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
-              child: Text(
-                'Hostel Buddy v1.0.0',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.3),
-                  fontSize: 11,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
+            const Spacer(),
+            ListTile(
+              leading: const Icon(Icons.logout_rounded, color: AppColors.error),
+              title: const Text('Log out', style: TextStyle(color: AppColors.error)),
+              onTap: () {
+                Get.back();
+                controller.onLogout();
+              },
             ),
+            const SizedBox(height: 24),
           ],
         ),
       ),
@@ -1063,117 +893,9 @@ class _SeekerDrawer extends StatelessWidget {
   }
 }
 
-class _DrawerSectionLabel extends StatelessWidget {
-  const _DrawerSectionLabel(this.label);
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(12, 8, 12, 6),
-      child: Text(
-        label.toUpperCase(),
-        style: TextStyle(
-          color: Colors.white.withValues(alpha: 0.35),
-          fontSize: 11,
-          fontWeight: FontWeight.w700,
-          letterSpacing: 0.8,
-        ),
-      ),
-    );
-  }
-}
-
-class _DrawerItem extends StatelessWidget {
-  const _DrawerItem({
-    required this.icon,
-    required this.label,
-    required this.onTap,
-    this.danger = false,
-  });
-
-  final IconData icon;
-  final String label;
-  final VoidCallback onTap;
-  final bool danger;
-
-  @override
-  Widget build(BuildContext context) {
-    final color = danger ? AppColors.error : Colors.white;
-    final iconColor = danger ? AppColors.error : AppColors.accentLight;
-
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(14),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-          child: Row(
-            children: [
-              Container(
-                width: 36,
-                height: 36,
-                decoration: BoxDecoration(
-                  color: danger
-                      ? AppColors.error.withValues(alpha: 0.12)
-                      : AppColors.accent.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Icon(icon, size: 18, color: iconColor),
-              ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Text(
-                  label,
-                  style: TextStyle(
-                    color: color,
-                    fontSize: 14.5,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-              if (!danger)
-                Icon(
-                  Icons.chevron_right_rounded,
-                  size: 18,
-                  color: Colors.white.withValues(alpha: 0.25),
-                ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
 // ═══════════════════════════════════════════
-// SHARED
+// BLOB
 // ═══════════════════════════════════════════
-
-class _GlassBox extends StatelessWidget {
-  const _GlassBox({required this.child});
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(16),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-            color: Colors.white.withValues(alpha: 0.08),
-            border: Border.all(color: Colors.white.withValues(alpha: 0.18)),
-          ),
-          child: child,
-        ),
-      ),
-    );
-  }
-}
 
 class _Blob extends StatelessWidget {
   const _Blob({required this.size, required this.color});
