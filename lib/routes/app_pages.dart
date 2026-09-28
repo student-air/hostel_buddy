@@ -29,6 +29,8 @@ import '../presentation/seeker_my_bids/views/seeker_my_bids_view.dart';
 import '../presentation/seeker_my_bids/views/bid_detail_view.dart';
 import '../presentation/notifications/bindings/notifications_binding.dart';
 import '../presentation/notifications/views/notifications_view.dart';
+import '../presentation/manager_incoming_bids/bindings/manager_incoming_bids_binding.dart';
+import '../presentation/manager_incoming_bids/views/manager_incoming_bids_view.dart';
 
 import 'app_routes.dart';
 
@@ -110,6 +112,11 @@ class AppPages {
   name: AppRoutes.notifications,
   page: () => const NotificationsView(),
   binding: NotificationsBinding(),
+),
+GetPage(
+  name: AppRoutes.managerIncomingBids,
+  page: () => const ManagerIncomingBidsView(),
+  binding: ManagerIncomingBidsBinding(),
 ),
   ];
 }

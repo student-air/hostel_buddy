@@ -161,7 +161,7 @@ class ManagerHomeController extends GetxController {
 
   void onProfile() => Get.toNamed(AppRoutes.profile);
 
-  void onViewBids() => AppSnackbar.info('Bids', 'All bids coming next.');
+  void onViewBids() => Get.toNamed(AppRoutes.managerIncomingBids);
 
   void onManageRooms() =>
       AppSnackbar.info('Rooms', 'Room management coming next.');
@@ -174,9 +174,8 @@ class ManagerHomeController extends GetxController {
   void onAddListing() => Get.toNamed(AppRoutes.hostelSetup);
 
   void onBidTap(Map<String, dynamic> bid) {
-    final name = bid['name']?.toString() ?? 'Bid';
-    AppSnackbar.info(name, 'Bid detail coming next.');
-  }
+  Get.toNamed(AppRoutes.managerIncomingBids);
+}
 
   void onSettings() => AppSnackbar.info('Settings', 'Settings coming next.');
 

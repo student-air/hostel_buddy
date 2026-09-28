@@ -15,5 +15,6 @@ class AppRoutes {
   static const String seekerMyBids = '/seeker-my-bids';
   static const String seekerMyBidDetail = '/seeker-my-bid-detail';
   static const String notifications = '/notifications';
+  static const String managerIncomingBids = '/manager-incoming-bids';
   static const String profile = '/profile';
 }

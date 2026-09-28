@@ -844,10 +844,10 @@ class _ManagerDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      backgroundColor: const Color(0xFF1F030E),
+      backgroundColor: const Color(0xFF1A0810),
+      width: MediaQuery.of(context).size.width * 0.82,
       child: SafeArea(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 16, 12, 8),
@@ -856,12 +856,9 @@ class _ManagerDrawer extends StatelessWidget {
                   Container(
                     width: 48,
                     height: 48,
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       shape: BoxShape.circle,
-                      color: AppColors.accent.withValues(alpha: 0.25),
-                      border: Border.all(
-                        color: AppColors.accent.withValues(alpha: 0.5),
-                      ),
+                      color: Colors.white,
                     ),
                     alignment: Alignment.center,
                     child: Obx(() {
@@ -869,8 +866,8 @@ class _ManagerDrawer extends StatelessWidget {
                       return Text(
                         controller.initials,
                         style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w700,
+                          color: Color(0xFF1A0810),
+                          fontWeight: FontWeight.w800,
                           fontSize: 16,
                         ),
                       );
@@ -883,116 +880,163 @@ class _ManagerDrawer extends StatelessWidget {
                       children: [
                         Obx(
                           () => Text(
-                            controller.userName.value,
+                            controller.userName.value.toUpperCase(),
                             style: const TextStyle(
                               color: Colors.white,
-                              fontSize: 17,
-                              fontWeight: FontWeight.w700,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 0.3,
                             ),
                           ),
                         ),
-                        Obx(
-                          () => Text(
-                            controller.hostelName.value,
-                            style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.5),
-                              fontSize: 12,
+                        const SizedBox(height: 4),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: AppColors.accent.withValues(alpha: 0.6),
+                            ),
+                          ),
+                          child: Obx(
+                            () => Text(
+                              controller.hostelName.value,
+                              style: const TextStyle(
+                                color: AppColors.accentLight,
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ),
                         ),
                       ],
                     ),
                   ),
-                  IconButton(
-                    onPressed: () => Navigator.pop(context),
-                    icon: Icon(
-                      Icons.close_rounded,
-                      color: Colors.white.withValues(alpha: 0.7),
+                  GestureDetector(
+                    onTap: () => Get.back(),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8),
+                      child: Icon(
+                        Icons.close_rounded,
+                        color: Colors.white.withValues(alpha: 0.6),
+                        size: 22,
+                      ),
                     ),
                   ),
                 ],
               ),
             ),
-            Divider(color: Colors.white.withValues(alpha: 0.08), height: 24),
+            const SizedBox(height: 8),
             Expanded(
-              child: ListView(
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-                children: [
-                  _DrawerItem(
-                    icon: Icons.home_rounded,
-                    label: 'Home',
-                    onTap: () => Navigator.pop(context),
-                  ),
-                  _DrawerItem(
-                    icon: Icons.gavel_rounded,
-                    label: 'Bids',
-                    onTap: () {
-                      Navigator.pop(context);
-                      controller.onViewBids();
-                    },
-                  ),
-                  _DrawerItem(
-                    icon: Icons.meeting_room_outlined,
-                    label: 'Manage rooms',
-                    onTap: () {
-                      Navigator.pop(context);
-                      controller.onManageRooms();
-                    },
-                  ),
-                  _DrawerItem(
-                    icon: Icons.edit_outlined,
-                    label: 'Edit listing',
-                    onTap: () {
-                      Navigator.pop(context);
-                      controller.onEditListing();
-                    },
-                  ),
-                  _DrawerItem(
-                    icon: Icons.add_home_outlined,
-                    label: 'Add hostel',
-                    onTap: () {
-                      Navigator.pop(context);
-                      controller.onAddListing();
-                    },
-                  ),
-                  _DrawerItem(
-                    icon: Icons.chat_bubble_outline_rounded,
-                    label: 'Messages',
-                    onTap: () {
-                      Navigator.pop(context);
-                      controller.onMessages();
-                    },
-                  ),
-                  _DrawerItem(
-                    icon: Icons.person_outline_rounded,
-                    label: 'Profile',
-                    onTap: () {
-                      Navigator.pop(context);
-                      controller.onProfile();
-                    },
-                  ),
-                  _DrawerItem(
-                    icon: Icons.settings_outlined,
-                    label: 'Settings',
-                    onTap: () {
-                      Navigator.pop(context);
-                      controller.onSettings();
-                    },
-                  ),
-                  Divider(
-                    color: Colors.white.withValues(alpha: 0.08),
-                    height: 28,
-                  ),
-                  _DrawerItem(
-                    icon: Icons.logout_rounded,
-                    label: 'Log out',
-                    danger: true,
-                    onTap: () {
-                      Navigator.pop(context);
-                      controller.onLogout();
-                    },
-                  ),
-                ],
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _DrawerTile(
+                      icon: Icons.home_rounded,
+                      label: 'Home',
+                      onTap: () => Get.back(),
+                    ),
+                    _DrawerTile(
+                      icon: Icons.gavel_rounded,
+                      label: 'Incoming Bids',
+                      onTap: () {
+                        Get.back();
+                        controller.onViewBids();
+                      },
+                    ),
+                    _DrawerTile(
+                      icon: Icons.meeting_room_rounded,
+                      label: 'Manage rooms',
+                      onTap: () {
+                        Get.back();
+                        controller.onManageRooms();
+                      },
+                    ),
+                    _DrawerTile(
+                      icon: Icons.edit_rounded,
+                      label: 'Edit listing',
+                      onTap: () {
+                        Get.back();
+                        controller.onEditListing();
+                      },
+                    ),
+                    _DrawerTile(
+                      icon: Icons.add_home_rounded,
+                      label: 'Add hostel',
+                      onTap: () {
+                        Get.back();
+                        controller.onAddListing();
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 8, bottom: 8),
+                      child: Text(
+                        'ACCOUNT',
+                        style: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.4),
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 1.1,
+                        ),
+                      ),
+                    ),
+                    _DrawerTile(
+                      icon: Icons.person_rounded,
+                      label: 'Profile',
+                      onTap: () {
+                        Get.back();
+                        controller.onProfile();
+                      },
+                    ),
+                    _DrawerTile(
+                      icon: Icons.notifications_rounded,
+                      label: 'Notifications',
+                      onTap: () {
+                        Get.back();
+                        controller.onNotifications();
+                      },
+                    ),
+                    _DrawerTile(
+                      icon: Icons.settings_rounded,
+                      label: 'Settings',
+                      onTap: () {
+                        Get.back();
+                        controller.onSettings();
+                      },
+                    ),
+                    const SizedBox(height: 12),
+                    Divider(
+                      color: Colors.white.withValues(alpha: 0.08),
+                      height: 1,
+                    ),
+                    const SizedBox(height: 8),
+                    _DrawerTile(
+                      icon: Icons.logout_rounded,
+                      label: 'Log out',
+                      color: AppColors.error,
+                      onTap: () {
+                        Get.back();
+                        controller.onLogout();
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 16, top: 8),
+              child: Text(
+                'Hostel Buddy v1.0.0',
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.3),
+                  fontSize: 11,
+                ),
               ),
             ),
           ],
@@ -1002,42 +1046,70 @@ class _ManagerDrawer extends StatelessWidget {
   }
 }
 
-class _DrawerItem extends StatelessWidget {
-  const _DrawerItem({
+class _DrawerTile extends StatelessWidget {
+  const _DrawerTile({
     required this.icon,
     required this.label,
     required this.onTap,
-    this.danger = false,
+    this.color,
   });
 
   final IconData icon;
   final String label;
   final VoidCallback onTap;
-  final bool danger;
+  final Color? color;
 
   @override
   Widget build(BuildContext context) {
-    final color = danger
-        ? AppColors.error
-        : Colors.white.withValues(alpha: 0.88);
+    final c = color ?? AppColors.accentLight;
+    final textColor = color ?? Colors.white;
 
-    return ListTile(
-      onTap: onTap,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      leading: Icon(icon, color: color, size: 22),
-      title: Text(
-        label,
-        style: TextStyle(
-          color: color,
-          fontSize: 14.5,
-          fontWeight: FontWeight.w600,
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 4),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(14),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+            child: Row(
+              children: [
+                Container(
+                  width: 38,
+                  height: 38,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.07),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(icon, color: c, size: 20),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Text(
+                    label,
+                    style: TextStyle(
+                      color: textColor,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+                if (color == null)
+                  Icon(
+                    Icons.chevron_right_rounded,
+                    color: Colors.white.withValues(alpha: 0.25),
+                    size: 20,
+                  ),
+              ],
+            ),
+          ),
         ),
       ),
-      dense: true,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
     );
   }
 }
+
 
 class _Blob extends StatelessWidget {
   const _Blob({required this.size, required this.color});
