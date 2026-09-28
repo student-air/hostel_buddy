@@ -615,10 +615,10 @@ class _QuickActions extends StatelessWidget {
         const SizedBox(width: 10),
         Expanded(
           child: _ActionTile(
-            label: 'Search',
-            icon: Icons.search_rounded,
+            label: 'My Bids',
+            icon: Icons.bookmark_outline_rounded,
             filled: false,
-            onTap: controller.onSearch,
+            onTap: controller.onMyBids,
           ),
         ),
       ],
@@ -856,37 +856,298 @@ class _SeekerDrawer extends StatelessWidget {
   Widget build(BuildContext context) {
     return Drawer(
       backgroundColor: const Color(0xFF1A0810),
+      width: MediaQuery.of(context).size.width * 0.82,
       child: SafeArea(
         child: Column(
           children: [
-            const SizedBox(height: 24),
-            ListTile(
-              leading: const Icon(Icons.person_rounded, color: Colors.white),
-              title: const Text('Profile', style: TextStyle(color: Colors.white)),
-              onTap: () {
-                Get.back();
-                controller.onProfile();
-              },
+            // ── Header ──
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 16, 12, 8),
+              child: Row(
+                children: [
+                  Container(
+                    width: 48,
+                    height: 48,
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white,
+                    ),
+                    alignment: Alignment.center,
+                    child: Obx(() {
+                      final _ = controller.userName.value;
+                      return Text(
+                        controller.initials,
+                        style: const TextStyle(
+                          color: Color(0xFF1A0810),
+                          fontWeight: FontWeight.w800,
+                          fontSize: 16,
+                        ),
+                      );
+                    }),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Obx(
+                          () => Text(
+                            controller.userName.value.toUpperCase(),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 0.3,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: AppColors.accent.withValues(alpha: 0.6),
+                            ),
+                          ),
+                          child: Obx(
+                            () => Text(
+                              controller.userRoleLabel.value,
+                              style: const TextStyle(
+                                color: AppColors.accentLight,
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () => Get.back(),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8),
+                      child: Icon(
+                        Icons.close_rounded,
+                        color: Colors.white.withValues(alpha: 0.6),
+                        size: 22,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
-            ListTile(
-              leading: const Icon(Icons.settings_rounded, color: Colors.white),
-              title: const Text('Settings', style: TextStyle(color: Colors.white)),
-              onTap: () {
-                Get.back();
-                controller.onSettings();
-              },
+            const SizedBox(height: 8),
+
+            // ── Main items ──
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _DrawerTile(
+                      icon: Icons.home_rounded,
+                      label: 'Home',
+                      onTap: () => Get.back(),
+                    ),
+                    _DrawerTile(
+                      icon: Icons.gavel_rounded,
+                      label: 'My bids',
+                      onTap: () {
+                        Get.back();
+                        controller.onViewAllBids();
+                      },
+                    ),
+                    _DrawerTile(
+                      icon: Icons.add_circle_rounded,
+                      label: 'Create bid',
+                      onTap: () {
+                        Get.back();
+                        controller.onCreateBid();
+                      },
+                    ),
+                    _DrawerTile(
+                      icon: Icons.bookmark_outlined,
+                      label: 'My Bids',
+                      onTap: () {
+                        Get.back();
+                        controller.onMyBids();
+                      },
+                    ),
+                    _DrawerTile(
+                      icon: Icons.map_rounded,
+                      label: 'Map view',
+                      onTap: () {
+                        Get.back();
+                        controller.onMapView();
+                      },
+                    ),
+                    _DrawerTile(
+                      icon: Icons.search_rounded,
+                      label: 'Search hostels',
+                      onTap: () {
+                        Get.back();
+                        controller.onSearch();
+                      },
+                    ),
+                    _DrawerTile(
+                      icon: Icons.apartment_rounded,
+                      label: 'Hostels near you',
+                      onTap: () {
+                        Get.back();
+                        controller.onSeeAllHostels();
+                      },
+                    ),
+
+                    const SizedBox(height: 16),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 8, bottom: 8),
+                      child: Text(
+                        'ACCOUNT',
+                        style: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.4),
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 1.1,
+                        ),
+                      ),
+                    ),
+
+                    _DrawerTile(
+                      icon: Icons.person_rounded,
+                      label: 'Profile',
+                      onTap: () {
+                        Get.back();
+                        controller.onProfile();
+                      },
+                    ),
+                    _DrawerTile(
+                      icon: Icons.chat_bubble_rounded,
+                      label: 'Chat',
+                      onTap: () {
+                        Get.back();
+                        controller.onChat();
+                      },
+                    ),
+                    _DrawerTile(
+                      icon: Icons.notifications_rounded,
+                      label: 'Notifications',
+                      onTap: () {
+                        Get.back();
+                        controller.onNotifications();
+                      },
+                    ),
+                    _DrawerTile(
+                      icon: Icons.settings_rounded,
+                      label: 'Settings',
+                      onTap: () {
+                        Get.back();
+                        controller.onSettings();
+                      },
+                    ),
+
+                    const SizedBox(height: 12),
+                    Divider(
+                      color: Colors.white.withValues(alpha: 0.08),
+                      height: 1,
+                    ),
+                    const SizedBox(height: 8),
+
+                    _DrawerTile(
+                      icon: Icons.logout_rounded,
+                      label: 'Log out',
+                      color: AppColors.error,
+                      onTap: () {
+                        Get.back();
+                        controller.onLogout();
+                      },
+                    ),
+                  ],
+                ),
+              ),
             ),
-            const Spacer(),
-            ListTile(
-              leading: const Icon(Icons.logout_rounded, color: AppColors.error),
-              title: const Text('Log out', style: TextStyle(color: AppColors.error)),
-              onTap: () {
-                Get.back();
-                controller.onLogout();
-              },
+
+            // ── Footer ──
+            Padding(
+              padding: const EdgeInsets.only(bottom: 16, top: 8),
+              child: Text(
+                'Hostel Buddy v1.0.0',
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.3),
+                  fontSize: 11,
+                ),
+              ),
             ),
-            const SizedBox(height: 24),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _DrawerTile extends StatelessWidget {
+  const _DrawerTile({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+    this.color,
+  });
+
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+  final Color? color;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = color ?? AppColors.accentLight;
+    final textColor = color ?? Colors.white;
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 4),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(14),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+            child: Row(
+              children: [
+                Container(
+                  width: 38,
+                  height: 38,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.07),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(icon, color: c, size: 20),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Text(
+                    label,
+                    style: TextStyle(
+                      color: textColor,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+                if (color == null)
+                  Icon(
+                    Icons.chevron_right_rounded,
+                    color: Colors.white.withValues(alpha: 0.25),
+                    size: 20,
+                  ),
+              ],
+            ),
+          ),
         ),
       ),
     );

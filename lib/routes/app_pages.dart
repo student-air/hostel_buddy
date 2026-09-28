@@ -20,7 +20,8 @@ import '../presentation/seeker_bids/bindings/seeker_bids_binding.dart';
 import '../presentation/seeker_bids/views/seeker_bids_view.dart';
 import '../presentation/seeker_search/bindings/seeker_search_binding.dart';
 import '../presentation/seeker_search/views/seeker_search_view.dart';
-
+import '../presentation/place_bid/bindings/place_bid_binding.dart';
+import '../presentation/place_bid/views/place_bid_view.dart';
 
 import 'app_routes.dart';
 
@@ -77,6 +78,10 @@ class AppPages {
       name: AppRoutes.seekerSearch,
       page: () => const SeekerSearchView(),
       binding: SeekerSearchBinding(),
-    ),
+    ),GetPage(
+  name: AppRoutes.placeBid,
+  page: () => const PlaceBidView(),
+  binding: PlaceBidBinding(),
+),
   ];
 }
