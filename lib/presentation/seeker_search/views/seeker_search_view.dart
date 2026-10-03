@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -16,60 +14,27 @@ class SeekerSearchView extends GetView<SeekerSearchController> {
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.light,
       child: Scaffold(
-        resizeToAvoidBottomInset: false, // keyboard won't push navbar
+        backgroundColor: AppColors.scaffoldBackground,
+        resizeToAvoidBottomInset: false,
         body: Stack(
           children: [
-            // ── Background ──
-            Container(
-              width: double.infinity,
-              height: double.infinity,
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    Color(0xFF6B0E24),
-                    Color(0xFF4A0A1E),
-                    Color(0xFF2A0412),
-                  ],
+            Column(
+              children: [
+                _Header(),
+                Expanded(
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 14),
+                      _SearchBar(controller: controller),
+                      const SizedBox(height: 14),
+                      _FilterChips(controller: controller),
+                      const SizedBox(height: 12),
+                      Expanded(child: _HostelList(controller: controller)),
+                    ],
+                  ),
                 ),
-              ),
+              ],
             ),
-            Positioned(
-              top: -60,
-              right: -40,
-              child: _Blob(
-                size: 220,
-                color: AppColors.accent.withValues(alpha: 0.08),
-              ),
-            ),
-            Positioned(
-              bottom: 120,
-              left: -50,
-              child: _Blob(
-                size: 180,
-                color: Colors.white.withValues(alpha: 0.03),
-              ),
-            ),
-
-            // ── Content ──
-            SafeArea(
-              bottom: false,
-              child: Column(
-                children: [
-                  const SizedBox(height: 8),
-                  _AppealingHeader(),
-                  const SizedBox(height: 16),
-                  _SearchBar(controller: controller),
-                  const SizedBox(height: 14),
-                  _FilterChips(controller: controller),
-                  const SizedBox(height: 12),
-                  Expanded(child: _HostelList(controller: controller)),
-                ],
-              ),
-            ),
-
-            // ── Floating navbar (no coloured block under it) ──
             Positioned(
               left: 0,
               right: 0,
@@ -89,25 +54,31 @@ class SeekerSearchView extends GetView<SeekerSearchController> {
 }
 
 // ═══════════════════════════════════════════
-// HEADER (same style as Bids)
+// HEADER — curved maroon
 // ═══════════════════════════════════════════
 
-class _AppealingHeader extends StatelessWidget {
+class _Header extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+    final top = MediaQuery.of(context).padding.top;
+
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.fromLTRB(16, top + 8, 20, 22),
+      decoration: const BoxDecoration(
+        color: AppColors.primary,
+        borderRadius: BorderRadius.vertical(bottom: Radius.circular(28)),
+      ),
       child: Row(
         children: [
           GestureDetector(
             onTap: () => Get.back(),
             child: Container(
-              width: 42,
-              height: 42,
+              width: 40,
+              height: 40,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.white.withValues(alpha: 0.1),
-                border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
+                color: Colors.white.withValues(alpha: 0.12),
               ),
               child: const Icon(
                 Icons.arrow_back_ios_new_rounded,
@@ -116,25 +87,25 @@ class _AppealingHeader extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(width: 14),
-          Expanded(
+          const SizedBox(width: 12),
+          const Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   'Search Hostels',
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 24,
+                    fontSize: 22,
                     fontWeight: FontWeight.w800,
-                    letterSpacing: -0.5,
+                    letterSpacing: -0.4,
                   ),
                 ),
-                const SizedBox(height: 2),
+                SizedBox(height: 2),
                 Text(
                   'Find your perfect stay',
                   style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.55),
+                    color: Colors.white70,
                     fontSize: 13,
                     fontWeight: FontWeight.w500,
                   ),
@@ -145,21 +116,19 @@ class _AppealingHeader extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
             decoration: BoxDecoration(
-              color: AppColors.accent.withValues(alpha: 0.2),
+              color: Colors.white.withValues(alpha: 0.14),
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: AppColors.accent.withValues(alpha: 0.45),
-              ),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
             ),
             child: const Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.search_rounded, size: 14, color: AppColors.accentLight),
+                Icon(Icons.search_rounded, size: 14, color: Colors.white),
                 SizedBox(width: 5),
                 Text(
                   'Explore',
                   style: TextStyle(
-                    color: AppColors.accentLight,
+                    color: Colors.white,
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
                   ),
@@ -185,46 +154,50 @@ class _SearchBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-          child: Container(
-            height: 50,
-            padding: const EdgeInsets.symmetric(horizontal: 14),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(16),
-              color: Colors.white.withValues(alpha: 0.1),
-              border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
+      child: Container(
+        height: 50,
+        padding: const EdgeInsets.symmetric(horizontal: 14),
+        decoration: BoxDecoration(
+          color: AppColors.surfaceWhite,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppColors.border),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.primary.withValues(alpha: 0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
             ),
-            child: Row(
-              children: [
-                Icon(
-                  Icons.search_rounded,
-                  color: Colors.white.withValues(alpha: 0.6),
-                  size: 22,
+          ],
+        ),
+        child: Row(
+          children: [
+            const Icon(
+              Icons.search_rounded,
+              color: AppColors.accent,
+              size: 22,
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: TextField(
+                style: const TextStyle(
+                  color: AppColors.textPrimary,
+                  fontSize: 15,
                 ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: TextField(
-                    style: const TextStyle(color: Colors.white, fontSize: 15),
-                    cursorColor: AppColors.accentLight,
-                    onChanged: (v) => controller.searchQuery.value = v,
-                    decoration: InputDecoration(
-                      hintText: 'Search by name or area...',
-                      hintStyle: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.4),
-                        fontSize: 14,
-                      ),
-                      border: InputBorder.none,
-                      isDense: true,
-                      contentPadding: EdgeInsets.zero,
-                    ),
+                cursorColor: AppColors.primary,
+                onChanged: (v) => controller.searchQuery.value = v,
+                decoration: const InputDecoration(
+                  hintText: 'Search by name or area...',
+                  hintStyle: TextStyle(
+                    color: AppColors.textMuted,
+                    fontSize: 14,
                   ),
+                  border: InputBorder.none,
+                  isDense: true,
+                  contentPadding: EdgeInsets.zero,
                 ),
-              ],
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );
@@ -256,24 +229,30 @@ class _FilterChips extends StatelessWidget {
               onTap: () => controller.selectedFilter.value = filter,
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 decoration: BoxDecoration(
-                  color: selected
-                      ? AppColors.accent
-                      : Colors.white.withValues(alpha: 0.08),
+                  color:
+                      selected ? AppColors.primary : AppColors.surfaceWhite,
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
-                    color: selected
-                        ? AppColors.accent
-                        : Colors.white.withValues(alpha: 0.12),
+                    color: selected ? AppColors.primary : AppColors.border,
                   ),
+                  boxShadow: selected
+                      ? [
+                          BoxShadow(
+                            color: AppColors.primary.withValues(alpha: 0.25),
+                            blurRadius: 8,
+                            offset: const Offset(0, 3),
+                          ),
+                        ]
+                      : null,
                 ),
                 child: Text(
                   filter,
                   style: TextStyle(
-                    color: selected
-                        ? Colors.white
-                        : Colors.white.withValues(alpha: 0.7),
+                    color:
+                        selected ? Colors.white : AppColors.textPrimary,
                     fontSize: 13,
                     fontWeight:
                         selected ? FontWeight.w700 : FontWeight.w500,
@@ -306,16 +285,24 @@ class _HostelList extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
-                Icons.search_off_rounded,
-                size: 48,
-                color: Colors.white.withValues(alpha: 0.25),
+              Container(
+                width: 72,
+                height: 72,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: AppColors.primary.withValues(alpha: 0.08),
+                ),
+                child: const Icon(
+                  Icons.search_off_rounded,
+                  size: 36,
+                  color: AppColors.primary,
+                ),
               ),
-              const SizedBox(height: 12),
-              Text(
+              const SizedBox(height: 14),
+              const Text(
                 'No hostels found',
                 style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.45),
+                  color: AppColors.textSecondary,
                   fontSize: 15,
                 ),
               ),
@@ -325,7 +312,6 @@ class _HostelList extends StatelessWidget {
       }
 
       return ListView.separated(
-        // Extra bottom padding so last card isn't hidden under floating nav
         padding: const EdgeInsets.fromLTRB(20, 4, 20, 110),
         physics: const BouncingScrollPhysics(),
         itemCount: list.length,
@@ -350,7 +336,7 @@ class _HostelCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = Color((hostel['color'] as int?) ?? 0xFF6B0E24);
+    final color = Color((hostel['color'] as int?) ?? 0xFF6B2035);
     final rating = (hostel['rating'] as num?)?.toDouble() ?? 0;
 
     return GestureDetector(
@@ -358,13 +344,14 @@ class _HostelCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.surfaceWhite,
           borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: AppColors.border),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.12),
-              blurRadius: 16,
-              offset: const Offset(0, 6),
+              color: AppColors.primary.withValues(alpha: 0.05),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
             ),
           ],
         ),
@@ -375,14 +362,10 @@ class _HostelCard extends StatelessWidget {
               height: 56,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(14),
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [color.withValues(alpha: 0.85), color],
-                ),
+                color: color,
               ),
               child: const Icon(
-                Icons.verified_outlined,
+                Icons.star_rounded,
                 color: Colors.white,
                 size: 26,
               ),
@@ -439,29 +422,13 @@ class _HostelCard extends StatelessWidget {
                 ],
               ),
             ),
-            Icon(Icons.chevron_right_rounded, color: Colors.grey.shade400),
+            const Icon(
+              Icons.chevron_right_rounded,
+              color: AppColors.textMuted,
+            ),
           ],
         ),
       ),
-    );
-  }
-}
-
-// ═══════════════════════════════════════════
-// BLOB
-// ═══════════════════════════════════════════
-
-class _Blob extends StatelessWidget {
-  const _Blob({required this.size, required this.color});
-  final double size;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(shape: BoxShape.circle, color: color),
     );
   }
 }

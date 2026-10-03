@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../constants/app_colors.dart';
 import '../constants/app_dimens.dart';
 import '../constants/app_text_styles.dart';
 
-/// Central ThemeData for Hostel Buddy.
+/// Central ThemeData — light pink + lighter maroon system.
 class AppTheme {
   AppTheme._();
 
@@ -26,12 +27,19 @@ class AppTheme {
         onError: AppColors.textOnPrimary,
       ),
       appBarTheme: const AppBarTheme(
-        backgroundColor: AppColors.scaffoldBackground,
-        foregroundColor: AppColors.textPrimary,
+        backgroundColor: AppColors.primary,
+        foregroundColor: AppColors.textOnPrimary,
         elevation: 0,
-        centerTitle: true,
-        titleTextStyle: AppTextStyles.h3,
-        iconTheme: IconThemeData(color: AppColors.textPrimary),
+        centerTitle: false,
+        systemOverlayStyle: SystemUiOverlayStyle.light,
+        titleTextStyle: TextStyle(
+          fontFamily: AppTextStyles.fontFamily,
+          fontSize: 18,
+          fontWeight: FontWeight.w600,
+          color: AppColors.textOnPrimary,
+        ),
+        iconTheme: IconThemeData(color: AppColors.textOnPrimary),
+        actionsIconTheme: IconThemeData(color: AppColors.textOnPrimary),
       ),
       textTheme: const TextTheme(
         headlineMedium: AppTextStyles.h1,
@@ -42,10 +50,12 @@ class AppTheme {
         labelSmall: AppTextStyles.label,
       ),
       inputDecorationTheme: InputDecorationTheme(
-        filled: false,
-        prefixIconColor: AppColors.accentLight,
+        filled: true,
+        fillColor: AppColors.surfaceWhite,
+        prefixIconColor: AppColors.accent,
         contentPadding: const EdgeInsets.symmetric(
           horizontal: AppDimens.space14,
+          vertical: 14,
         ),
         hintStyle: AppTextStyles.bodyRegular.copyWith(
           color: AppColors.textMuted,
@@ -69,11 +79,16 @@ class AppTheme {
           borderRadius: BorderRadius.circular(AppDimens.radiusMedium),
           borderSide: const BorderSide(color: AppColors.error),
         ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(AppDimens.radiusMedium),
+          borderSide: const BorderSide(color: AppColors.error, width: 1.5),
+        ),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primary,
           foregroundColor: AppColors.textOnPrimary,
+          disabledBackgroundColor: AppColors.primary.withValues(alpha: 0.45),
           minimumSize: const Size.fromHeight(AppDimens.buttonHeight),
           textStyle: AppTextStyles.button,
           elevation: 0,
@@ -106,6 +121,7 @@ class AppTheme {
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppDimens.radiusXLarge),
+          side: const BorderSide(color: AppColors.border),
         ),
         margin: EdgeInsets.zero,
       ),
@@ -115,7 +131,7 @@ class AppTheme {
         space: 1,
       ),
       chipTheme: ChipThemeData(
-        backgroundColor: AppColors.scaffoldBackground,
+        backgroundColor: AppColors.surfaceSoft,
         selectedColor: AppColors.primary,
         labelStyle: AppTextStyles.bodyRegular,
         secondaryLabelStyle: AppTextStyles.button,
@@ -132,7 +148,32 @@ class AppTheme {
         type: BottomNavigationBarType.fixed,
         elevation: 0,
       ),
+      floatingActionButtonTheme: const FloatingActionButtonThemeData(
+        backgroundColor: AppColors.accent,
+        foregroundColor: AppColors.textOnPrimary,
+        elevation: 2,
+      ),
       iconTheme: const IconThemeData(color: AppColors.textPrimary),
+      snackBarTheme: const SnackBarThemeData(
+        backgroundColor: AppColors.primary,
+        contentTextStyle: TextStyle(
+          color: AppColors.textOnPrimary,
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+        ),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(12)),
+        ),
+      ),
+      dialogTheme: DialogThemeData(
+        backgroundColor: AppColors.surfaceWhite,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        titleTextStyle: AppTextStyles.h3,
+        contentTextStyle: AppTextStyles.bodyRegular,
+      ),
     );
   }
 }

@@ -16,7 +16,6 @@ class AppBottomNavItem {
   final String label;
 }
 
-/// Floating glass pill bottom nav — 4 items only
 class AppBottomNavBar extends StatelessWidget {
   const AppBottomNavBar({
     super.key,
@@ -29,7 +28,6 @@ class AppBottomNavBar extends StatelessWidget {
   final ValueChanged<int> onTap;
   final List<AppBottomNavItem> items;
 
-  /// Home · Bids · Search · Profile
   static const List<AppBottomNavItem> defaultItems = [
     AppBottomNavItem(
       icon: Icons.home_outlined,
@@ -81,32 +79,23 @@ class AppBottomNavBar extends StatelessWidget {
     final bottomPad = MediaQuery.of(context).padding.bottom;
 
     return Padding(
-      // No hard bottom border — floating with soft gap
       padding: EdgeInsets.fromLTRB(18, 0, 18, 10 + bottomPad),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(36),
         child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
+          filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
           child: Container(
-            height: 68, // a bit taller
+            height: 68,
             padding: const EdgeInsets.symmetric(horizontal: 6),
             decoration: BoxDecoration(
-              color: const Color(0xFF1A0810).withValues(alpha: 0.72),
+              color: AppColors.surfaceWhite.withValues(alpha: 0.82),
               borderRadius: BorderRadius.circular(36),
-              border: Border.all(
-                color: Colors.white.withValues(alpha: 0.12),
-                width: 1,
-              ),
+              border: Border.all(color: AppColors.border),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.4),
-                  blurRadius: 28,
-                  offset: const Offset(0, 10),
-                ),
-                BoxShadow(
-                  color: AppColors.accent.withValues(alpha: 0.08),
+                  color: AppColors.primary.withValues(alpha: 0.08),
                   blurRadius: 20,
-                  spreadRadius: -4,
+                  offset: const Offset(0, 8),
                 ),
               ],
             ),
@@ -127,13 +116,15 @@ class AppBottomNavBar extends StatelessWidget {
                       vertical: 11,
                     ),
                     decoration: BoxDecoration(
-                      color: selected ? AppColors.accent : Colors.transparent,
+                      color:
+                          selected ? AppColors.primary : Colors.transparent,
                       borderRadius: BorderRadius.circular(28),
                       boxShadow: selected
                           ? [
                               BoxShadow(
-                                color: AppColors.accent.withValues(alpha: 0.45),
-                                blurRadius: 14,
+                                color: AppColors.primary
+                                    .withValues(alpha: 0.3),
+                                blurRadius: 12,
                                 offset: const Offset(0, 4),
                               ),
                             ]
@@ -144,10 +135,10 @@ class AppBottomNavBar extends StatelessWidget {
                       children: [
                         Icon(
                           selected ? item.activeIcon : item.icon,
-                          size: 24, // bigger icons
+                          size: 24,
                           color: selected
                               ? Colors.white
-                              : Colors.white.withValues(alpha: 0.48),
+                              : AppColors.textMuted,
                         ),
                         if (selected) ...[
                           const SizedBox(width: 7),

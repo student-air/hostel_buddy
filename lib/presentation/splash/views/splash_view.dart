@@ -5,7 +5,6 @@ import 'package:get/get.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/constants/app_dimens.dart';
-import '../../../core/constants/app_text_styles.dart';
 import '../controllers/splash_controller.dart';
 
 class SplashView extends GetView<SplashController> {
@@ -14,64 +13,37 @@ class SplashView extends GetView<SplashController> {
   @override
   Widget build(BuildContext context) {
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.light,
+      value: SystemUiOverlayStyle.dark,
       child: Scaffold(
+        backgroundColor: AppColors.scaffoldBackground,
         body: Stack(
           children: [
-            // Background gradient
-            Container(
-              width: double.infinity,
-              height: double.infinity,
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    Color(0xFF6B0E24),
-                    Color(0xFF4A0A1E),
-                    Color(0xFF3C0515),
-                    Color(0xFF2A0412),
-                  ],
-                  stops: [0.0, 0.35, 0.7, 1.0],
-                ),
-              ),
-            ),
-
-            // Decorative circles
+            // Soft decorative circles (same family as light screens)
             Positioned(
-              top: -50,
-              right: -70,
+              top: -80,
+              right: -60,
               child: _DecorCircle(
-                size: 240,
-                color: Colors.white.withValues(alpha: 0.04),
+                size: 260,
+                color: AppColors.primary.withValues(alpha: 0.06),
               ),
             ),
             Positioned(
-              top: 100,
-              right: -20,
+              bottom: 100,
+              left: -70,
               child: _DecorCircle(
-                size: 160,
-                color: const Color(0xFF2A1840).withValues(alpha: 0.4),
-              ),
-            ),
-            Positioned(
-              bottom: 120,
-              left: -90,
-              child: _DecorCircle(
-                size: 220,
-                color: Colors.white.withValues(alpha: 0.03),
+                size: 200,
+                color: AppColors.accent.withValues(alpha: 0.06),
               ),
             ),
             Positioned(
               bottom: -30,
               right: 30,
               child: _DecorCircle(
-                size: 150,
-                color: AppColors.accent.withValues(alpha: 0.08),
+                size: 140,
+                color: AppColors.primary.withValues(alpha: 0.04),
               ),
             ),
 
-            // Content — centered
             SafeArea(
               child: Center(
                 child: Column(
@@ -81,16 +53,20 @@ class SplashView extends GetView<SplashController> {
                     const SizedBox(height: AppDimens.space24),
                     Text(
                       AppConstants.appName,
-                      style: AppTextStyles.splashTitle.copyWith(
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: -0.4,
+                      style: const TextStyle(
+                        color: AppColors.textPrimary,
+                        fontSize: 28,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: -0.5,
                       ),
                     ),
                     const SizedBox(height: AppDimens.space8),
                     Text(
                       AppConstants.appTagline,
-                      style: AppTextStyles.splashSubtitle.copyWith(
-                        color: Colors.white.withValues(alpha: 0.7),
+                      style: const TextStyle(
+                        color: AppColors.textSecondary,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
                     const SizedBox(height: AppDimens.space32),
@@ -105,10 +81,6 @@ class SplashView extends GetView<SplashController> {
     );
   }
 }
-
-// ─────────────────────────────────────────────
-// Animated logo (gentle scale pulse)
-// ─────────────────────────────────────────────
 
 class _AnimatedLogo extends StatefulWidget {
   const _AnimatedLogo();
@@ -130,10 +102,9 @@ class _AnimatedLogoState extends State<_AnimatedLogo>
       duration: const Duration(milliseconds: 1400),
     )..repeat(reverse: true);
 
-    _scale = Tween<double>(
-      begin: 1.0,
-      end: 1.06,
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
+    _scale = Tween<double>(begin: 1.0, end: 1.06).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    );
   }
 
   @override
@@ -150,17 +121,18 @@ class _AnimatedLogoState extends State<_AnimatedLogo>
         width: 100,
         height: 100,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.surfaceWhite,
           borderRadius: BorderRadius.circular(28),
+          border: Border.all(color: AppColors.border),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.25),
+              color: AppColors.primary.withValues(alpha: 0.12),
               blurRadius: 24,
               offset: const Offset(0, 10),
             ),
             BoxShadow(
-              color: AppColors.accent.withValues(alpha: 0.3),
-              blurRadius: 28,
+              color: AppColors.accent.withValues(alpha: 0.2),
+              blurRadius: 20,
               offset: const Offset(0, 4),
             ),
           ],
@@ -179,10 +151,6 @@ class _AnimatedLogoState extends State<_AnimatedLogo>
     );
   }
 }
-
-// ─────────────────────────────────────────────
-// Pulsing dots loader (teal)
-// ─────────────────────────────────────────────
 
 class _PulsingDotsLoader extends StatefulWidget {
   const _PulsingDotsLoader();
@@ -242,7 +210,7 @@ class _PulsingDotsLoaderState extends State<_PulsingDotsLoader>
                       boxShadow: [
                         BoxShadow(
                           color: AppColors.accent.withValues(
-                            alpha: 0.45 * bounce,
+                            alpha: 0.4 * bounce,
                           ),
                           blurRadius: 8,
                           spreadRadius: 1,
@@ -259,10 +227,6 @@ class _PulsingDotsLoaderState extends State<_PulsingDotsLoader>
     );
   }
 }
-
-// ─────────────────────────────────────────────
-// Decor circle
-// ─────────────────────────────────────────────
 
 class _DecorCircle extends StatelessWidget {
   const _DecorCircle({required this.size, required this.color});

@@ -13,286 +13,176 @@ class AuthView extends GetView<AuthController> {
   @override
   Widget build(BuildContext context) {
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.light,
+      value: SystemUiOverlayStyle.dark,
       child: GestureDetector(
         onTap: () => FocusScope.of(context).unfocus(),
         child: Scaffold(
-          body: Stack(
-            children: [
-              // Background gradient
-              Container(
-                width: double.infinity,
-                height: double.infinity,
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      Color(0xFF6B0E24),
-                      Color(0xFF4A0A1E),
-                      Color(0xFF3C0515),
-                      Color(0xFF2A0412),
-                    ],
-                    stops: [0.0, 0.35, 0.7, 1.0],
-                  ),
-                ),
-              ),
-
-              // Decorative circles
-              Positioned(
-                top: -40,
-                right: -60,
-                child: _DecorCircle(
-                  size: 220,
-                  color: Colors.white.withValues(alpha: 0.04),
-                ),
-              ),
-              Positioned(
-                top: 120,
-                right: -30,
-                child: _DecorCircle(
-                  size: 160,
-                  color: const Color(0xFF2A1840).withValues(alpha: 0.45),
-                ),
-              ),
-              Positioned(
-                bottom: 180,
-                left: -80,
-                child: _DecorCircle(
-                  size: 200,
-                  color: Colors.white.withValues(alpha: 0.03),
-                ),
-              ),
-              Positioned(
-                bottom: -40,
-                right: 40,
-                child: _DecorCircle(
-                  size: 140,
-                  color: const Color(0xFF2A1840).withValues(alpha: 0.35),
-                ),
-              ),
-
-              // Content
-              SafeArea(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.fromLTRB(28, 16, 28, 32),
-                  physics: const BouncingScrollPhysics(),
-                  child: Form(
-                    key: controller.formKey,
-                    child: Obx(
-                      () => Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const SizedBox(height: 12),
-
-                          // Your logo
-                          const _LogoMark(),
-
-                          const SizedBox(height: 28),
-
-                          // Title
-                          AnimatedSwitcher(
-                            duration: const Duration(milliseconds: 250),
-                            child: Text(
-                              controller.isLogin.value
-                                  ? 'Welcome back'
-                                  : 'Create account',
-                              key: ValueKey(controller.isLogin.value),
-                              style: const TextStyle(
-                                fontFamily: 'Inter',
-                                fontSize: 32,
-                                fontWeight: FontWeight.w700,
-                                color: Colors.white,
-                                letterSpacing: -0.5,
-                                height: 1.15,
-                              ),
-                            ),
+          backgroundColor: AppColors.scaffoldBackground,
+          body: SafeArea(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(28, 16, 28, 32),
+              physics: const BouncingScrollPhysics(),
+              child: Form(
+                key: controller.formKey,
+                child: Obx(
+                  () => Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 12),
+                      const _LogoMark(),
+                      const SizedBox(height: 28),
+                      AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 250),
+                        child: Text(
+                          controller.isLogin.value
+                              ? 'Welcome back'
+                              : 'Create account',
+                          key: ValueKey(controller.isLogin.value),
+                          style: const TextStyle(
+                            fontFamily: 'Inter',
+                            fontSize: 32,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.textPrimary,
+                            letterSpacing: -0.5,
+                            height: 1.15,
                           ),
-                          const SizedBox(height: 8),
-                          AnimatedSwitcher(
-                            duration: const Duration(milliseconds: 250),
-                            child: Text(
-                              controller.isLogin.value
-                                  ? 'Your bids are waiting for you'
-                                  : 'Find your fit. Fill your rooms.',
-                              key: ValueKey('sub_${controller.isLogin.value}'),
-                              style: TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w400,
-                                color: Colors.white.withValues(alpha: 0.65),
-                                height: 1.35,
-                              ),
-                            ),
-                          ),
-
-                          const SizedBox(height: 36),
-
-                          // Full name — signup only
-                          if (!controller.isLogin.value) ...[
-                            _GlassTextField(
-                              controller: controller.nameController,
-                              label: 'Full name',
-                              hint: 'John Doe',
-                              validator: Validators.name,
-                              prefixIcon: Icons.person_outline_rounded,
-                              textInputAction: TextInputAction.next,
-                              textCapitalization: TextCapitalization.words,
-                            ),
-                            const SizedBox(height: 18),
-                          ],
-
-                          // Email
-                          _GlassTextField(
-                            controller: controller.emailController,
-                            label: 'Email address',
-                            hint: 'you@example.com',
-                            validator: Validators.email,
-                            keyboardType: TextInputType.emailAddress,
-                            prefixIcon: Icons.mail_outline_rounded,
-                            textInputAction: TextInputAction.next,
-                            autofillHints: const [AutofillHints.email],
-                          ),
-                          const SizedBox(height: 18),
-
-                          // Phone — signup only
-                          if (!controller.isLogin.value) ...[
-                            _GlassTextField(
-                              controller: controller.phoneController,
-                              label: 'Phone number',
-                              hint: '+92 300 1234567',
-                              validator: Validators.phone,
-                              keyboardType: TextInputType.phone,
-                              prefixIcon: Icons.phone_outlined,
-                              textInputAction: TextInputAction.next,
-                              autofillHints: const [
-                                AutofillHints.telephoneNumber,
-                              ],
-                            ),
-                            const SizedBox(height: 18),
-                          ],
-
-                          // Password
-                          _GlassTextField(
-                            controller: controller.passwordController,
-                            label: 'Password',
-                            hint: '••••••••',
-                            validator: Validators.password,
-                            obscureText: controller.obscurePassword.value,
-                            prefixIcon: Icons.lock_outline_rounded,
-                            textInputAction: TextInputAction.done,
-                            autofillHints: const [AutofillHints.password],
-                            onFieldSubmitted: (_) => controller.submit(),
-                            suffix: IconButton(
-                              onPressed: controller.togglePasswordVisibility,
-                              splashRadius: 20,
-                              icon: Icon(
-                                controller.obscurePassword.value
-                                    ? Icons.visibility_off_outlined
-                                    : Icons.visibility_outlined,
-                                size: 20,
-                                color: AppColors.textSecondary,
-                              ),
-                            ),
-                          ),
-
-                          // Forgot password — login only
-                          if (controller.isLogin.value) ...[
-                            const SizedBox(height: 6),
-                            Align(
-                              alignment: Alignment.centerRight,
-                              child: TextButton(
-                                onPressed: () {
-                                  AppSnackbar.info(
-                                    'Forgot password',
-                                    'Password reset coming soon',
-                                  );
-                                },
-                                style: TextButton.styleFrom(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 2,
-                                    vertical: 4,
-                                  ),
-                                  minimumSize: Size.zero,
-                                  tapTargetSize:
-                                      MaterialTapTargetSize.shrinkWrap,
-                                ),
-                                child: const Text(
-                                  'Forgot password?',
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w600,
-                                    color: AppColors.accent,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-
-                          const SizedBox(height: 28),
-
-                          // Teal primary CTA
-                          _TealButton(
-                            label: controller.isLogin.value
-                                ? 'Log in'
-                                : 'Create account',
-                            isLoading: controller.isLoading.value,
-                            onTap: controller.submit,
-                          ),
-
-                          const SizedBox(height: 28),
-
-                          // Divider
-                          const _OrDivider(),
-
-                          const SizedBox(height: 22),
-
-                          // Google
-                          _GoogleButton(onTap: controller.continueWithGoogle),
-
-                          const SizedBox(height: 32),
-
-                          // Mode toggle
-                          _ModeToggle(
-                            isLogin: controller.isLogin.value,
-                            onToggle: controller.toggleMode,
-                          ),
-                        ],
+                        ),
                       ),
-                    ),
+                      const SizedBox(height: 8),
+                      AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 250),
+                        child: Text(
+                          controller.isLogin.value
+                              ? 'Your bids are waiting for you'
+                              : 'Find your fit. Fill your rooms.',
+                          key: ValueKey('sub_${controller.isLogin.value}'),
+                          style: const TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w400,
+                            color: AppColors.textSecondary,
+                            height: 1.35,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 36),
+                      if (!controller.isLogin.value) ...[
+                        _LightTextField(
+                          controller: controller.nameController,
+                          label: 'Full name',
+                          hint: 'John Doe',
+                          validator: Validators.name,
+                          prefixIcon: Icons.person_outline_rounded,
+                          textInputAction: TextInputAction.next,
+                          textCapitalization: TextCapitalization.words,
+                        ),
+                        const SizedBox(height: 18),
+                      ],
+                      _LightTextField(
+                        controller: controller.emailController,
+                        label: 'Email address',
+                        hint: 'you@example.com',
+                        validator: Validators.email,
+                        keyboardType: TextInputType.emailAddress,
+                        prefixIcon: Icons.mail_outline_rounded,
+                        textInputAction: TextInputAction.next,
+                        autofillHints: const [AutofillHints.email],
+                      ),
+                      const SizedBox(height: 18),
+                      if (!controller.isLogin.value) ...[
+                        _LightTextField(
+                          controller: controller.phoneController,
+                          label: 'Phone number',
+                          hint: '+92 300 1234567',
+                          validator: Validators.phone,
+                          keyboardType: TextInputType.phone,
+                          prefixIcon: Icons.phone_outlined,
+                          textInputAction: TextInputAction.next,
+                          autofillHints: const [
+                            AutofillHints.telephoneNumber,
+                          ],
+                        ),
+                        const SizedBox(height: 18),
+                      ],
+                      _LightTextField(
+                        controller: controller.passwordController,
+                        label: 'Password',
+                        hint: '••••••••',
+                        validator: Validators.password,
+                        obscureText: controller.obscurePassword.value,
+                        prefixIcon: Icons.lock_outline_rounded,
+                        textInputAction: TextInputAction.done,
+                        autofillHints: const [AutofillHints.password],
+                        onFieldSubmitted: (_) => controller.submit(),
+                        suffix: IconButton(
+                          onPressed: controller.togglePasswordVisibility,
+                          splashRadius: 20,
+                          icon: Icon(
+                            controller.obscurePassword.value
+                                ? Icons.visibility_off_outlined
+                                : Icons.visibility_outlined,
+                            size: 20,
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                      ),
+                      if (controller.isLogin.value) ...[
+                        const SizedBox(height: 6),
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: TextButton(
+                            onPressed: () {
+                              AppSnackbar.info(
+                                'Forgot password',
+                                'Password reset coming soon',
+                              );
+                            },
+                            style: TextButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 2,
+                                vertical: 4,
+                              ),
+                              minimumSize: Size.zero,
+                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                            ),
+                            child: const Text(
+                              'Forgot password?',
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.accent,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                      const SizedBox(height: 28),
+                      _PrimaryButton(
+                        label: controller.isLogin.value
+                            ? 'Log in'
+                            : 'Create account',
+                        isLoading: controller.isLoading.value,
+                        onTap: controller.submit,
+                      ),
+                      const SizedBox(height: 28),
+                      const _OrDivider(),
+                      const SizedBox(height: 22),
+                      _GoogleButton(onTap: controller.continueWithGoogle),
+                      const SizedBox(height: 32),
+                      _ModeToggle(
+                        isLogin: controller.isLogin.value,
+                        onToggle: controller.toggleMode,
+                      ),
+                    ],
                   ),
                 ),
               ),
-            ],
+            ),
           ),
         ),
       ),
     );
   }
 }
-
-// ─────────────────────────────────────────────
-// Decorative circle
-// ─────────────────────────────────────────────
-
-class _DecorCircle extends StatelessWidget {
-  const _DecorCircle({required this.size, required this.color});
-
-  final double size;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(shape: BoxShape.circle, color: color),
-    );
-  }
-}
-
-// ─────────────────────────────────────────────
-// Logo — your designed asset
-// ─────────────────────────────────────────────
 
 class _LogoMark extends StatelessWidget {
   const _LogoMark();
@@ -303,11 +193,12 @@ class _LogoMark extends StatelessWidget {
       width: 56,
       height: 56,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surfaceWhite,
         borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.border),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.2),
+            color: AppColors.primary.withValues(alpha: 0.08),
             blurRadius: 16,
             offset: const Offset(0, 6),
           ),
@@ -324,21 +215,17 @@ class _LogoMark extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────────
-// Glass text field — lighter fill + textSecondary
-// ─────────────────────────────────────────────
-
-class _GlassTextField extends StatelessWidget {
-  const _GlassTextField({
+class _LightTextField extends StatelessWidget {
+  const _LightTextField({
     required this.controller,
     required this.label,
     required this.hint,
     this.validator,
     this.keyboardType,
-    this.textInputAction,
-    this.obscureText = false,
-    this.suffix,
     this.prefixIcon,
+    this.suffix,
+    this.obscureText = false,
+    this.textInputAction,
     this.textCapitalization = TextCapitalization.none,
     this.autofillHints,
     this.onFieldSubmitted,
@@ -349,13 +236,13 @@ class _GlassTextField extends StatelessWidget {
   final String hint;
   final String? Function(String?)? validator;
   final TextInputType? keyboardType;
-  final TextInputAction? textInputAction;
-  final bool obscureText;
-  final Widget? suffix;
   final IconData? prefixIcon;
+  final Widget? suffix;
+  final bool obscureText;
+  final TextInputAction? textInputAction;
   final TextCapitalization textCapitalization;
   final Iterable<String>? autofillHints;
-  final ValueChanged<String>? onFieldSubmitted;
+  final void Function(String)? onFieldSubmitted;
 
   @override
   Widget build(BuildContext context) {
@@ -366,10 +253,10 @@ class _GlassTextField extends StatelessWidget {
           padding: const EdgeInsets.only(left: 2, bottom: 8),
           child: Text(
             label,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w500,
-              color: AppColors.textSecondary.withValues(alpha: 0.95),
+              color: AppColors.textSecondary,
               letterSpacing: 0.1,
             ),
           ),
@@ -386,21 +273,20 @@ class _GlassTextField extends StatelessWidget {
           style: const TextStyle(
             fontSize: 15,
             fontWeight: FontWeight.w500,
-            color: Colors.white,
+            color: AppColors.textPrimary,
             letterSpacing: 0.1,
           ),
-          cursorColor: AppColors.accent,
+          cursorColor: AppColors.primary,
           cursorWidth: 1.6,
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: TextStyle(
               fontSize: 14,
-              color: AppColors.textSecondary.withValues(alpha: 0.7),
+              color: AppColors.textMuted.withValues(alpha: 0.9),
               fontWeight: FontWeight.w400,
             ),
             filled: true,
-            // Lighter glass fill
-            fillColor: Colors.white.withValues(alpha: 0.14),
+            fillColor: AppColors.surfaceWhite,
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 16,
               vertical: 16,
@@ -411,25 +297,23 @@ class _GlassTextField extends StatelessWidget {
                     child: Icon(
                       prefixIcon,
                       size: 20,
-                      color: AppColors.textSecondary,
+                      color: AppColors.accent,
                     ),
                   )
                 : null,
-            prefixIconConstraints: const BoxConstraints(
-              minWidth: 0,
-              minHeight: 0,
-            ),
+            prefixIconConstraints:
+                const BoxConstraints(minWidth: 0, minHeight: 0),
             suffixIcon: suffix,
             isDense: true,
-            border: _border(Colors.white.withValues(alpha: 0.22)),
-            enabledBorder: _border(Colors.white.withValues(alpha: 0.22)),
-            focusedBorder: _border(AppColors.accent, width: 1.5),
+            border: _border(AppColors.border),
+            enabledBorder: _border(AppColors.border),
+            focusedBorder: _border(AppColors.primary, width: 1.5),
             errorBorder: _border(AppColors.error),
             focusedErrorBorder: _border(AppColors.error, width: 1.5),
             errorStyle: const TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w500,
-              color: Color(0xFFFF8A9A),
+              color: AppColors.error,
             ),
           ),
         ),
@@ -445,12 +329,8 @@ class _GlassTextField extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────────
-// Teal primary button
-// ─────────────────────────────────────────────
-
-class _TealButton extends StatelessWidget {
-  const _TealButton({
+class _PrimaryButton extends StatelessWidget {
+  const _PrimaryButton({
     required this.label,
     required this.onTap,
     this.isLoading = false,
@@ -468,9 +348,9 @@ class _TealButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: isLoading ? null : onTap,
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.accent,
-          foregroundColor: Colors.white,
-          disabledBackgroundColor: AppColors.accent.withValues(alpha: 0.55),
+          backgroundColor: AppColors.primary,
+          foregroundColor: AppColors.textOnPrimary,
+          disabledBackgroundColor: AppColors.primary.withValues(alpha: 0.45),
           elevation: 0,
           shadowColor: Colors.transparent,
           shape: RoundedRectangleBorder(
@@ -499,9 +379,30 @@ class _TealButton extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────────
-// Google button
-// ─────────────────────────────────────────────
+class _OrDivider extends StatelessWidget {
+  const _OrDivider();
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        const Expanded(child: Divider(color: AppColors.divider, thickness: 1)),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 14),
+          child: Text(
+            'or',
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w500,
+              color: AppColors.textMuted,
+            ),
+          ),
+        ),
+        const Expanded(child: Divider(color: AppColors.divider, thickness: 1)),
+      ],
+    );
+  }
+}
 
 class _GoogleButton extends StatelessWidget {
   const _GoogleButton({required this.onTap});
@@ -516,12 +417,13 @@ class _GoogleButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: onTap,
         style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.white,
+          backgroundColor: AppColors.surfaceWhite,
           foregroundColor: AppColors.textPrimary,
           elevation: 0,
           shadowColor: Colors.transparent,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(28),
+            side: const BorderSide(color: AppColors.border),
           ),
         ),
         child: Row(
@@ -538,7 +440,7 @@ class _GoogleButton extends StatelessWidget {
               style: TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.w600,
-                color: Color(0xFF1F1F1F),
+                color: AppColors.textPrimary,
                 letterSpacing: 0.1,
               ),
             ),
@@ -589,47 +491,11 @@ class _GoogleGPainter extends CustomPainter {
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
-// ─────────────────────────────────────────────
-// Divider + mode toggle
-// ─────────────────────────────────────────────
-
-class _OrDivider extends StatelessWidget {
-  const _OrDivider();
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: Divider(
-            color: Colors.white.withValues(alpha: 0.2),
-            thickness: 1,
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 14),
-          child: Text(
-            'or continue with',
-            style: TextStyle(
-              fontSize: 13,
-              color: Colors.white.withValues(alpha: 0.5),
-              fontWeight: FontWeight.w400,
-            ),
-          ),
-        ),
-        Expanded(
-          child: Divider(
-            color: Colors.white.withValues(alpha: 0.2),
-            thickness: 1,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
 class _ModeToggle extends StatelessWidget {
-  const _ModeToggle({required this.isLogin, required this.onToggle});
+  const _ModeToggle({
+    required this.isLogin,
+    required this.onToggle,
+  });
 
   final bool isLogin;
   final VoidCallback onToggle;
@@ -640,10 +506,11 @@ class _ModeToggle extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
-          isLogin ? 'New here? ' : 'Already have an account? ',
-          style: TextStyle(
+          isLogin ? "Don't have an account? " : 'Already have an account? ',
+          style: const TextStyle(
             fontSize: 14,
-            color: Colors.white.withValues(alpha: 0.55),
+            fontWeight: FontWeight.w400,
+            color: AppColors.textSecondary,
           ),
         ),
         GestureDetector(

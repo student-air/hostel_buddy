@@ -1,5 +1,5 @@
 import 'package:get/get.dart';
-import '../../../core/utils/app_snackbar.dart';
+// import '../../../core/utils/app_snackbar.dart';
 import '../../../routes/app_routes.dart';
 
 class SeekerSearchController extends GetxController {
@@ -93,6 +93,6 @@ class SeekerSearchController extends GetxController {
   }
 
   void onHostelTap(Map<String, dynamic> hostel) {
-    AppSnackbar.info(hostel['name']?.toString() ?? 'Hostel', 'Details coming next.');
-  }
+  Get.toNamed(AppRoutes.hostelDetails, arguments: hostel);
+}
 }

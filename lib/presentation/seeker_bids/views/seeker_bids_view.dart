@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -16,60 +14,27 @@ class SeekerBidsView extends GetView<SeekerBidsController> {
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.light,
       child: Scaffold(
-        resizeToAvoidBottomInset: false, // keyboard won't push navbar
+        backgroundColor: AppColors.scaffoldBackground,
+        resizeToAvoidBottomInset: false,
         body: Stack(
           children: [
-            // ── Background ──
-            Container(
-              width: double.infinity,
-              height: double.infinity,
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    Color(0xFF6B0E24),
-                    Color(0xFF4A0A1E),
-                    Color(0xFF2A0412),
-                  ],
+            Column(
+              children: [
+                _Header(controller: controller),
+                Expanded(
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 14),
+                      _CoinsBar(controller: controller),
+                      const SizedBox(height: 14),
+                      _Tabs(controller: controller),
+                      const SizedBox(height: 12),
+                      Expanded(child: _TabBody(controller: controller)),
+                    ],
+                  ),
                 ),
-              ),
+              ],
             ),
-            Positioned(
-              top: -60,
-              right: -40,
-              child: _Blob(
-                size: 220,
-                color: AppColors.accent.withValues(alpha: 0.08),
-              ),
-            ),
-            Positioned(
-              bottom: 120,
-              left: -50,
-              child: _Blob(
-                size: 180,
-                color: Colors.white.withValues(alpha: 0.03),
-              ),
-            ),
-
-            // ── Content ──
-            SafeArea(
-              bottom: false,
-              child: Column(
-                children: [
-                  const SizedBox(height: 8),
-                  _AppealingHeader(controller: controller),
-                  const SizedBox(height: 18),
-                  _CoinsBar(controller: controller),
-                  const SizedBox(height: 16),
-                  _Tabs(controller: controller),
-                  const SizedBox(height: 12),
-                  Expanded(child: _TabBody(controller: controller)),
-                ],
-              ),
-            ),
-
-            // ── Floating navbar ──
             Positioned(
               left: 0,
               right: 0,
@@ -89,28 +54,34 @@ class SeekerBidsView extends GetView<SeekerBidsController> {
 }
 
 // ═══════════════════════════════════════════
-// HEADER
+// HEADER — curved maroon
 // ═══════════════════════════════════════════
 
-class _AppealingHeader extends StatelessWidget {
-  const _AppealingHeader({required this.controller});
+class _Header extends StatelessWidget {
+  const _Header({required this.controller});
   final SeekerBidsController controller;
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+    final top = MediaQuery.of(context).padding.top;
+
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.fromLTRB(16, top + 8, 20, 22),
+      decoration: const BoxDecoration(
+        color: AppColors.primary,
+        borderRadius: BorderRadius.vertical(bottom: Radius.circular(28)),
+      ),
       child: Row(
         children: [
           GestureDetector(
             onTap: () => Get.back(),
             child: Container(
-              width: 42,
-              height: 42,
+              width: 40,
+              height: 40,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.white.withValues(alpha: 0.1),
-                border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
+                color: Colors.white.withValues(alpha: 0.12),
               ),
               child: const Icon(
                 Icons.arrow_back_ios_new_rounded,
@@ -119,25 +90,25 @@ class _AppealingHeader extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(width: 14),
-          Expanded(
+          const SizedBox(width: 12),
+          const Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   'My Bids',
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 24,
+                    fontSize: 22,
                     fontWeight: FontWeight.w800,
-                    letterSpacing: -0.5,
+                    letterSpacing: -0.4,
                   ),
                 ),
-                const SizedBox(height: 2),
+                SizedBox(height: 2),
                 Text(
                   'Track offers & close deals',
                   style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.55),
+                    color: Colors.white70,
                     fontSize: 13,
                     fontWeight: FontWeight.w500,
                   ),
@@ -148,21 +119,19 @@ class _AppealingHeader extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
             decoration: BoxDecoration(
-              color: AppColors.accent.withValues(alpha: 0.2),
+              color: Colors.white.withValues(alpha: 0.14),
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: AppColors.accent.withValues(alpha: 0.45),
-              ),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
             ),
             child: const Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.gavel_rounded, size: 14, color: AppColors.accentLight),
+                Icon(Icons.gavel_rounded, size: 14, color: Colors.white),
                 SizedBox(width: 5),
                 Text(
                   'Live',
                   style: TextStyle(
-                    color: AppColors.accentLight,
+                    color: Colors.white,
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
                   ),
@@ -188,89 +157,83 @@ class _CoinsBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-          child: Container(
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(16),
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  Colors.white.withValues(alpha: 0.14),
-                  Colors.white.withValues(alpha: 0.05),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          color: AppColors.surfaceWhite,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppColors.border),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.primary.withValues(alpha: 0.05),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.accent.withValues(alpha: 0.12),
+              ),
+              child: const Icon(
+                Icons.monetization_on_rounded,
+                color: AppColors.accent,
+                size: 20,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Coins available',
+                    style: TextStyle(
+                      color: AppColors.textSecondary,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Obx(
+                    () => Text(
+                      '${controller.coins.value}',
+                      style: const TextStyle(
+                        color: AppColors.textPrimary,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: -0.4,
+                      ),
+                    ),
+                  ),
                 ],
               ),
-              border: Border.all(color: Colors.white.withValues(alpha: 0.18)),
             ),
-            child: Row(
-              children: [
-                Container(
-                  width: 36,
-                  height: 36,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: AppColors.accent.withValues(alpha: 0.25),
-                  ),
-                  child: const Icon(
-                    Icons.monetization_on_rounded,
-                    color: AppColors.accentLight,
-                    size: 20,
-                  ),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              decoration: BoxDecoration(
+                color: AppColors.accent.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: AppColors.accent.withValues(alpha: 0.35),
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Coins available',
-                        style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.55),
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Obx(
-                        () => Text(
-                          '${controller.coins.value}',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 20,
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: -0.4,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+              ),
+              child: const Text(
+                '−100 / continue',
+                style: TextStyle(
+                  color: AppColors.accent,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
                 ),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                  decoration: BoxDecoration(
-                    color: AppColors.accent.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: AppColors.accent.withValues(alpha: 0.4),
-                    ),
-                  ),
-                  child: const Text(
-                    '−100 / continue',
-                    style: TextStyle(
-                      color: AppColors.accentLight,
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ],
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );
@@ -295,9 +258,9 @@ class _Tabs extends StatelessWidget {
           height: 44,
           padding: const EdgeInsets.all(4),
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.08),
+            color: AppColors.surfaceWhite,
             borderRadius: BorderRadius.circular(22),
-            border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+            border: Border.all(color: AppColors.border),
           ),
           child: Row(
             children: [
@@ -345,12 +308,12 @@ class _TabChip extends StatelessWidget {
           curve: Curves.easeOutCubic,
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: selected ? AppColors.accent : Colors.transparent,
+            color: selected ? AppColors.primary : Colors.transparent,
             borderRadius: BorderRadius.circular(18),
             boxShadow: selected
                 ? [
                     BoxShadow(
-                      color: AppColors.accent.withValues(alpha: 0.35),
+                      color: AppColors.primary.withValues(alpha: 0.25),
                       blurRadius: 10,
                       offset: const Offset(0, 3),
                     ),
@@ -360,9 +323,7 @@ class _TabChip extends StatelessWidget {
           child: Text(
             label,
             style: TextStyle(
-              color: selected
-                  ? Colors.white
-                  : Colors.white.withValues(alpha: 0.55),
+              color: selected ? Colors.white : AppColors.textSecondary,
               fontSize: 13,
               fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
             ),
@@ -374,7 +335,7 @@ class _TabChip extends StatelessWidget {
 }
 
 // ═══════════════════════════════════════════
-// TAB BODY
+// TAB BODY + EMPTY
 // ═══════════════════════════════════════════
 
 class _TabBody extends StatelessWidget {
@@ -396,7 +357,6 @@ class _TabBody extends StatelessWidget {
       }
 
       return ListView.separated(
-        // Extra bottom padding so last card isn't hidden under floating nav
         padding: const EdgeInsets.fromLTRB(20, 4, 20, 110),
         physics: const BouncingScrollPhysics(),
         itemCount: list.length,
@@ -443,16 +403,24 @@ class _EmptyState extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.inbox_outlined,
-            size: 48,
-            color: Colors.white.withValues(alpha: 0.25),
+          Container(
+            width: 72,
+            height: 72,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: AppColors.primary.withValues(alpha: 0.08),
+            ),
+            child: const Icon(
+              Icons.inbox_outlined,
+              size: 36,
+              color: AppColors.primary,
+            ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 14),
           Text(
             labels[tab],
-            style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.45),
+            style: const TextStyle(
+              color: AppColors.textSecondary,
               fontSize: 15,
               fontWeight: FontWeight.w500,
             ),
@@ -462,6 +430,9 @@ class _EmptyState extends StatelessWidget {
     );
   }
 }
+
+// ── Keep your existing _ReceivedCard, _PendingCard, _ClosedCard below ──
+// (they already use white cards + AppColors)
 
 // ═══════════════════════════════════════════
 // RECEIVED CARD
@@ -996,7 +967,7 @@ class _OfferBottomSheet extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(top: 48),
       decoration: const BoxDecoration(
-        color: Color(0xFF2A0412),
+        color: AppColors.surfaceWhite,
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
       child: Column(
@@ -1007,11 +978,13 @@ class _OfferBottomSheet extends StatelessWidget {
             width: 40,
             height: 4,
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.25),
+              color: AppColors.border,
               borderRadius: BorderRadius.circular(2),
             ),
           ),
           const SizedBox(height: 20),
+
+          // Header: avatar + name + location
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24),
             child: Row(
@@ -1021,16 +994,16 @@ class _OfferBottomSheet extends StatelessWidget {
                   height: 52,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: AppColors.accent.withValues(alpha: 0.25),
+                    color: AppColors.accent.withValues(alpha: 0.15),
                     border: Border.all(
-                      color: AppColors.accent.withValues(alpha: 0.5),
+                      color: AppColors.accent.withValues(alpha: 0.4),
                     ),
                   ),
                   alignment: Alignment.center,
                   child: Text(
                     item.initials,
                     style: const TextStyle(
-                      color: Colors.white,
+                      color: AppColors.accent,
                       fontWeight: FontWeight.w700,
                       fontSize: 16,
                     ),
@@ -1044,7 +1017,7 @@ class _OfferBottomSheet extends StatelessWidget {
                       Text(
                         item.hostelName,
                         style: const TextStyle(
-                          color: Colors.white,
+                          color: AppColors.textPrimary,
                           fontSize: 17,
                           fontWeight: FontWeight.w700,
                         ),
@@ -1052,17 +1025,19 @@ class _OfferBottomSheet extends StatelessWidget {
                       const SizedBox(height: 4),
                       Row(
                         children: [
-                          Icon(
+                          const Icon(
                             Icons.location_on_rounded,
                             size: 14,
-                            color: AppColors.accentLight.withValues(alpha: 0.8),
+                            color: AppColors.accent,
                           ),
                           const SizedBox(width: 4),
-                          Text(
-                            item.location,
-                            style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.65),
-                              fontSize: 13,
+                          Flexible(
+                            child: Text(
+                              item.location,
+                              style: const TextStyle(
+                                color: AppColors.textSecondary,
+                                fontSize: 13,
+                              ),
                             ),
                           ),
                         ],
@@ -1073,16 +1048,19 @@ class _OfferBottomSheet extends StatelessWidget {
               ],
             ),
           ),
+
           const SizedBox(height: 22),
+
+          // Details box
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24),
             child: Container(
               width: double.infinity,
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.06),
+                color: AppColors.surfaceSoft,
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+                border: Border.all(color: AppColors.border),
               ),
               child: Column(
                 children: [
@@ -1091,20 +1069,20 @@ class _OfferBottomSheet extends StatelessWidget {
                     value: item.phone,
                     icon: Icons.phone_rounded,
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 14),
                   _DetailRow(
                     label: 'Your bid',
                     value: item.yourBid,
                     icon: Icons.gavel_rounded,
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 14),
                   _DetailRow(
                     label: 'Hostel offer',
                     value: item.offeredPrice,
                     icon: Icons.local_offer_rounded,
-                    valueColor: AppColors.accentLight,
+                    valueColor: AppColors.accent,
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 14),
                   _DetailRow(
                     label: 'Room',
                     value: '${item.roomType} · ${item.seater}',
@@ -1114,7 +1092,10 @@ class _OfferBottomSheet extends StatelessWidget {
               ),
             ),
           ),
+
           const SizedBox(height: 24),
+
+          // Buttons
           Padding(
             padding: EdgeInsets.fromLTRB(24, 0, 24, 16 + bottomPad),
             child: Row(
@@ -1125,10 +1106,8 @@ class _OfferBottomSheet extends StatelessWidget {
                     child: OutlinedButton(
                       onPressed: () => Get.back(),
                       style: OutlinedButton.styleFrom(
-                        foregroundColor: Colors.white,
-                        side: BorderSide(
-                          color: Colors.white.withValues(alpha: 0.25),
-                        ),
+                        foregroundColor: AppColors.textPrimary,
+                        side: const BorderSide(color: AppColors.border),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(26),
                         ),
@@ -1193,26 +1172,25 @@ class _DetailRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Icon(
-          icon,
-          size: 18,
-          color: AppColors.accentLight.withValues(alpha: 0.7),
-        ),
+        Icon(icon, size: 18, color: AppColors.accent),
         const SizedBox(width: 10),
         Text(
           label,
-          style: TextStyle(
-            color: Colors.white.withValues(alpha: 0.5),
+          style: const TextStyle(
+            color: AppColors.textSecondary,
             fontSize: 13,
           ),
         ),
         const Spacer(),
-        Text(
-          value,
-          style: TextStyle(
-            color: valueColor ?? Colors.white,
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
+        Flexible(
+          child: Text(
+            value,
+            textAlign: TextAlign.end,
+            style: TextStyle(
+              color: valueColor ?? AppColors.textPrimary,
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+            ),
           ),
         ),
       ],
@@ -1237,15 +1215,7 @@ class _ReviewBottomSheet extends StatelessWidget {
     return Container(
       height: MediaQuery.of(context).size.height * 0.88,
       decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            Color(0xFF3C0A1A),
-            Color(0xFF2A0412),
-            Color(0xFF1A020A),
-          ],
-        ),
+        color: AppColors.surfaceWhite,
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
       child: Column(
@@ -1255,11 +1225,13 @@ class _ReviewBottomSheet extends StatelessWidget {
             width: 40,
             height: 4,
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.25),
+              color: AppColors.border,
               borderRadius: BorderRadius.circular(2),
             ),
           ),
           const SizedBox(height: 16),
+
+          // Title
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Row(
@@ -1268,7 +1240,7 @@ class _ReviewBottomSheet extends StatelessWidget {
                   child: Text(
                     'Review ${item.hostelName}',
                     style: const TextStyle(
-                      color: Colors.white,
+                      color: AppColors.textPrimary,
                       fontSize: 18,
                       fontWeight: FontWeight.w800,
                     ),
@@ -1276,9 +1248,9 @@ class _ReviewBottomSheet extends StatelessWidget {
                 ),
                 GestureDetector(
                   onTap: () => Get.back(),
-                  child: Icon(
+                  child: const Icon(
                     Icons.close_rounded,
-                    color: Colors.white.withValues(alpha: 0.6),
+                    color: AppColors.textSecondary,
                     size: 22,
                   ),
                 ),
@@ -1287,35 +1259,36 @@ class _ReviewBottomSheet extends StatelessWidget {
           ),
           const SizedBox(height: 18),
 
-          // Overall rating box — green glow + green outline, yellow stars
+          // Overall rating
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Obx(() {
               final overall = controller.overallRating;
               return Container(
                 width: double.infinity,
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.06),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: AppColors.accent.withValues(alpha: 0.55),
-                    width: 1.4,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.accent.withValues(alpha: 0.25),
-                      blurRadius: 18,
-                      spreadRadius: 1,
-                    ),
-                  ],
-                ),
+  color: AppColors.accent.withValues(alpha: 0.12), // greenish fill
+  borderRadius: BorderRadius.circular(16),
+  border: Border.all(
+    color: AppColors.accent.withValues(alpha: 0.45),
+    width: 1.4,
+  ),
+  boxShadow: [
+    BoxShadow(
+      color: AppColors.accent.withValues(alpha: 0.18),
+      blurRadius: 14,
+      spreadRadius: 0,
+    ),
+  ],
+),
                 child: Row(
                   children: [
                     Text(
                       overall == 0 ? '0.0' : overall.toStringAsFixed(1),
                       style: const TextStyle(
-                        color: Colors.white,
+                        color: AppColors.textPrimary,
                         fontSize: 32,
                         fontWeight: FontWeight.w800,
                         letterSpacing: -0.5,
@@ -1339,7 +1312,7 @@ class _ReviewBottomSheet extends StatelessWidget {
                               size: 18,
                               color: filled || half
                                   ? const Color(0xFFFFC107)
-                                  : Colors.white.withValues(alpha: 0.3),
+                                  : AppColors.textMuted,
                             );
                           }),
                         ),
@@ -1348,8 +1321,8 @@ class _ReviewBottomSheet extends StatelessWidget {
                           overall == 0
                               ? 'Overall · rate to see score'
                               : 'Overall · updates as you rate',
-                          style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.5),
+                          style: const TextStyle(
+                            color: AppColors.textSecondary,
                             fontSize: 12,
                           ),
                         ),
@@ -1368,10 +1341,10 @@ class _ReviewBottomSheet extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  const Text(
                     'Rate each category',
                     style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.65),
+                      color: AppColors.textSecondary,
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
                     ),
@@ -1392,10 +1365,10 @@ class _ReviewBottomSheet extends StatelessWidget {
                     );
                   }),
                   const SizedBox(height: 16),
-                  Text(
+                  const Text(
                     'Your review',
                     style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.65),
+                      color: AppColors.textSecondary,
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
                     ),
@@ -1404,33 +1377,36 @@ class _ReviewBottomSheet extends StatelessWidget {
                   TextField(
                     maxLines: 4,
                     maxLength: 300,
-                    style: const TextStyle(color: Colors.white, fontSize: 14),
+                    style: const TextStyle(
+                      color: AppColors.textPrimary,
+                      fontSize: 14,
+                    ),
+                    cursorColor: AppColors.primary,
                     onChanged: (v) => controller.reviewText.value = v,
                     decoration: InputDecoration(
                       hintText: 'Share your experience...',
-                      hintStyle: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.35),
+                      hintStyle: const TextStyle(
+                        color: AppColors.textMuted,
                       ),
                       filled: true,
-                      fillColor: Colors.white.withValues(alpha: 0.06),
+                      fillColor: AppColors.surfaceSoft,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(14),
-                        borderSide: BorderSide(
-                          color: Colors.white.withValues(alpha: 0.1),
-                        ),
+                        borderSide: const BorderSide(color: AppColors.border),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(14),
-                        borderSide: BorderSide(
-                          color: Colors.white.withValues(alpha: 0.1),
-                        ),
+                        borderSide: const BorderSide(color: AppColors.border),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(14),
-                        borderSide: const BorderSide(color: AppColors.accent),
+                        borderSide: const BorderSide(
+                          color: AppColors.primary,
+                          width: 1.5,
+                        ),
                       ),
-                      counterStyle: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.35),
+                      counterStyle: const TextStyle(
+                        color: AppColors.textMuted,
                         fontSize: 11,
                       ),
                     ),
@@ -1485,9 +1461,9 @@ class _CategoryRatingRow extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.06),
+        color: AppColors.surfaceSoft,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+        border: Border.all(color: AppColors.border),
       ),
       child: Row(
         children: [
@@ -1495,7 +1471,7 @@ class _CategoryRatingRow extends StatelessWidget {
             child: Text(
               label,
               style: const TextStyle(
-                color: Colors.white,
+                color: AppColors.textPrimary,
                 fontSize: 15,
                 fontWeight: FontWeight.w700,
               ),
@@ -1515,7 +1491,7 @@ class _CategoryRatingRow extends StatelessWidget {
                     size: 26,
                     color: filled
                         ? const Color(0xFFFFC107)
-                        : Colors.white.withValues(alpha: 0.3),
+                        : AppColors.textMuted,
                   ),
                 ),
               );

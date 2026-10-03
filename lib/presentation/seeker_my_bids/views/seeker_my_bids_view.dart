@@ -13,38 +13,14 @@ class SeekerMyBidsView extends GetView<SeekerMyBidsController> {
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.light,
       child: Scaffold(
-        body: Stack(
+        backgroundColor: AppColors.scaffoldBackground,
+        body: Column(
           children: [
-            Container(
-              width: double.infinity,
-              height: double.infinity,
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    Color(0xFF6B0E24),
-                    Color(0xFF4A0A1E),
-                    Color(0xFF2A0412),
-                  ],
-                ),
-              ),
-            ),
-            Positioned(
-              top: -60,
-              right: -40,
-              child: _Blob(
-                size: 220,
-                color: AppColors.accent.withValues(alpha: 0.08),
-              ),
-            ),
-
-            SafeArea(
+            _Header(),
+            Expanded(
               child: Column(
                 children: [
-                  const SizedBox(height: 8),
-                  _Header(),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 14),
                   _SearchBar(controller: controller),
                   const SizedBox(height: 14),
                   Expanded(child: _Body(controller: controller)),
@@ -59,25 +35,31 @@ class SeekerMyBidsView extends GetView<SeekerMyBidsController> {
 }
 
 // ═══════════════════════════════════════════
-// HEADER
+// HEADER — curved maroon
 // ═══════════════════════════════════════════
 
 class _Header extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+    final top = MediaQuery.of(context).padding.top;
+
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.fromLTRB(16, top + 8, 20, 22),
+      decoration: const BoxDecoration(
+        color: AppColors.primary,
+        borderRadius: BorderRadius.vertical(bottom: Radius.circular(28)),
+      ),
       child: Row(
         children: [
           GestureDetector(
             onTap: () => Get.back(),
             child: Container(
-              width: 42,
-              height: 42,
+              width: 40,
+              height: 40,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.white.withValues(alpha: 0.1),
-                border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
+                color: Colors.white.withValues(alpha: 0.12),
               ),
               child: const Icon(
                 Icons.arrow_back_ios_new_rounded,
@@ -86,25 +68,25 @@ class _Header extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(width: 14),
-          Expanded(
+          const SizedBox(width: 12),
+          const Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   'My Bids',
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 24,
+                    fontSize: 22,
                     fontWeight: FontWeight.w800,
-                    letterSpacing: -0.5,
+                    letterSpacing: -0.4,
                   ),
                 ),
-                const SizedBox(height: 2),
+                SizedBox(height: 2),
                 Text(
                   'Bids you have created',
                   style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.55),
+                    color: Colors.white70,
                     fontSize: 13,
                     fontWeight: FontWeight.w500,
                   ),
@@ -133,27 +115,37 @@ class _SearchBar extends StatelessWidget {
       child: Container(
         height: 48,
         decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.08),
+          color: AppColors.surfaceWhite,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
+          border: Border.all(color: AppColors.border),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.primary.withValues(alpha: 0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
         child: TextField(
           onChanged: controller.onSearchChanged,
-          style: const TextStyle(color: Colors.white, fontSize: 15),
-          cursorColor: AppColors.accentLight,
-          decoration: InputDecoration(
+          style: const TextStyle(
+            color: AppColors.textPrimary,
+            fontSize: 15,
+          ),
+          cursorColor: AppColors.primary,
+          decoration: const InputDecoration(
             hintText: 'Search bids...',
             hintStyle: TextStyle(
-              color: Colors.white.withValues(alpha: 0.4),
+              color: AppColors.textMuted,
               fontSize: 15,
             ),
             prefixIcon: Icon(
               Icons.search_rounded,
-              color: Colors.white.withValues(alpha: 0.45),
+              color: AppColors.accent,
               size: 22,
             ),
             border: InputBorder.none,
-            contentPadding: const EdgeInsets.symmetric(vertical: 14),
+            contentPadding: EdgeInsets.symmetric(vertical: 14),
           ),
         ),
       ),
@@ -179,18 +171,26 @@ class _Body extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
-                Icons.gavel_rounded,
-                size: 48,
-                color: Colors.white.withValues(alpha: 0.25),
+              Container(
+                width: 72,
+                height: 72,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: AppColors.primary.withValues(alpha: 0.08),
+                ),
+                child: const Icon(
+                  Icons.gavel_rounded,
+                  size: 36,
+                  color: AppColors.primary,
+                ),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 14),
               Text(
                 controller.searchQuery.value.isEmpty
                     ? 'No bids yet'
                     : 'No matching bids',
-                style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.45),
+                style: const TextStyle(
+                  color: AppColors.textSecondary,
                   fontSize: 15,
                   fontWeight: FontWeight.w500,
                 ),
@@ -230,17 +230,17 @@ class _BidCard extends StatelessWidget {
   Color get statusColor {
     switch (item.status) {
       case 'pending':
-        return const Color(0xFFE0A33C);
+        return AppColors.warning;
       case 'responded':
-        return AppColors.accentLight;
+        return AppColors.accent;
       case 'won':
         return AppColors.success;
       case 'lost':
         return AppColors.error;
       case 'closed':
-        return Colors.white54;
+        return AppColors.textMuted;
       default:
-        return AppColors.accentLight;
+        return AppColors.accent;
     }
   }
 
@@ -251,13 +251,14 @@ class _BidCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.surfaceWhite,
           borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: AppColors.border),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.12),
-              blurRadius: 16,
-              offset: const Offset(0, 6),
+              color: AppColors.primary.withValues(alpha: 0.05),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
             ),
           ],
         ),
@@ -271,9 +272,7 @@ class _BidCard extends StatelessWidget {
                   height: 44,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(12),
-                    gradient: const LinearGradient(
-                      colors: [Color(0xFF8B1538), Color(0xFF6B0E24)],
-                    ),
+                    color: AppColors.primary,
                   ),
                   child: const Icon(
                     Icons.edit_note_rounded,
@@ -306,7 +305,6 @@ class _BidCard extends StatelessWidget {
                     ],
                   ),
                 ),
-                // Status chip
                 Container(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
@@ -346,8 +344,10 @@ class _BidCard extends StatelessWidget {
                 runSpacing: 6,
                 children: item.amenities.take(4).map((a) {
                   return Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 5,
+                    ),
                     decoration: BoxDecoration(
                       color: AppColors.tagBackground,
                       borderRadius: BorderRadius.circular(12),
@@ -367,21 +367,6 @@ class _BidCard extends StatelessWidget {
           ],
         ),
       ),
-    );
-  }
-}
-
-class _Blob extends StatelessWidget {
-  const _Blob({required this.size, required this.color});
-  final double size;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(shape: BoxShape.circle, color: color),
     );
   }
 }

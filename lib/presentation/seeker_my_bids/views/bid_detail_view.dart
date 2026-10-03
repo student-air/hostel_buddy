@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -19,9 +17,9 @@ class BidDetailView extends StatelessWidget {
         Get.offNamed(AppRoutes.seekerMyBids);
       });
       return const Scaffold(
-        backgroundColor: Color(0xFF2A0412),
+        backgroundColor: AppColors.scaffoldBackground,
         body: Center(
-          child: CircularProgressIndicator(color: Colors.white),
+          child: CircularProgressIndicator(color: AppColors.primary),
         ),
       );
     }
@@ -34,393 +32,313 @@ class BidDetailView extends StatelessWidget {
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.light,
       child: Scaffold(
-        body: Stack(
+        backgroundColor: AppColors.scaffoldBackground,
+        body: Column(
           children: [
-            Container(
-              width: double.infinity,
-              height: double.infinity,
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    Color(0xFF6B0E24),
-                    Color(0xFF4A0A1E),
-                    Color(0xFF2A0412),
-                  ],
-                ),
-              ),
-            ),
-            Positioned(
-              top: -60,
-              right: -40,
-              child: _Blob(
-                size: 220,
-                color: AppColors.accent.withValues(alpha: 0.08),
-              ),
-            ),
-            Positioned(
-              bottom: 120,
-              left: -50,
-              child: _Blob(
-                size: 180,
-                color: Colors.white.withValues(alpha: 0.03),
-              ),
-            ),
-
-            SafeArea(
-              child: Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 8, 20, 0),
-                    child: Row(
-                      children: [
-                        GestureDetector(
-                          onTap: () => Get.back(),
-                          child: Container(
-                            width: 40,
-                            height: 40,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Colors.white.withValues(alpha: 0.1),
-                              border: Border.all(
-                                color: Colors.white.withValues(alpha: 0.14),
-                              ),
-                            ),
-                            child: const Icon(
-                              Icons.arrow_back_ios_new_rounded,
-                              color: Colors.white,
-                              size: 18,
-                            ),
+            _Header(),
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+                physics: const BouncingScrollPhysics(),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Receipt card
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.fromLTRB(18, 18, 18, 16),
+                      decoration: BoxDecoration(
+                        color: AppColors.surfaceWhite,
+                        borderRadius: BorderRadius.circular(22),
+                        border: Border.all(color: AppColors.border),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.primary.withValues(alpha: 0.06),
+                            blurRadius: 16,
+                            offset: const Offset(0, 6),
                           ),
-                        ),
-                        const SizedBox(width: 12),
-                        const Text(
-                          'Bid Details',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 22,
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: -0.4,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(height: 20),
-
-                  Expanded(
-                    child: SingleChildScrollView(
-                      padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
-                      physics: const BouncingScrollPhysics(),
+                        ],
+                      ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // WHITE RECEIPT CARD
-                          Container(
-                            width: double.infinity,
-                            padding: const EdgeInsets.fromLTRB(18, 18, 18, 16),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(22),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withValues(alpha: 0.2),
-                                  blurRadius: 20,
-                                  offset: const Offset(0, 8),
+                          Row(
+                            children: [
+                              Container(
+                                width: 40,
+                                height: 40,
+                                decoration: BoxDecoration(
+                                  color: AppColors.primary,
+                                  borderRadius: BorderRadius.circular(12),
                                 ),
-                              ],
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
+                                child: const Icon(
+                                  Icons.edit_note_rounded,
+                                  color: Colors.white,
+                                  size: 22,
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Text(
+                                  item.seater,
+                                  style: const TextStyle(
+                                    color: AppColors.textPrimary,
+                                    fontSize: 17,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 5,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: AppColors.warning
+                                      .withValues(alpha: 0.12),
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
                                   children: [
                                     Container(
-                                      width: 40,
-                                      height: 40,
-                                      decoration: BoxDecoration(
-                                        color: const Color(0xFF6B0E24),
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                      child: const Icon(
-                                        Icons.edit_note_rounded,
-                                        color: Colors.white,
-                                        size: 22,
+                                      width: 6,
+                                      height: 6,
+                                      decoration: const BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: AppColors.warning,
                                       ),
                                     ),
-                                    const SizedBox(width: 12),
-                                    Expanded(
-                                      child: Text(
-                                        item.seater,
-                                        style: const TextStyle(
-                                          color: Color(0xFF1A0A10),
-                                          fontSize: 17,
-                                          fontWeight: FontWeight.w700,
-                                        ),
-                                      ),
-                                    ),
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 10,
-                                        vertical: 5,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: const Color(0xFFE0A33C)
-                                            .withValues(alpha: 0.15),
-                                        borderRadius: BorderRadius.circular(20),
-                                      ),
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Container(
-                                            width: 6,
-                                            height: 6,
-                                            decoration: const BoxDecoration(
-                                              shape: BoxShape.circle,
-                                              color: Color(0xFFE0A33C),
-                                            ),
-                                          ),
-                                          const SizedBox(width: 5),
-                                          Text(
-                                            item.statusLabel,
-                                            style: const TextStyle(
-                                              color: Color(0xFFE0A33C),
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.w700,
-                                            ),
-                                          ),
-                                        ],
+                                    const SizedBox(width: 5),
+                                    Text(
+                                      item.statusLabel,
+                                      style: const TextStyle(
+                                        color: AppColors.warning,
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w700,
                                       ),
                                     ),
                                   ],
                                 ),
-                                const SizedBox(height: 18),
-                                Text(
-                                  'Your Offer',
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 18),
+                          const Text(
+                            'Your Offer',
+                            style: TextStyle(
+                              color: AppColors.textSecondary,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          RichText(
+                            text: TextSpan(
+                              children: [
+                                TextSpan(
+                                  text: 'Rs $offerText',
+                                  style: const TextStyle(
+                                    color: AppColors.textPrimary,
+                                    fontSize: 32,
+                                    fontWeight: FontWeight.w800,
+                                    letterSpacing: -0.8,
+                                  ),
+                                ),
+                                const TextSpan(
+                                  text: '/mo',
                                   style: TextStyle(
-                                    color: Colors.grey.shade500,
-                                    fontSize: 13,
+                                    color: AppColors.textSecondary,
+                                    fontSize: 16,
                                     fontWeight: FontWeight.w500,
                                   ),
                                 ),
-                                const SizedBox(height: 4),
-                                RichText(
-                                  text: TextSpan(
-                                    children: [
-                                      TextSpan(
-                                        text: 'Rs $offerText',
-                                        style: const TextStyle(
-                                          color: Color(0xFF1A0A10),
-                                          fontSize: 32,
-                                          fontWeight: FontWeight.w800,
-                                          letterSpacing: -0.8,
-                                        ),
-                                      ),
-                                      TextSpan(
-                                        text: '/mo',
-                                        style: TextStyle(
-                                          color: Colors.grey.shade500,
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                const SizedBox(height: 18),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                    vertical: 12,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFFF8F0F4),
-                                    borderRadius: BorderRadius.circular(14),
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      _MetaItem(
-                                        label: 'Seater',
-                                        value: item.seater,
-                                      ),
-                                      _MetaDivider(),
-                                      _MetaItem(
-                                        label: 'Placed',
-                                        value: _timeAgo(item.createdAt),
-                                      ),
-                                      _MetaDivider(),
-                                      _MetaItem(
-                                        label: 'Ends in',
-                                        value: item.endsIn,
-                                      ),
-                                    ],
-                                  ),
-                                ),
                               ],
                             ),
                           ),
-
-                          const SizedBox(height: 22),
-
-                          // PROGRESS
+                          const SizedBox(height: 18),
                           Container(
-                            width: double.infinity,
-                            padding: const EdgeInsets.fromLTRB(16, 16, 16, 18),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 12,
+                            ),
                             decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.07),
-                              borderRadius: BorderRadius.circular(18),
-                              border: Border.all(
-                                color: Colors.white.withValues(alpha: 0.1),
-                              ),
+                              color: AppColors.surfaceSoft,
+                              borderRadius: BorderRadius.circular(14),
                             ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                            child: Row(
                               children: [
-                                Text(
-                                  'Progress',
-                                  style: TextStyle(
-                                    color: Colors.white.withValues(alpha: 0.7),
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600,
-                                  ),
+                                _MetaItem(
+                                  label: 'Seater',
+                                  value: item.seater,
                                 ),
-                                const SizedBox(height: 18),
-                                _ProgressTracker(status: item.status),
+                                _MetaDivider(),
+                                _MetaItem(
+                                  label: 'Placed',
+                                  value: _timeAgo(item.createdAt),
+                                ),
+                                _MetaDivider(),
+                                _MetaItem(
+                                  label: 'Ends in',
+                                  value: item.endsIn,
+                                ),
                               ],
-                            ),
-                          ),
-
-                          const SizedBox(height: 22),
-
-                          // AMENITIES
-                          if (item.amenities.isNotEmpty) ...[
-                            Text(
-                              'Amenities',
-                              style: TextStyle(
-                                color: Colors.white.withValues(alpha: 0.7),
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            const SizedBox(height: 12),
-                            Wrap(
-                              spacing: 8,
-                              runSpacing: 8,
-                              children: item.amenities.map((a) {
-                                return Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 14,
-                                    vertical: 9,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color:
-                                        Colors.white.withValues(alpha: 0.08),
-                                    borderRadius: BorderRadius.circular(20),
-                                    border: Border.all(
-                                      color: Colors.white
-                                          .withValues(alpha: 0.14),
-                                    ),
-                                  ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Icon(
-                                        _amenityIcon(a),
-                                        size: 15,
-                                        color: AppColors.accentLight,
-                                      ),
-                                      const SizedBox(width: 6),
-                                      Text(
-                                        a,
-                                        style: const TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 13,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              }).toList(),
-                            ),
-                          ],
-
-                          const SizedBox(height: 32),
-
-                          // EDIT BUTTON
-                          SizedBox(
-                            width: double.infinity,
-                            height: 52,
-                            child: ElevatedButton(
-                              onPressed: () =>
-                                  _openEditSheet(context, item, controller),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: AppColors.accent,
-                                foregroundColor: Colors.white,
-                                elevation: 0,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(28),
-                                ),
-                              ),
-                              child: const Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(Icons.edit_rounded, size: 18),
-                                  SizedBox(width: 8),
-                                  Text(
-                                    'Edit Bid',
-                                    style: TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-
-                          const SizedBox(height: 12),
-
-                          // DELETE BUTTON
-                          SizedBox(
-                            width: double.infinity,
-                            height: 52,
-                            child: OutlinedButton(
-                              onPressed: () =>
-                                  _showDeleteDialog(item, controller),
-                              style: OutlinedButton.styleFrom(
-                                foregroundColor: const Color(0xFFE8736C),
-                                side: const BorderSide(
-                                  color: Color(0xFFE8736C),
-                                  width: 1.4,
-                                ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(28),
-                                ),
-                              ),
-                              child: const Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(Icons.delete_outline_rounded, size: 18),
-                                  SizedBox(width: 8),
-                                  Text(
-                                    'Delete Bid',
-                                    style: TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                  ),
-                                ],
-                              ),
                             ),
                           ),
                         ],
                       ),
                     ),
-                  ),
-                ],
+
+                    const SizedBox(height: 16),
+
+                    // Progress
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 18),
+                      decoration: BoxDecoration(
+                        color: AppColors.surfaceWhite,
+                        borderRadius: BorderRadius.circular(18),
+                        border: Border.all(color: AppColors.border),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Progress',
+                            style: TextStyle(
+                              color: AppColors.textPrimary,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(height: 18),
+                          _ProgressTracker(status: item.status),
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // Amenities
+                    if (item.amenities.isNotEmpty) ...[
+                      const Text(
+                        'Amenities',
+                        style: TextStyle(
+                          color: AppColors.textPrimary,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: item.amenities.map((a) {
+                          return Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 14,
+                              vertical: 9,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColors.surfaceWhite,
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(color: AppColors.border),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  _amenityIcon(a),
+                                  size: 15,
+                                  color: AppColors.accent,
+                                ),
+                                const SizedBox(width: 6),
+                                Text(
+                                  a,
+                                  style: const TextStyle(
+                                    color: AppColors.textPrimary,
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ],
+
+                    const SizedBox(height: 28),
+
+                    // Edit
+                    SizedBox(
+                      width: double.infinity,
+                      height: 52,
+                      child: ElevatedButton(
+                        onPressed: () =>
+                            _openEditSheet(context, item, controller),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.accent,
+                          foregroundColor: Colors.white,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(28),
+                          ),
+                        ),
+                        child: const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.edit_rounded, size: 18),
+                            SizedBox(width: 8),
+                            Text(
+                              'Edit Bid',
+                              style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 12),
+
+                    // Delete
+                    SizedBox(
+                      width: double.infinity,
+                      height: 52,
+                      child: OutlinedButton(
+                        onPressed: () =>
+                            _showDeleteDialog(item, controller),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: AppColors.error,
+                          side: const BorderSide(
+                            color: AppColors.error,
+                            width: 1.4,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(28),
+                          ),
+                        ),
+                        child: const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.delete_outline_rounded, size: 18),
+                            SizedBox(width: 8),
+                            Text(
+                              'Delete Bid',
+                              style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ],
@@ -428,10 +346,6 @@ class BidDetailView extends StatelessWidget {
       ),
     );
   }
-
-  // ═══════════════════════════════════════════
-  // EDIT BOTTOM SHEET
-  // ═══════════════════════════════════════════
 
   void _openEditSheet(
     BuildContext context,
@@ -469,7 +383,7 @@ class BidDetailView extends StatelessWidget {
           maxHeight: MediaQuery.of(context).size.height * 0.85,
         ),
         decoration: const BoxDecoration(
-          color: Color(0xFF2A0412),
+          color: AppColors.surfaceWhite,
           borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
         ),
         child: Column(
@@ -480,7 +394,7 @@ class BidDetailView extends StatelessWidget {
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.25),
+                color: AppColors.border,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -492,7 +406,7 @@ class BidDetailView extends StatelessWidget {
                   Text(
                     'Edit Bid',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: AppColors.textPrimary,
                       fontSize: 20,
                       fontWeight: FontWeight.w800,
                     ),
@@ -507,10 +421,10 @@ class BidDetailView extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
+                    const Text(
                       'Seater',
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.6),
+                        color: AppColors.textSecondary,
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
                       ),
@@ -518,16 +432,18 @@ class BidDetailView extends StatelessWidget {
                     const SizedBox(height: 8),
                     TextField(
                       controller: seaterCtrl,
-                      style:
-                          const TextStyle(color: Colors.white, fontSize: 15),
-                      cursorColor: AppColors.accentLight,
+                      style: const TextStyle(
+                        color: AppColors.textPrimary,
+                        fontSize: 15,
+                      ),
+                      cursorColor: AppColors.primary,
                       decoration: _fieldDecoration('e.g. 3 Seater'),
                     ),
                     const SizedBox(height: 18),
-                    Text(
+                    const Text(
                       'Your Offer (Rs / month)',
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.6),
+                        color: AppColors.textSecondary,
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
                       ),
@@ -536,16 +452,18 @@ class BidDetailView extends StatelessWidget {
                     TextField(
                       controller: offerCtrl,
                       keyboardType: TextInputType.number,
-                      style:
-                          const TextStyle(color: Colors.white, fontSize: 15),
-                      cursorColor: AppColors.accentLight,
+                      style: const TextStyle(
+                        color: AppColors.textPrimary,
+                        fontSize: 15,
+                      ),
+                      cursorColor: AppColors.primary,
                       decoration: _fieldDecoration('e.g. 13000'),
                     ),
                     const SizedBox(height: 18),
-                    Text(
+                    const Text(
                       'Amenities',
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.6),
+                        color: AppColors.textSecondary,
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
                       ),
@@ -574,21 +492,21 @@ class BidDetailView extends StatelessWidget {
                               ),
                               decoration: BoxDecoration(
                                 color: selected
-                                    ? AppColors.accent.withValues(alpha: 0.25)
-                                    : Colors.transparent,
+                                    ? AppColors.accent.withValues(alpha: 0.12)
+                                    : AppColors.surfaceSoft,
                                 borderRadius: BorderRadius.circular(20),
                                 border: Border.all(
                                   color: selected
                                       ? AppColors.accent
-                                      : Colors.white.withValues(alpha: 0.2),
+                                      : AppColors.border,
                                 ),
                               ),
                               child: Text(
                                 a,
                                 style: TextStyle(
                                   color: selected
-                                      ? AppColors.accentLight
-                                      : Colors.white.withValues(alpha: 0.7),
+                                      ? AppColors.accent
+                                      : AppColors.textPrimary,
                                   fontSize: 13,
                                   fontWeight: selected
                                       ? FontWeight.w600
@@ -601,8 +519,6 @@ class BidDetailView extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 28),
-
-                    // SAVE → update + go to My Bids
                     SizedBox(
                       width: double.infinity,
                       height: 52,
@@ -657,22 +573,22 @@ class BidDetailView extends StatelessWidget {
   InputDecoration _fieldDecoration(String hint) {
     return InputDecoration(
       hintText: hint,
-      hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.3)),
+      hintStyle: const TextStyle(color: AppColors.textMuted),
       filled: true,
-      fillColor: Colors.white.withValues(alpha: 0.06),
+      fillColor: AppColors.surfaceSoft,
       contentPadding:
           const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),
-        borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.12)),
+        borderSide: const BorderSide(color: AppColors.border),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),
-        borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.12)),
+        borderSide: const BorderSide(color: AppColors.border),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),
-        borderSide: const BorderSide(color: AppColors.accent),
+        borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
       ),
     );
   }
@@ -689,140 +605,117 @@ class BidDetailView extends StatelessWidget {
     return buf.toString();
   }
 
-  // ═══════════════════════════════════════════
-  // DELETE CONFIRM → delete + go to My Bids
-  // ═══════════════════════════════════════════
-
   void _showDeleteDialog(MyBidItem item, SeekerMyBidsController controller) {
     Get.dialog(
       Dialog(
         backgroundColor: Colors.transparent,
         insetPadding: const EdgeInsets.symmetric(horizontal: 28),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(24),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
-            child: Container(
-              padding: const EdgeInsets.fromLTRB(24, 28, 24, 20),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    Colors.white.withValues(alpha: 0.12),
-                    Colors.white.withValues(alpha: 0.04),
-                  ],
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(24, 28, 24, 20),
+          decoration: BoxDecoration(
+            color: AppColors.surfaceWhite,
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: AppColors.border),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.primary.withValues(alpha: 0.12),
+                blurRadius: 24,
+                offset: const Offset(0, 8),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 64,
+                height: 64,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: AppColors.error.withValues(alpha: 0.12),
                 ),
-                borderRadius: BorderRadius.circular(24),
-                border:
-                    Border.all(color: Colors.white.withValues(alpha: 0.18)),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppColors.primary.withValues(alpha: 0.35),
-                    blurRadius: 28,
-                    spreadRadius: 2,
-                  ),
-                ],
+                child: const Icon(
+                  Icons.delete_outline_rounded,
+                  size: 28,
+                  color: AppColors.error,
+                ),
               ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
+              const SizedBox(height: 18),
+              const Text(
+                'Delete bid?',
+                style: TextStyle(
+                  color: AppColors.textPrimary,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: -0.3,
+                ),
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                'Are you sure you want to delete this bid? This action cannot be undone.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: AppColors.textSecondary,
+                  fontSize: 14,
+                  height: 1.4,
+                ),
+              ),
+              const SizedBox(height: 28),
+              Row(
                 children: [
-                  Container(
-                    width: 64,
-                    height: 64,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: AppColors.error.withValues(alpha: 0.15),
-                      border: Border.all(
-                        color: AppColors.error.withValues(alpha: 0.4),
-                      ),
-                    ),
-                    child: const Icon(
-                      Icons.delete_outline_rounded,
-                      size: 28,
-                      color: AppColors.error,
-                    ),
-                  ),
-                  const SizedBox(height: 18),
-                  const Text(
-                    'Delete bid?',
-                    style: TextStyle(
-                      color: AppColors.accent,
-                      fontSize: 20,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: -0.3,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Are you sure you want to delete this bid? This action cannot be undone.',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: AppColors.accentLight.withValues(alpha: 0.85),
-                      fontSize: 14,
-                      height: 1.4,
-                    ),
-                  ),
-                  const SizedBox(height: 28),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: SizedBox(
-                          height: 48,
-                          child: OutlinedButton(
-                            onPressed: () => Get.back(),
-                            style: OutlinedButton.styleFrom(
-                              foregroundColor: Colors.white,
-                              side: BorderSide(
-                                color: Colors.white.withValues(alpha: 0.25),
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(24),
-                              ),
-                            ),
-                            child: const Text(
-                              'Cancel',
-                              style: TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
+                  Expanded(
+                    child: SizedBox(
+                      height: 48,
+                      child: OutlinedButton(
+                        onPressed: () => Get.back(),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: AppColors.textPrimary,
+                          side: const BorderSide(color: AppColors.border),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(24),
+                          ),
+                        ),
+                        child: const Text(
+                          'Cancel',
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
                       ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: SizedBox(
-                          height: 48,
-                          child: ElevatedButton(
-                            onPressed: () {
-                              Get.back(); // close dialog
-                              controller.deleteBid(item);
-                              Get.offNamed(AppRoutes.seekerMyBids);
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: AppColors.error,
-                              foregroundColor: Colors.white,
-                              elevation: 0,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(24),
-                              ),
-                            ),
-                            child: const Text(
-                              'Delete',
-                              style: TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: SizedBox(
+                      height: 48,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Get.back();
+                          controller.deleteBid(item);
+                          Get.offNamed(AppRoutes.seekerMyBids);
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.error,
+                          foregroundColor: Colors.white,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(24),
+                          ),
+                        ),
+                        child: const Text(
+                          'Delete',
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w700,
                           ),
                         ),
                       ),
-                    ],
+                    ),
                   ),
                 ],
               ),
-            ),
+            ],
           ),
         ),
       ),
@@ -869,21 +762,48 @@ class BidDetailView extends StatelessWidget {
   }
 }
 
-// ═══════════════════════════════════════════
-// HELPERS
-// ═══════════════════════════════════════════
-
-class _Blob extends StatelessWidget {
-  const _Blob({required this.size, required this.color});
-  final double size;
-  final Color color;
-
+class _Header extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final top = MediaQuery.of(context).padding.top;
+
     return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(shape: BoxShape.circle, color: color),
+      width: double.infinity,
+      padding: EdgeInsets.fromLTRB(16, top + 8, 20, 18),
+      decoration: const BoxDecoration(
+        color: AppColors.primary,
+        borderRadius: BorderRadius.vertical(bottom: Radius.circular(28)),
+      ),
+      child: Row(
+        children: [
+          GestureDetector(
+            onTap: () => Get.back(),
+            child: Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white.withValues(alpha: 0.12),
+              ),
+              child: const Icon(
+                Icons.arrow_back_ios_new_rounded,
+                color: Colors.white,
+                size: 18,
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          const Text(
+            'Bid Details',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 22,
+              fontWeight: FontWeight.w800,
+              letterSpacing: -0.4,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -900,8 +820,8 @@ class _MetaItem extends StatelessWidget {
         children: [
           Text(
             label,
-            style: TextStyle(
-              color: Colors.grey.shade500,
+            style: const TextStyle(
+              color: AppColors.textSecondary,
               fontSize: 11,
               fontWeight: FontWeight.w500,
             ),
@@ -910,7 +830,7 @@ class _MetaItem extends StatelessWidget {
           Text(
             value,
             style: const TextStyle(
-              color: Color(0xFF1A0A10),
+              color: AppColors.textPrimary,
               fontSize: 13,
               fontWeight: FontWeight.w700,
             ),
@@ -924,7 +844,7 @@ class _MetaItem extends StatelessWidget {
 class _MetaDivider extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Container(width: 1, height: 28, color: Colors.grey.shade300);
+    return Container(width: 1, height: 28, color: AppColors.divider);
   }
 }
 
@@ -963,7 +883,7 @@ class _ProgressTracker extends StatelessWidget {
           sub: 'Ends in 6h',
           done: step >= 1,
           active: step == 1,
-          activeColor: const Color(0xFFE0A33C),
+          activeColor: AppColors.warning,
         ),
         _Line(filled: step >= 2),
         _Step(
@@ -995,10 +915,10 @@ class _Step extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = active
-        ? (activeColor ?? AppColors.accentLight)
+        ? (activeColor ?? AppColors.accent)
         : done
             ? AppColors.success
-            : Colors.white.withValues(alpha: 0.25);
+            : AppColors.textMuted;
 
     return Expanded(
       child: Column(
@@ -1009,7 +929,7 @@ class _Step extends StatelessWidget {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: done || active
-                  ? color.withValues(alpha: 0.2)
+                  ? color.withValues(alpha: 0.15)
                   : Colors.transparent,
               border: Border.all(color: color, width: 2),
             ),
@@ -1030,8 +950,8 @@ class _Step extends StatelessWidget {
             label,
             style: TextStyle(
               color: active || done
-                  ? Colors.white
-                  : Colors.white.withValues(alpha: 0.4),
+                  ? AppColors.textPrimary
+                  : AppColors.textMuted,
               fontSize: 12,
               fontWeight: FontWeight.w700,
             ),
@@ -1039,8 +959,8 @@ class _Step extends StatelessWidget {
           const SizedBox(height: 2),
           Text(
             sub,
-            style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.4),
+            style: const TextStyle(
+              color: AppColors.textMuted,
               fontSize: 10,
             ),
           ),
@@ -1062,7 +982,7 @@ class _Line extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 28),
         color: filled
             ? AppColors.success.withValues(alpha: 0.7)
-            : Colors.white.withValues(alpha: 0.15),
+            : AppColors.border,
       ),
     );
   }

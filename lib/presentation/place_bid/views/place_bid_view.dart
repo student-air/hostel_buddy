@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -15,78 +13,44 @@ class PlaceBidView extends GetView<PlaceBidController> {
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.light,
       child: Scaffold(
-        body: Stack(
+        backgroundColor: AppColors.scaffoldBackground,
+        body: Column(
           children: [
-            // Same background as Home
-            Container(
-              width: double.infinity,
-              height: double.infinity,
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    Color(0xFF6B0E24),
-                    Color(0xFF4A0A1E),
-                    Color(0xFF2A0412),
+            _Header(),
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
+                physics: const BouncingScrollPhysics(),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const _SectionLabel('Room type'),
+                    const SizedBox(height: 10),
+                    _RoomTypeChips(controller: controller),
+                    const SizedBox(height: 22),
+                    const _SectionLabel('Amenities · pick any you need'),
+                    const SizedBox(height: 10),
+                    _AmenityChips(controller: controller),
+                    const SizedBox(height: 22),
+                    _HighestBidCard(controller: controller),
+                    const SizedBox(height: 22),
+                    const _SectionLabel('Your offer'),
+                    const SizedBox(height: 10),
+                    _OfferBox(controller: controller),
+                    const SizedBox(height: 14),
+                    _StatusLine(controller: controller),
                   ],
                 ),
               ),
             ),
-            Positioned(
-              top: -60,
-              right: -40,
-              child: _Blob(
-                size: 220,
-                color: AppColors.accent.withValues(alpha: 0.08),
+            Padding(
+              padding: EdgeInsets.fromLTRB(
+                20,
+                8,
+                20,
+                16 + MediaQuery.of(context).padding.bottom,
               ),
-            ),
-            Positioned(
-              bottom: 120,
-              left: -50,
-              child: _Blob(
-                size: 180,
-                color: Colors.white.withValues(alpha: 0.03),
-              ),
-            ),
-
-            SafeArea(
-  child: Column(
-    children: [
-      const SizedBox(height: 8),
-      _AppealingHeader(),
-      Expanded(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
-          physics: const BouncingScrollPhysics(),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-                          _SectionLabel('Room type'),
-                          const SizedBox(height: 10),
-                          _RoomTypeChips(controller: controller),
-                          const SizedBox(height: 22),
-                          _SectionLabel('Amenities · pick any you need'),
-                          const SizedBox(height: 10),
-                          _AmenityChips(controller: controller),
-                          const SizedBox(height: 22),
-                          _HighestBidCard(controller: controller),
-                          const SizedBox(height: 22),
-                          _SectionLabel('Your offer'),
-                          const SizedBox(height: 10),
-                          _OfferBox(controller: controller),
-                          const SizedBox(height: 14),
-                          _StatusLine(controller: controller),
-                        ],
-                      ),
-                    ),
-                  ),
-                  Padding(
-        padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
-        child: _PlaceBidButton(controller: controller),
-      ),
-                ],
-              ),
+              child: _PlaceBidButton(controller: controller),
             ),
           ],
         ),
@@ -95,26 +59,28 @@ class PlaceBidView extends GetView<PlaceBidController> {
   }
 }
 
-// ═══════════════════════════════════════════
-// HEADER (same style as Bids / Search)
-// ══════════════════════════════════════════
-
-class _AppealingHeader extends StatelessWidget {
+class _Header extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+    final top = MediaQuery.of(context).padding.top;
+
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.fromLTRB(16, top + 8, 20, 22),
+      decoration: const BoxDecoration(
+        color: AppColors.primary,
+        borderRadius: BorderRadius.vertical(bottom: Radius.circular(28)),
+      ),
       child: Row(
         children: [
           GestureDetector(
             onTap: () => Get.back(),
             child: Container(
-              width: 42,
-              height: 42,
+              width: 40,
+              height: 40,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.white.withValues(alpha: 0.1),
-                border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
+                color: Colors.white.withValues(alpha: 0.12),
               ),
               child: const Icon(
                 Icons.arrow_back_ios_new_rounded,
@@ -123,25 +89,25 @@ class _AppealingHeader extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(width: 14),
-          Expanded(
+          const SizedBox(width: 12),
+          const Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   'Place a bid',
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 24,
+                    fontSize: 22,
                     fontWeight: FontWeight.w800,
-                    letterSpacing: -0.5,
+                    letterSpacing: -0.4,
                   ),
                 ),
-                const SizedBox(height: 2),
+                SizedBox(height: 2),
                 Text(
                   'Set your offer & requirements',
                   style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.55),
+                    color: Colors.white70,
                     fontSize: 13,
                     fontWeight: FontWeight.w500,
                   ),
@@ -152,21 +118,18 @@ class _AppealingHeader extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
             decoration: BoxDecoration(
-              color: AppColors.accent.withValues(alpha: 0.2),
+              color: Colors.white.withValues(alpha: 0.14),
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: AppColors.accent.withValues(alpha: 0.45),
-              ),
             ),
             child: const Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.gavel_rounded, size: 14, color: AppColors.accentLight),
+                Icon(Icons.gavel_rounded, size: 14, color: Colors.white),
                 SizedBox(width: 5),
                 Text(
                   'New bid',
                   style: TextStyle(
-                    color: AppColors.accentLight,
+                    color: Colors.white,
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
                   ),
@@ -188,18 +151,14 @@ class _SectionLabel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       text,
-      style: TextStyle(
-        color: Colors.white.withValues(alpha: 0.7),
+      style: const TextStyle(
+        color: AppColors.textSecondary,
         fontSize: 13,
         fontWeight: FontWeight.w600,
       ),
     );
   }
 }
-
-// ═══════════════════════════════════════════
-// ROOM TYPE
-// ═══════════════════════════════════════════
 
 class _RoomTypeChips extends StatelessWidget {
   const _RoomTypeChips({required this.controller});
@@ -218,14 +177,17 @@ class _RoomTypeChips extends StatelessWidget {
               onTap: () => controller.selectSeater(s),
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 180),
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                 decoration: BoxDecoration(
-                  color: selected ? AppColors.accent : Colors.transparent,
+                  color: selected
+                      ? AppColors.primary
+                      : AppColors.surfaceWhite,
                   borderRadius: BorderRadius.circular(22),
                   border: Border.all(
                     color: selected
-                        ? AppColors.accent
-                        : Colors.white.withValues(alpha: 0.2),
+                        ? AppColors.primary
+                        : AppColors.border,
                   ),
                 ),
                 child: Text(
@@ -233,29 +195,27 @@ class _RoomTypeChips extends StatelessWidget {
                   style: TextStyle(
                     color: selected
                         ? Colors.white
-                        : Colors.white.withValues(alpha: 0.75),
+                        : AppColors.textPrimary,
                     fontSize: 13,
-                    fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+                    fontWeight:
+                        selected ? FontWeight.w700 : FontWeight.w500,
                   ),
                 ),
               ),
             );
           }),
-          // Dashed + → opens add dialog
           GestureDetector(
             onTap: controller.openAddSeaterDialog,
             child: Container(
               width: 42,
               height: 42,
               decoration: BoxDecoration(
+                color: AppColors.surfaceWhite,
                 borderRadius: BorderRadius.circular(22),
-                border: Border.all(
-                  color: Colors.white.withValues(alpha: 0.3),
-                  width: 1.2,
-                ),
+                border: Border.all(color: AppColors.border),
               ),
               child: const Center(
-                child: Icon(Icons.add, color: Colors.white54, size: 20),
+                child: Icon(Icons.add, color: AppColors.accent, size: 20),
               ),
             ),
           ),
@@ -264,10 +224,6 @@ class _RoomTypeChips extends StatelessWidget {
     });
   }
 }
-
-// ═══════════════════════════════════════════
-// AMENITIES
-// ═══════════════════════════════════════════
 
 class _AmenityChips extends StatelessWidget {
   const _AmenityChips({required this.controller});
@@ -285,16 +241,15 @@ class _AmenityChips extends StatelessWidget {
             onTap: () => controller.toggleAmenity(a),
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 180),
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
               decoration: BoxDecoration(
                 color: selected
-                    ? AppColors.accent.withValues(alpha: 0.2)
-                    : Colors.transparent,
+                    ? AppColors.accent.withValues(alpha: 0.12)
+                    : AppColors.surfaceWhite,
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
-                  color: selected
-                      ? AppColors.accent
-                      : Colors.white.withValues(alpha: 0.2),
+                  color: selected ? AppColors.accent : AppColors.border,
                 ),
               ),
               child: Row(
@@ -304,7 +259,7 @@ class _AmenityChips extends StatelessWidget {
                     const Icon(
                       Icons.check_rounded,
                       size: 14,
-                      color: AppColors.accentLight,
+                      color: AppColors.accent,
                     ),
                     const SizedBox(width: 4),
                   ],
@@ -312,10 +267,11 @@ class _AmenityChips extends StatelessWidget {
                     a,
                     style: TextStyle(
                       color: selected
-                          ? AppColors.accentLight
-                          : Colors.white.withValues(alpha: 0.7),
+                          ? AppColors.accent
+                          : AppColors.textPrimary,
                       fontSize: 13,
-                      fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
+                      fontWeight:
+                          selected ? FontWeight.w600 : FontWeight.w500,
                     ),
                   ),
                 ],
@@ -328,10 +284,6 @@ class _AmenityChips extends StatelessWidget {
   }
 }
 
-// ═══════════════════════════════════════════
-// HIGHEST BID
-// ═══════════════════════════════════════════
-
 class _HighestBidCard extends StatelessWidget {
   const _HighestBidCard({required this.controller});
   final PlaceBidController controller;
@@ -342,9 +294,9 @@ class _HighestBidCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.06),
+        color: AppColors.surfaceWhite,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+        border: Border.all(color: AppColors.border),
       ),
       child: Row(
         children: [
@@ -353,11 +305,11 @@ class _HighestBidCard extends StatelessWidget {
             height: 44,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: const Color(0xFFE0A33C).withValues(alpha: 0.2),
+              color: AppColors.warning.withValues(alpha: 0.15),
             ),
             child: const Icon(
               Icons.emoji_events_rounded,
-              color: Color(0xFFE0A33C),
+              color: AppColors.warning,
               size: 22,
             ),
           ),
@@ -366,10 +318,10 @@ class _HighestBidCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                const Text(
                   'Current highest bid',
                   style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.55),
+                    color: AppColors.textSecondary,
                     fontSize: 12,
                   ),
                 ),
@@ -378,7 +330,7 @@ class _HighestBidCard extends StatelessWidget {
                   () => Text(
                     'Rs ${controller.formatAmount(controller.currentHighestBid.value)}',
                     style: const TextStyle(
-                      color: Colors.white,
+                      color: AppColors.textPrimary,
                       fontSize: 22,
                       fontWeight: FontWeight.w800,
                       letterSpacing: -0.4,
@@ -391,8 +343,8 @@ class _HighestBidCard extends StatelessWidget {
           Obx(
             () => Text(
               '${controller.bidsSoFar.value} bids so far',
-              style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.5),
+              style: const TextStyle(
+                color: AppColors.textMuted,
                 fontSize: 12,
               ),
             ),
@@ -402,10 +354,6 @@ class _HighestBidCard extends StatelessWidget {
     );
   }
 }
-
-// ═══════════════════════════════════════════
-// YOUR OFFER
-// ═══════════════════════════════════════════
 
 class _OfferBox extends StatelessWidget {
   const _OfferBox({required this.controller});
@@ -417,9 +365,9 @@ class _OfferBox extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.06),
+        color: AppColors.surfaceWhite,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
+        border: Border.all(color: AppColors.border),
       ),
       child: Column(
         children: [
@@ -435,7 +383,7 @@ class _OfferBox extends StatelessWidget {
                 () => Text(
                   'Rs ${controller.formatAmount(controller.yourOffer.value)}',
                   style: const TextStyle(
-                    color: Colors.white,
+                    color: AppColors.textPrimary,
                     fontSize: 28,
                     fontWeight: FontWeight.w800,
                     letterSpacing: -0.6,
@@ -495,10 +443,10 @@ class _RoundBtn extends StatelessWidget {
         height: 40,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: Colors.white.withValues(alpha: 0.1),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
+          color: AppColors.surfaceSoft,
+          border: Border.all(color: AppColors.border),
         ),
-        child: Icon(icon, color: Colors.white, size: 20),
+        child: Icon(icon, color: AppColors.textPrimary, size: 20),
       ),
     );
   }
@@ -524,21 +472,17 @@ class _QuickAdd extends StatelessWidget {
         alignment: Alignment.center,
         decoration: BoxDecoration(
           color: highlight
-              ? AppColors.accent.withValues(alpha: 0.2)
-              : Colors.white.withValues(alpha: 0.06),
+              ? AppColors.accent.withValues(alpha: 0.12)
+              : AppColors.surfaceSoft,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: highlight
-                ? AppColors.accent.withValues(alpha: 0.5)
-                : Colors.white.withValues(alpha: 0.12),
+            color: highlight ? AppColors.accent : AppColors.border,
           ),
         ),
         child: Text(
           label,
           style: TextStyle(
-            color: highlight
-                ? AppColors.accentLight
-                : Colors.white.withValues(alpha: 0.8),
+            color: highlight ? AppColors.accent : AppColors.textPrimary,
             fontSize: 12,
             fontWeight: FontWeight.w600,
           ),
@@ -547,10 +491,6 @@ class _QuickAdd extends StatelessWidget {
     );
   }
 }
-
-// ═══════════════════════════════════════════
-// STATUS + BUTTON
-// ═══════════════════════════════════════════
 
 class _StatusLine extends StatelessWidget {
   const _StatusLine({required this.controller});
@@ -600,14 +540,13 @@ class _PlaceBidButton extends StatelessWidget {
         child: ElevatedButton(
           onPressed: ok ? controller.placeBid : null,
           style: ElevatedButton.styleFrom(
-            backgroundColor:
-                ok ? AppColors.accent : Colors.white.withValues(alpha: 0.12),
+            backgroundColor: ok ? AppColors.accent : AppColors.border,
             foregroundColor: Colors.white,
-            disabledBackgroundColor: Colors.white.withValues(alpha: 0.1),
-            disabledForegroundColor: Colors.white.withValues(alpha: 0.35),
+            disabledBackgroundColor: AppColors.border,
+            disabledForegroundColor: AppColors.textMuted,
             elevation: 0,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(28),
             ),
           ),
           child: Text(
@@ -619,20 +558,5 @@ class _PlaceBidButton extends StatelessWidget {
         ),
       );
     });
-  }
-}
-
-class _Blob extends StatelessWidget {
-  const _Blob({required this.size, required this.color});
-  final double size;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(shape: BoxShape.circle, color: color),
-    );
   }
 }

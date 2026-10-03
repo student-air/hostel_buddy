@@ -8,7 +8,7 @@ class SeekerMapController extends GetxController {
   final searchQuery = ''.obs;
   final selectedHostel = Rxn<Map<String, dynamic>>();
 
-  final filters = ['All', 'Nearby', 'Under 10k', 'Shared', 'Private'];
+  final filters = ['All', 'Nearby', 'Under 30k', 'Shared', 'Private'];
 
   final hostels = <Map<String, dynamic>>[
     {
@@ -55,7 +55,7 @@ class SeekerMapController extends GetxController {
         return name.contains(q) || area.contains(q);
       }).toList();
     }
-    if (selectedFilter.value == 'Under 10k') {
+    if (selectedFilter.value == 'Under 30k') {
       list = list.where((h) {
         final p = (h['price'] ?? '').toString();
         return p.contains('9') || p.contains('8') || p.contains('7');

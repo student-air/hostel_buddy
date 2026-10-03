@@ -1,25 +1,25 @@
 import 'package:flutter/material.dart';
 
-/// Hostel Buddy — Maroon / Burgundy palette + teal accent.
-/// Values pulled from the approved UI mockup.
+/// Hostel Buddy — light UI system.
+/// Soft pink surfaces + deep maroon chrome.
 class AppColors {
   AppColors._();
 
-  // Primary (maroon)
-  static const Color primary = Color(0xFF6B0E24);
-  static const Color primaryDark = Color(0xFF4A0A1E);
+// Primary — deep maroon, slightly lighter + richer
+  static const Color primary = Color(0xFF5C1024);
+  static const Color primaryDark = Color(0xFF4A0A1A);
   static const Color primaryDeep = Color(0xFF3C0515);
 
-  // Accent (teal / cyan — CTAs, links on dark screens)
+  // Accent (teal — links, field icons, secondary actions)
   static const Color accent = Color(0xFF0D9488);
   static const Color accentDark = Color(0xFF0F766E);
   static const Color accentLight = Color(0xFF14B8A6);
 
-  // Gradient stops used on Splash / Auth / Role Selection headers
-  static const Color gradientStart = Color(0xFF8B1538);
-  static const Color gradientMid = Color(0xFF5C0E24);
-  static const Color gradientEnd = Color(0xFF4A0A1E);
-
+  // Gradients
+  static const Color gradientStart = Color(0xFF7A1F38);
+  static const Color gradientMid = Color(0xFF5C1024);
+  static const Color gradientEnd = Color(0xFF3C0515);
+  
   static const LinearGradient primaryGradient = LinearGradient(
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
@@ -32,9 +32,10 @@ class AppColors {
     colors: [primary, primaryDeep],
   );
 
-  // Backgrounds
+  // Surfaces
   static const Color scaffoldBackground = Color(0xFFFCF5FD);
   static const Color surfaceWhite = Color(0xFFFFFFFF);
+  static const Color surfaceSoft = Color(0xFFFFF5F8);
 
   // Text
   static const Color textPrimary = Color(0xFF33041A);
@@ -50,17 +51,21 @@ class AppColors {
   static const Color tagBackground = Color(0xFFFBE4EF);
   static const Color tagText = Color(0xFF6E1330);
 
-  // Placeholder / skeleton blocks (image shimmer)
+  // Placeholder
   static const Color placeholderStart = Color(0xFFF1DEE9);
   static const Color placeholderEnd = Color(0xFFF6E7F0);
 
   // Status
   static const Color notificationDot = Color(0xFFE8736C);
   static const Color success = Color(0xFF3EA66B);
+  static const Color successSoft = Color(0xFFE8F6EE);
   static const Color error = Color(0xFFD1435B);
+  static const Color errorSoft = Color(0xFFFBEAED);
   static const Color warning = Color(0xFFE0A33C);
+  static const Color warningSoft = Color(0xFFFFF4E5);
+  static const Color infoSoft = Color(0xFFE8F4FF);
 
-  // Auth dark-screen glass fields
+  // Glass (legacy)
   static const Color glassFill = Color(0x33FFFFFF);
   static const Color glassBorder = Color(0x40FFFFFF);
   static const Color glassHint = Color(0x99FFFFFF);

@@ -13,38 +13,14 @@ class NotificationsView extends GetView<NotificationsController> {
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.light,
       child: Scaffold(
-        body: Stack(
+        backgroundColor: AppColors.scaffoldBackground,
+        body: Column(
           children: [
-            Container(
-              width: double.infinity,
-              height: double.infinity,
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    Color(0xFF6B0E24),
-                    Color(0xFF4A0A1E),
-                    Color(0xFF2A0412),
-                  ],
-                ),
-              ),
-            ),
-            Positioned(
-              top: -60,
-              right: -40,
-              child: _Blob(
-                size: 220,
-                color: AppColors.accent.withValues(alpha: 0.08),
-              ),
-            ),
-
-            SafeArea(
+            _Header(controller: controller),
+            Expanded(
               child: Column(
                 children: [
-                  const SizedBox(height: 8),
-                  _Header(controller: controller),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 14),
                   _Tabs(controller: controller),
                   const SizedBox(height: 12),
                   Expanded(child: _Body(controller: controller)),
@@ -59,7 +35,7 @@ class NotificationsView extends GetView<NotificationsController> {
 }
 
 // ═══════════════════════════════════════════
-// HEADER
+// HEADER — curved maroon
 // ═══════════════════════════════════════════
 
 class _Header extends StatelessWidget {
@@ -68,19 +44,25 @@ class _Header extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+    final top = MediaQuery.of(context).padding.top;
+
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.fromLTRB(16, top + 8, 16, 22),
+      decoration: const BoxDecoration(
+        color: AppColors.primary,
+        borderRadius: BorderRadius.vertical(bottom: Radius.circular(28)),
+      ),
       child: Row(
         children: [
           GestureDetector(
             onTap: () => Get.back(),
             child: Container(
-              width: 42,
-              height: 42,
+              width: 40,
+              height: 40,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.white.withValues(alpha: 0.1),
-                border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
+                color: Colors.white.withValues(alpha: 0.12),
               ),
               child: const Icon(
                 Icons.arrow_back_ios_new_rounded,
@@ -89,7 +71,7 @@ class _Header extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(width: 14),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -98,9 +80,9 @@ class _Header extends StatelessWidget {
                   'Notifications',
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 24,
+                    fontSize: 22,
                     fontWeight: FontWeight.w800,
-                    letterSpacing: -0.5,
+                    letterSpacing: -0.4,
                   ),
                 ),
                 const SizedBox(height: 2),
@@ -109,8 +91,8 @@ class _Header extends StatelessWidget {
                     controller.unreadCount == 0
                         ? 'All caught up'
                         : '${controller.unreadCount} unread',
-                    style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.55),
+                    style: const TextStyle(
+                      color: Colors.white70,
                       fontSize: 13,
                       fontWeight: FontWeight.w500,
                     ),
@@ -129,16 +111,16 @@ class _Header extends StatelessWidget {
                   vertical: 7,
                 ),
                 decoration: BoxDecoration(
-                  color: AppColors.accent.withValues(alpha: 0.2),
+                  color: Colors.white.withValues(alpha: 0.14),
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
-                    color: AppColors.accent.withValues(alpha: 0.45),
+                    color: Colors.white.withValues(alpha: 0.2),
                   ),
                 ),
                 child: const Text(
                   'Mark all read',
                   style: TextStyle(
-                    color: AppColors.accentLight,
+                    color: Colors.white,
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
                   ),
@@ -170,9 +152,9 @@ class _Tabs extends StatelessWidget {
           height: 44,
           padding: const EdgeInsets.all(4),
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.08),
+            color: AppColors.surfaceWhite,
             borderRadius: BorderRadius.circular(22),
-            border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+            border: Border.all(color: AppColors.border),
           ),
           child: Row(
             children: [
@@ -215,13 +197,13 @@ class _TabChip extends StatelessWidget {
           curve: Curves.easeOutCubic,
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: selected ? AppColors.accent : Colors.transparent,
+            color: selected ? AppColors.primary : Colors.transparent,
             borderRadius: BorderRadius.circular(18),
             boxShadow: selected
                 ? [
                     BoxShadow(
-                      color: AppColors.accent.withValues(alpha: 0.35),
-                      blurRadius: 10,
+                      color: AppColors.primary.withValues(alpha: 0.25),
+                      blurRadius: 8,
                       offset: const Offset(0, 3),
                     ),
                   ]
@@ -230,9 +212,7 @@ class _TabChip extends StatelessWidget {
           child: Text(
             label,
             style: TextStyle(
-              color: selected
-                  ? Colors.white
-                  : Colors.white.withValues(alpha: 0.55),
+              color: selected ? Colors.white : AppColors.textSecondary,
               fontSize: 13,
               fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
             ),
@@ -261,18 +241,26 @@ class _Body extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
-                Icons.notifications_none_rounded,
-                size: 52,
-                color: Colors.white.withValues(alpha: 0.25),
+              Container(
+                width: 72,
+                height: 72,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: AppColors.primary.withValues(alpha: 0.08),
+                ),
+                child: const Icon(
+                  Icons.notifications_none_rounded,
+                  size: 36,
+                  color: AppColors.primary,
+                ),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 14),
               Text(
                 controller.selectedTab.value == 1
                     ? 'No unread notifications'
                     : 'No notifications yet',
-                style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.45),
+                style: const TextStyle(
+                  color: AppColors.textSecondary,
                   fontSize: 15,
                   fontWeight: FontWeight.w500,
                 ),
@@ -331,13 +319,13 @@ class _NotificationCard extends StatelessWidget {
   Color get _iconColor {
     switch (item.type) {
       case 'bid':
-        return AppColors.accentLight;
+        return AppColors.accent;
       case 'offer':
-        return const Color(0xFFE0A33C);
+        return AppColors.warning;
       case 'chat':
         return const Color(0xFF60A5FA);
       default:
-        return Colors.white70;
+        return AppColors.textSecondary;
     }
   }
 
@@ -351,25 +339,33 @@ class _NotificationCard extends StatelessWidget {
         alignment: Alignment.centerRight,
         padding: const EdgeInsets.only(right: 20),
         decoration: BoxDecoration(
-          color: AppColors.error.withValues(alpha: 0.2),
+          color: AppColors.error.withValues(alpha: 0.12),
           borderRadius: BorderRadius.circular(16),
         ),
-        child: const Icon(Icons.delete_outline_rounded, color: AppColors.error),
+        child: const Icon(
+          Icons.delete_outline_rounded,
+          color: AppColors.error,
+        ),
       ),
       child: GestureDetector(
         onTap: onTap,
         child: Container(
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: item.isRead
-                ? Colors.white.withValues(alpha: 0.05)
-                : Colors.white.withValues(alpha: 0.1),
+            color: AppColors.surfaceWhite,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
               color: item.isRead
-                  ? Colors.white.withValues(alpha: 0.08)
-                  : AppColors.accent.withValues(alpha: 0.25),
+                  ? AppColors.border
+                  : AppColors.accent.withValues(alpha: 0.35),
             ),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.primary.withValues(alpha: 0.04),
+                blurRadius: 10,
+                offset: const Offset(0, 3),
+              ),
+            ],
           ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -379,7 +375,7 @@ class _NotificationCard extends StatelessWidget {
                 height: 42,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: _iconColor.withValues(alpha: 0.15),
+                  color: _iconColor.withValues(alpha: 0.12),
                 ),
                 child: Icon(_icon, color: _iconColor, size: 20),
               ),
@@ -394,7 +390,7 @@ class _NotificationCard extends StatelessWidget {
                           child: Text(
                             item.title,
                             style: TextStyle(
-                              color: Colors.white,
+                              color: AppColors.textPrimary,
                               fontSize: 14,
                               fontWeight: item.isRead
                                   ? FontWeight.w600
@@ -408,7 +404,7 @@ class _NotificationCard extends StatelessWidget {
                             height: 8,
                             decoration: const BoxDecoration(
                               shape: BoxShape.circle,
-                              color: AppColors.accentLight,
+                              color: AppColors.notificationDot,
                             ),
                           ),
                       ],
@@ -418,8 +414,8 @@ class _NotificationCard extends StatelessWidget {
                       item.body,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.55),
+                      style: const TextStyle(
+                        color: AppColors.textSecondary,
                         fontSize: 12.5,
                         height: 1.35,
                       ),
@@ -427,8 +423,8 @@ class _NotificationCard extends StatelessWidget {
                     const SizedBox(height: 6),
                     Text(
                       item.time,
-                      style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.35),
+                      style: const TextStyle(
+                        color: AppColors.textMuted,
                         fontSize: 11,
                       ),
                     ),
@@ -439,21 +435,6 @@ class _NotificationCard extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
-}
-
-class _Blob extends StatelessWidget {
-  const _Blob({required this.size, required this.color});
-  final double size;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(shape: BoxShape.circle, color: color),
     );
   }
 }
