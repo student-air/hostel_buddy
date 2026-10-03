@@ -257,10 +257,9 @@ void onNavTap(int index) {
     case 1:
       Get.offAllNamed(AppRoutes.managerIncomingBids);
       break;
-    case 2:
-      AppSnackbar.info('Rooms', 'Room management coming next.');
-      selectedNavIndex.value = 0; // stay home until Rooms exists
-      break;
+   case 2:
+  Get.offAllNamed(AppRoutes.managerRooms);
+  break;
     case 3:
       Get.toNamed(AppRoutes.profile); // profile can stack
       selectedNavIndex.value = 0;
@@ -276,8 +275,7 @@ void onViewBids() => Get.offAllNamed(AppRoutes.managerIncomingBids);
 
 
 
-  void onManageRooms() =>
-      AppSnackbar.info('Rooms', 'Room management coming next.');
+  void onManageRooms() => Get.offAllNamed(AppRoutes.managerRooms);
 
    void onEditListing() {
   final h = currentHostel;

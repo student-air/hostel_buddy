@@ -32,6 +32,8 @@ import '../presentation/notifications/bindings/notifications_binding.dart';
 import '../presentation/notifications/views/notifications_view.dart';
 import '../presentation/manager_incoming_bids/bindings/manager_incoming_bids_binding.dart';
 import '../presentation/manager_incoming_bids/views/manager_incoming_bids_view.dart';
+import '../presentation/manager_rooms/bindings/manager_rooms_binding.dart';
+import '../presentation/manager_rooms/views/manager_rooms_view.dart';
 
 import 'app_routes.dart';
 
@@ -122,6 +124,11 @@ GetPage(
   name: AppRoutes.managerIncomingBids,
   page: () => const ManagerIncomingBidsView(),
   binding: ManagerIncomingBidsBinding(),
+),
+GetPage(
+  name: AppRoutes.managerRooms,
+  page: () => const ManagerRoomsView(),
+  binding: ManagerRoomsBinding(),
 ),
   ];
 }

@@ -32,10 +32,10 @@ class AppColors {
     colors: [primary, primaryDeep],
   );
 
-  // Surfaces
-  static const Color scaffoldBackground = Color(0xFFFCF5FD);
-  static const Color surfaceWhite = Color(0xFFFFFFFF);
-  static const Color surfaceSoft = Color(0xFFFFF5F8);
+ // Surfaces — softer, less pink
+static const Color scaffoldBackground = Color(0xFFF8F6F7); 
+static const Color surfaceWhite = Color(0xFFFFFFFF);
+static const Color surfaceSoft = Color(0xFFF5F2F3); 
 
   // Text
   static const Color textPrimary = Color(0xFF33041A);
@@ -44,8 +44,8 @@ class AppColors {
   static const Color textOnPrimary = Color(0xFFFFFFFF);
 
   // Borders / dividers
-  static const Color border = Color(0xFFEED9E6);
-  static const Color divider = Color(0xFFF6E7F0);
+  static const Color border = Color(0xFFE8E2E5);  
+  static const Color divider = Color(0xFFF0EBED); 
 
   // Tags / chips
   static const Color tagBackground = Color(0xFFFBE4EF);

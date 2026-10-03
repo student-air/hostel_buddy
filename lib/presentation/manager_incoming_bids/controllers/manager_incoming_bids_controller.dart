@@ -378,9 +378,8 @@ class ManagerIncomingBidsController extends GetxController {
       // Already on bids
       break;
     case 2:
-      AppSnackbar.info('Rooms', 'Room management coming next.');
-      selectedNavIndex.value = 1;
-      break;
+  Get.offAllNamed(AppRoutes.managerRooms);
+  break;
     case 3:
       Get.toNamed(AppRoutes.profile);
       selectedNavIndex.value = 1;

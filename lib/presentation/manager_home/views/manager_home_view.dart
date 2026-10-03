@@ -247,16 +247,16 @@ class _Header extends StatelessWidget {
                         vertical: 6,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.12),
+                        color: AppColors.accentDark.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.18),
+                          color: AppColors.accentLight.withValues(alpha: 0.18),
                         ),
                       ),
                       child: const Text(
-                        'Hostel manager',
+                        'Hostel Manager',
                         style: TextStyle(
-                          color: Colors.white,
+                          color: AppColors.accent,
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
                         ),
