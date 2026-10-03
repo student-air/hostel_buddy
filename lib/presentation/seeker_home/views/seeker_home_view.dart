@@ -60,7 +60,7 @@ class SeekerHomeView extends GetView<SeekerHomeController> {
               ),
             ),
 
-            // Navbar stays fixed
+            //    bar stays fixed
             Positioned(
               left: 0,
               right: 0,

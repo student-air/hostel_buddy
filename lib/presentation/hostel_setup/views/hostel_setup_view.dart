@@ -11,6 +11,17 @@ import '../controllers/hostel_setup_controller.dart';
 class HostelSetupView extends GetView<HostelSetupController> {
   const HostelSetupView({super.key});
 
+  static const _stepTitles = [
+    'Hostel basics',
+    'Rooms & capacity',
+    'Facilities & amenities',
+  ];
+  static const _stepSubtitles = [
+    'Name, location and a few photos',
+    'How many rooms, and what kind',
+    "Who it's for, and what's included",
+  ];
+
   @override
   Widget build(BuildContext context) {
     final bottomPad = MediaQuery.of(context).padding.bottom;
@@ -18,87 +29,43 @@ class HostelSetupView extends GetView<HostelSetupController> {
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.light,
       child: Scaffold(
-        body: Stack(
+        backgroundColor: AppColors.scaffoldBackground,
+        body: Column(
           children: [
-            Container(
-              width: double.infinity,
-              height: double.infinity,
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    Color(0xFF6B0E24),
-                    Color(0xFF4A0A1E),
-                    Color(0xFF3C0515),
-                    Color(0xFF2A0412),
-                  ],
-                  stops: [0.0, 0.35, 0.7, 1.0],
-                ),
+            Obx(
+              () => _Header(
+                step: controller.currentStep.value,
+                progress: (controller.currentStep.value + 1) / 3,
+                stepLabel: '${controller.currentStep.value + 1}/3',
+                title: _stepTitles[controller.currentStep.value],
+                subtitle: _stepSubtitles[controller.currentStep.value],
+                onBack: controller.previousStep,
               ),
             ),
-            Positioned(
-              top: -40,
-              right: -50,
-              child: _DecorCircle(
-                size: 200,
-                color: Colors.white.withValues(alpha: 0.04),
-              ),
-            ),
-            Positioned(
-              top: 100,
-              right: -20,
-              child: _DecorCircle(
-                size: 140,
-                color: const Color(0xFF2A1840).withValues(alpha: 0.4),
-              ),
-            ),
-            Positioned(
-              bottom: 160,
-              left: -70,
-              child: _DecorCircle(
-                size: 180,
-                color: Colors.white.withValues(alpha: 0.03),
-              ),
-            ),
-            SafeArea(
-              child: Column(
+            Expanded(
+              child: PageView(
+                controller: controller.pageController,
+                physics: const NeverScrollableScrollPhysics(),
+                onPageChanged: (i) => controller.currentStep.value = i,
                 children: [
-                  Obx(
-                    () => _TopBar(
-                      progress: (controller.currentStep.value + 1) / 3,
-                      stepLabel: '${controller.currentStep.value + 1}/3',
-                      onBack: controller.previousStep,
-                    ),
-                  ),
-                  Expanded(
-                    child: PageView(
-                      controller: controller.pageController,
-                      physics: const NeverScrollableScrollPhysics(),
-                      onPageChanged: (i) => controller.currentStep.value = i,
-                      children: [
-                        _StepBasics(controller: controller),
-                        _StepRooms(controller: controller),
-                        _StepFacilities(controller: controller),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(28, 8, 28, 12 + bottomPad),
-                    child: Obx(() {
-                      final step = controller.currentStep.value;
-                      final isLast = step == 2;
-                      return _TealButton(
-                        label: isLast ? 'Publish listing' : 'Continue',
-                        isLoading: controller.isLoading.value,
-                        onTap: isLast
-                            ? controller.publishListing
-                            : controller.nextStep,
-                      );
-                    }),
-                  ),
+                  _StepBasics(controller: controller),
+                  _StepRooms(controller: controller),
+                  _StepFacilities(controller: controller),
                 ],
               ),
+            ),
+            Padding(
+              padding: EdgeInsets.fromLTRB(24, 8, 24, 12 + bottomPad),
+              child: Obx(() {
+                final isLast = controller.currentStep.value == 2;
+                return _TealButton(
+                  label: isLast ? 'Publish listing' : 'Continue',
+                  isLoading: controller.isLoading.value,
+                  onTap: isLast
+                      ? controller.publishListing
+                      : controller.nextStep,
+                );
+              }),
             ),
           ],
         ),
@@ -108,54 +75,100 @@ class HostelSetupView extends GetView<HostelSetupController> {
 }
 
 // ═══════════════════════════════════════════
-// TOP BAR
+// HEADER — curved maroon (matches mockup)
 // ═══════════════════════════════════════════
 
-class _TopBar extends StatelessWidget {
-  const _TopBar({
+class _Header extends StatelessWidget {
+  const _Header({
+    required this.step,
     required this.progress,
     required this.stepLabel,
+    required this.title,
+    required this.subtitle,
     required this.onBack,
   });
 
+  final int step;
   final double progress;
   final String stepLabel;
+  final String title;
+  final String subtitle;
   final VoidCallback onBack;
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 8, 20, 4),
-      child: Row(
+    final top = MediaQuery.of(context).padding.top;
+
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.fromLTRB(16, top + 6, 20, 22),
+      decoration: const BoxDecoration(
+        color: AppColors.primary,
+        borderRadius: BorderRadius.vertical(bottom: Radius.circular(28)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          IconButton(
-            onPressed: onBack,
-            icon: const Icon(
-              Icons.arrow_back_ios_new_rounded,
-              size: 20,
-              color: Colors.white,
-            ),
-          ),
-          Expanded(
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(4),
-              child: LinearProgressIndicator(
-                value: progress,
-                minHeight: 4,
-                backgroundColor: Colors.white.withValues(alpha: 0.15),
-                valueColor: const AlwaysStoppedAnimation<Color>(
-                  AppColors.accent,
+          Row(
+            children: [
+              GestureDetector(
+                onTap: onBack,
+                child: Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.white.withValues(alpha: 0.12),
+                  ),
+                  child: const Icon(
+                    Icons.arrow_back_ios_new_rounded,
+                    size: 16,
+                    color: Colors.white,
+                  ),
                 ),
               ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(4),
+                  child: LinearProgressIndicator(
+                    value: progress,
+                    minHeight: 5,
+                    backgroundColor: Colors.white.withValues(alpha: 0.2),
+                    valueColor: const AlwaysStoppedAnimation<Color>(
+                      AppColors.accent,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Text(
+                stepLabel,
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white.withValues(alpha: 0.75),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 18),
+          Text(
+            title,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 24,
+              fontWeight: FontWeight.w800,
+              letterSpacing: -0.4,
             ),
           ),
-          const SizedBox(width: 14),
+          const SizedBox(height: 4),
           Text(
-            stepLabel,
+            subtitle,
             style: TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
               color: Colors.white.withValues(alpha: 0.7),
+              fontSize: 13,
+              fontWeight: FontWeight.w500,
             ),
           ),
         ],
@@ -170,7 +183,6 @@ class _TopBar extends StatelessWidget {
 
 class _StepBasics extends StatelessWidget {
   const _StepBasics({required this.controller});
-
   final HostelSetupController controller;
 
   @override
@@ -178,43 +190,23 @@ class _StepBasics extends StatelessWidget {
     return Form(
       key: controller.basicsFormKey,
       child: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(28, 8, 28, 16),
+        padding: const EdgeInsets.fromLTRB(24, 20, 24, 16),
         physics: const BouncingScrollPhysics(),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'Hostel basics',
-              style: TextStyle(
-                fontFamily: 'Inter',
-                fontSize: 26,
-                fontWeight: FontWeight.w700,
-                color: Colors.white,
-                letterSpacing: -0.4,
-                height: 1.2,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Name, location and a few photos',
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.white.withValues(alpha: 0.6),
-              ),
-            ),
-            const SizedBox(height: 22),
-            Text(
               'Pictures',
               style: TextStyle(
                 fontSize: 13,
-                fontWeight: FontWeight.w500,
-                color: AppColors.textSecondary.withValues(alpha: 0.95),
+                fontWeight: FontWeight.w600,
+                color: AppColors.textSecondary,
               ),
             ),
             const SizedBox(height: 12),
             _PhotoPickerSection(controller: controller),
             const SizedBox(height: 20),
-            _GlassField(
+            _LightField(
               controller: controller.nameController,
               label: 'Hostel name',
               hint: 'Green Valley Hostel',
@@ -222,22 +214,23 @@ class _StepBasics extends StatelessWidget {
               prefixIcon: Icons.home_outlined,
               textCapitalization: TextCapitalization.words,
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 14),
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
-                  child: _GlassField(
+                  child: _LightField(
                     controller: controller.areaController,
                     label: 'Area',
                     hint: 'G-9',
-                    validator: (v) => Validators.required(v, fieldName: 'Area'),
+                    validator: (v) =>
+                        Validators.required(v, fieldName: 'Area'),
                     textCapitalization: TextCapitalization.words,
                   ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: _GlassField(
+                  child: _LightField(
                     controller: controller.cityController,
                     label: 'City',
                     hint: 'Islamabad',
@@ -247,8 +240,8 @@ class _StepBasics extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 16),
-            _GlassField(
+            const SizedBox(height: 14),
+            _LightField(
               controller: controller.contactController,
               label: 'Contact number',
               hint: '+92 51 1234567',
@@ -256,11 +249,12 @@ class _StepBasics extends StatelessWidget {
               prefixIcon: Icons.phone_outlined,
               keyboardType: TextInputType.phone,
             ),
-            const SizedBox(height: 16),
-            _GlassField(
+            const SizedBox(height: 14),
+            _LightField(
               controller: controller.descriptionController,
               label: 'Description',
-              hint: 'Shared rooms 5 minutes from campus, common study hall, laundry twice a week…',
+              hint:
+                  'Shared rooms 5 minutes from campus, common study hall, laundry twice a week…',
               maxLines: 4,
               textCapitalization: TextCapitalization.sentences,
             ),
@@ -273,8 +267,12 @@ class _StepBasics extends StatelessWidget {
 
 class _PhotoPickerSection extends StatelessWidget {
   const _PhotoPickerSection({required this.controller});
-
   final HostelSetupController controller;
+
+  static const _placeholderColors = [
+    Color(0xFF8B3A55),
+    Color(0xFF14B8A6),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -285,50 +283,30 @@ class _PhotoPickerSection extends StatelessWidget {
         physics: const BouncingScrollPhysics(),
         child: Row(
           children: [
-            GestureDetector(
-              onTap: controller.pickPhotos,
-              child: Container(
-                width: 80,
-                height: 80,
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: AppColors.accent.withValues(alpha: 0.5),
-                    width: 1.5,
+            // Show up to 2 color placeholders when empty (mockup style)
+            if (paths.isEmpty) ...[
+              for (final c in _placeholderColors)
+                Padding(
+                  padding: const EdgeInsets.only(right: 10),
+                  child: Container(
+                    width: 72,
+                    height: 72,
+                    decoration: BoxDecoration(
+                      color: c,
+                      borderRadius: BorderRadius.circular(16),
+                    ),
                   ),
                 ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.add_a_photo_outlined,
-                      size: 26,
-                      color: AppColors.accent,
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Add',
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.accent,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            if (paths.isNotEmpty) const SizedBox(width: 12),
+            ],
             ...List.generate(paths.length, (i) {
               return Padding(
-                padding: EdgeInsets.only(right: i < paths.length - 1 ? 10 : 0),
+                padding: const EdgeInsets.only(right: 10),
                 child: Stack(
                   clipBehavior: Clip.none,
                   children: [
                     Container(
-                      width: 80,
-                      height: 80,
+                      width: 72,
+                      height: 72,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(16),
                         image: DecorationImage(
@@ -361,11 +339,77 @@ class _PhotoPickerSection extends StatelessWidget {
                 ),
               );
             }),
+            // Add button (dashed)
+            GestureDetector(
+              onTap: controller.pickPhotos,
+              child: Container(
+                width: 72,
+                height: 72,
+                decoration: BoxDecoration(
+                  color: AppColors.surfaceWhite,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: AppColors.primary.withValues(alpha: 0.35),
+                    width: 1.5,
+                    strokeAlign: BorderSide.strokeAlignInside,
+                  ),
+                ),
+                child: CustomPaint(
+                  painter: _DashedBorderPainter(
+                    color: AppColors.primary.withValues(alpha: 0.4),
+                    radius: 16,
+                  ),
+                  child: const Center(
+                    child: Icon(
+                      Icons.add_rounded,
+                      size: 28,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
       );
     });
   }
+}
+
+class _DashedBorderPainter extends CustomPainter {
+  _DashedBorderPainter({required this.color, required this.radius});
+  final Color color;
+  final double radius;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = 1.5
+      ..style = PaintingStyle.stroke;
+    final rrect = RRect.fromRectAndRadius(
+      Rect.fromLTWH(1, 1, size.width - 2, size.height - 2),
+      Radius.circular(radius),
+    );
+    final path = Path()..addRRect(rrect);
+    final dashWidth = 5.0;
+    final dashSpace = 4.0;
+    final pathMetrics = path.computeMetrics();
+    for (final metric in pathMetrics) {
+      double distance = 0;
+      while (distance < metric.length) {
+        final next = distance + dashWidth;
+        canvas.drawPath(
+          metric.extractPath(distance, next.clamp(0, metric.length)),
+          paint,
+        );
+        distance = next + dashSpace;
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
 // ═══════════════════════════════════════════
@@ -374,54 +418,34 @@ class _PhotoPickerSection extends StatelessWidget {
 
 class _StepRooms extends StatelessWidget {
   const _StepRooms({required this.controller});
-
   final HostelSetupController controller;
 
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.fromLTRB(28, 8, 28, 16),
+      padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
       physics: const BouncingScrollPhysics(),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Rooms & capacity',
-            style: TextStyle(
-              fontFamily: 'Inter',
-              fontSize: 26,
-              fontWeight: FontWeight.w700,
-              color: Colors.white,
-              letterSpacing: -0.4,
-              height: 1.2,
+          const Center(
+            child: Text(
+              'Total rooms',
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: AppColors.textSecondary,
+              ),
             ),
           ),
-          const SizedBox(height: 8),
-          Text(
-            'How many rooms, and what kind',
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.white.withValues(alpha: 0.6),
-            ),
-          ),
-          const SizedBox(height: 32),
-          Text(
-            'Total rooms',
-            style: TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w500,
-              color: AppColors.textSecondary.withValues(alpha: 0.95),
-            ),
-          ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 16),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               _RoundIconButton(
                 icon: Icons.remove_rounded,
                 onTap: controller.decrementRooms,
-                backgroundColor: Colors.white.withValues(alpha: 0.12),
-                iconColor: Colors.white,
+                filled: false,
               ),
               const SizedBox(width: 20),
               SizedBox(
@@ -437,11 +461,11 @@ class _StepRooms extends StatelessWidget {
                   onChanged: controller.onRoomsTextChanged,
                   style: const TextStyle(
                     fontSize: 44,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.white,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.textPrimary,
                     letterSpacing: -1,
                   ),
-                  cursorColor: AppColors.accent,
+                  cursorColor: AppColors.primary,
                   decoration: const InputDecoration(
                     border: InputBorder.none,
                     isDense: true,
@@ -453,38 +477,35 @@ class _StepRooms extends StatelessWidget {
               _RoundIconButton(
                 icon: Icons.add_rounded,
                 onTap: controller.incrementRooms,
-                backgroundColor: AppColors.success,
-                iconColor: Colors.white,
-                showBorder: false,
+                filled: true,
               ),
             ],
           ),
           const SizedBox(height: 8),
-          Center(
+          const Center(
             child: Text(
               'Tap the number to type',
               style: TextStyle(
                 fontSize: 12,
-                color: Colors.white.withValues(alpha: 0.4),
+                color: AppColors.textMuted,
               ),
             ),
           ),
-          const SizedBox(height: 32),
-          Text(
+          const SizedBox(height: 28),
+          const Text(
             'Room type — select all that apply',
             style: TextStyle(
               fontSize: 13,
-              fontWeight: FontWeight.w500,
-              color: AppColors.textSecondary.withValues(alpha: 0.95),
+              fontWeight: FontWeight.w600,
+              color: AppColors.textSecondary,
             ),
           ),
           const SizedBox(height: 14),
           Obx(() {
             final defaults = HostelSetupController.roomTypeOptions;
             final selected = controller.selectedRoomTypes;
-            final custom = selected
-                .where((t) => !defaults.contains(t))
-                .toList();
+            final custom =
+                selected.where((t) => !defaults.contains(t)).toList();
 
             return Wrap(
               spacing: 10,
@@ -495,7 +516,6 @@ class _StepRooms extends StatelessWidget {
                   return _SelectChip(
                     label: type,
                     selected: isSelected,
-                    showCheck: true,
                     onTap: () => controller.toggleRoomType(type),
                   );
                 }),
@@ -503,30 +523,38 @@ class _StepRooms extends StatelessWidget {
                   return _SelectChip(
                     label: type,
                     selected: true,
-                    showCheck: true,
                     onTap: () => controller.toggleRoomType(type),
                   );
                 }),
               ],
             );
           }),
-          const SizedBox(height: 20),
+          const SizedBox(height: 18),
           GestureDetector(
             onTap: () => _showCustomSeaterSheet(context),
-            child: const Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.add_rounded, size: 18, color: AppColors.accent),
-                SizedBox(width: 6),
-                Text(
-                  'Add custom seater',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.accent,
-                  ),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(
+                  color: AppColors.primary.withValues(alpha: 0.35),
                 ),
-              ],
+              ),
+              child: const Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.add_rounded, size: 18, color: AppColors.primary),
+                  SizedBox(width: 6),
+                  Text(
+                    'Add custom seater',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ],
@@ -545,7 +573,7 @@ class _StepRooms extends StatelessWidget {
           20 + MediaQuery.of(context).viewInsets.bottom,
         ),
         decoration: const BoxDecoration(
-          color: Color(0xFF2A0412),
+          color: Colors.white,
           borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
         ),
         child: Column(
@@ -557,26 +585,35 @@ class _StepRooms extends StatelessWidget {
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
-                color: Colors.white,
+                color: AppColors.textPrimary,
               ),
             ),
             const SizedBox(height: 16),
             TextField(
               controller: controller.customRoomTypeController,
               autofocus: true,
-              style: const TextStyle(color: Colors.white, fontSize: 15),
-              cursorColor: AppColors.accent,
+              style: const TextStyle(color: AppColors.textPrimary, fontSize: 15),
+              cursorColor: AppColors.primary,
               textCapitalization: TextCapitalization.words,
               decoration: InputDecoration(
                 hintText: 'e.g. 2-seater, 6-seater, Studio',
-                hintStyle: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.4),
-                ),
+                hintStyle: const TextStyle(color: AppColors.textMuted),
                 filled: true,
-                fillColor: Colors.white.withValues(alpha: 0.1),
+                fillColor: AppColors.surfaceSoft,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(16),
-                  borderSide: BorderSide.none,
+                  borderSide: const BorderSide(color: AppColors.border),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: const BorderSide(color: AppColors.border),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: const BorderSide(
+                    color: AppColors.primary,
+                    width: 1.5,
+                  ),
                 ),
               ),
               onSubmitted: (_) {
@@ -595,6 +632,7 @@ class _StepRooms extends StatelessWidget {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.accent,
                   foregroundColor: Colors.white,
+                  elevation: 0,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(24),
                   ),
@@ -617,104 +655,85 @@ class _RoundIconButton extends StatelessWidget {
   const _RoundIconButton({
     required this.icon,
     required this.onTap,
-    this.backgroundColor,
-    this.iconColor,
-    this.showBorder = true,
+    required this.filled,
   });
 
   final IconData icon;
   final VoidCallback onTap;
-  final Color? backgroundColor;
-  final Color? iconColor;
-  final bool showBorder;
+  final bool filled;
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 48,
-        height: 48,
+        width: 44,
+        height: 44,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: backgroundColor ?? Colors.white.withValues(alpha: 0.12),
-          border: showBorder
-              ? Border.all(color: Colors.white.withValues(alpha: 0.2))
+          color: filled ? AppColors.accent : Colors.white,
+          border: filled ? null : Border.all(color: AppColors.border),
+          boxShadow: filled
+              ? [
+                  BoxShadow(
+                    color: AppColors.accent.withValues(alpha: 0.3),
+                    blurRadius: 8,
+                    offset: const Offset(0, 3),
+                  ),
+                ]
               : null,
         ),
-        child: Icon(icon, color: iconColor ?? Colors.white, size: 24),
+        child: Icon(
+          icon,
+          color: filled ? Colors.white : AppColors.textPrimary,
+          size: 22,
+        ),
       ),
     );
   }
 }
 
 // ═══════════════════════════════════════════
-// STEP 3 — Facilities (hostel type + amenities)
+// STEP 3 — Facilities
 // ═══════════════════════════════════════════
 
 class _StepFacilities extends StatelessWidget {
   const _StepFacilities({required this.controller});
-
   final HostelSetupController controller;
 
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.fromLTRB(28, 8, 28, 16),
+      padding: const EdgeInsets.fromLTRB(24, 20, 24, 16),
       physics: const BouncingScrollPhysics(),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            'Facilities & amenities',
-            style: TextStyle(
-              fontFamily: 'Inter',
-              fontSize: 26,
-              fontWeight: FontWeight.w700,
-              color: Colors.white,
-              letterSpacing: -0.4,
-              height: 1.2,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            "What's included for residents",
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.white.withValues(alpha: 0.6),
-            ),
-          ),
-          const SizedBox(height: 28),
-
-          // Hostel type — vertical high–low cards
-          Text(
             'Hostel type',
             style: TextStyle(
               fontSize: 13,
-              fontWeight: FontWeight.w500,
-              color: AppColors.textSecondary.withValues(alpha: 0.95),
+              fontWeight: FontWeight.w600,
+              color: AppColors.textSecondary,
             ),
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 12),
           Obx(
             () => _HostelTypeSelector(
               selected: controller.selectedHostelType.value,
               onSelect: controller.selectHostelType,
             ),
           ),
-
-          const SizedBox(height: 28),
-
-          // Amenities header + Select all
+          const SizedBox(height: 24),
           Row(
             children: [
-              Expanded(
+              const Expanded(
                 child: Text(
                   'Amenities',
                   style: TextStyle(
                     fontSize: 13,
-                    fontWeight: FontWeight.w500,
-                    color: AppColors.textSecondary.withValues(alpha: 0.95),
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textSecondary,
                   ),
                 ),
               ),
@@ -722,56 +741,19 @@ class _StepFacilities extends StatelessWidget {
                 final allSelected = controller.allFacilitiesSelected;
                 return GestureDetector(
                   onTap: controller.toggleSelectAllFacilities,
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 6,
-                    ),
-                    decoration: BoxDecoration(
-                      color: allSelected
-                          ? AppColors.accent.withValues(alpha: 0.25)
-                          : Colors.white.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(
-                        color: allSelected
-                            ? AppColors.accent
-                            : Colors.white.withValues(alpha: 0.2),
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          allSelected
-                              ? Icons.check_circle_rounded
-                              : Icons.select_all_rounded,
-                          size: 16,
-                          color: allSelected
-                              ? AppColors.accent
-                              : Colors.white.withValues(alpha: 0.7),
-                        ),
-                        const SizedBox(width: 6),
-                        Text(
-                          allSelected ? 'Deselect all' : 'Select all',
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                            color: allSelected
-                                ? AppColors.accent
-                                : Colors.white.withValues(alpha: 0.75),
-                          ),
-                        ),
-                      ],
+                  child: Text(
+                    allSelected ? 'Deselect all' : 'Select all',
+                    style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.tagText
                     ),
                   ),
                 );
               }),
             ],
           ),
-          const SizedBox(height: 14),
-
-          // Amenities grid
+          const SizedBox(height: 12),
           Obx(() {
             final items = HostelSetupController.facilityOptions;
             return Column(
@@ -779,7 +761,7 @@ class _StepFacilities extends StatelessWidget {
                 for (int i = 0; i < items.length; i += 2)
                   Padding(
                     padding: EdgeInsets.only(
-                      bottom: i + 2 < items.length ? 14 : 0,
+                      bottom: i + 2 < items.length ? 12 : 0,
                     ),
                     child: Row(
                       children: [
@@ -787,15 +769,14 @@ class _StepFacilities extends StatelessWidget {
                           child: _FacilityChip(
                             label: items[i]['label'] as String,
                             icon: items[i]['icon'] as IconData,
-                            selected: controller.selectedFacilities.contains(
-                              items[i]['label'],
-                            ),
+                            selected: controller.selectedFacilities
+                                .contains(items[i]['label']),
                             onTap: () => controller.toggleFacility(
                               items[i]['label'] as String,
                             ),
                           ),
                         ),
-                        const SizedBox(width: 14),
+                        const SizedBox(width: 12),
                         Expanded(
                           child: i + 1 < items.length
                               ? _FacilityChip(
@@ -815,8 +796,6 @@ class _StepFacilities extends StatelessWidget {
               ],
             );
           }),
-
-          // Custom facilities
           Obx(() {
             final defaults = HostelSetupController.facilityOptions
                 .map((e) => e['label'] as String)
@@ -826,13 +805,13 @@ class _StepFacilities extends StatelessWidget {
                 .toList();
             if (custom.isEmpty) return const SizedBox.shrink();
             return Padding(
-              padding: const EdgeInsets.only(top: 14),
+              padding: const EdgeInsets.only(top: 12),
               child: Column(
                 children: [
                   for (int i = 0; i < custom.length; i += 2)
                     Padding(
                       padding: EdgeInsets.only(
-                        bottom: i + 2 < custom.length ? 14 : 0,
+                        bottom: i + 2 < custom.length ? 12 : 0,
                       ),
                       child: Row(
                         children: [
@@ -841,19 +820,19 @@ class _StepFacilities extends StatelessWidget {
                               label: custom[i],
                               icon: Icons.star_rounded,
                               selected: true,
-                              onTap: () => controller.toggleFacility(custom[i]),
+                              onTap: () =>
+                                  controller.toggleFacility(custom[i]),
                             ),
                           ),
-                          const SizedBox(width: 14),
+                          const SizedBox(width: 12),
                           Expanded(
                             child: i + 1 < custom.length
                                 ? _FacilityChip(
                                     label: custom[i + 1],
                                     icon: Icons.star_rounded,
                                     selected: true,
-                                    onTap: () => controller.toggleFacility(
-                                      custom[i + 1],
-                                    ),
+                                    onTap: () => controller
+                                        .toggleFacility(custom[i + 1]),
                                   )
                                 : const SizedBox.shrink(),
                           ),
@@ -864,24 +843,36 @@ class _StepFacilities extends StatelessWidget {
               ),
             );
           }),
-
-          const SizedBox(height: 20),
-          GestureDetector(
-            onTap: () => _showCustomFacilitySheet(context),
-            child: const Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.add_rounded, size: 18, color: AppColors.accent),
-                SizedBox(width: 6),
-                Text(
-                  'Add a custom facility',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.accent,
+          const SizedBox(height: 18),
+          Center(
+            child: GestureDetector(
+              onTap: () => _showCustomFacilitySheet(context),
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(
+                    color: AppColors.primary.withValues(alpha: 0.35),
                   ),
                 ),
-              ],
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.add_rounded,
+                        size: 18, color: AppColors.primary),
+                    SizedBox(width: 6),
+                    Text(
+                      'Add a custom facility',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.primary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
         ],
@@ -900,7 +891,7 @@ class _StepFacilities extends StatelessWidget {
           20 + MediaQuery.of(context).viewInsets.bottom,
         ),
         decoration: const BoxDecoration(
-          color: Color(0xFF2A0412),
+          color: Colors.white,
           borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
         ),
         child: Column(
@@ -912,25 +903,34 @@ class _StepFacilities extends StatelessWidget {
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
-                color: Colors.white,
+                color: AppColors.textPrimary,
               ),
             ),
             const SizedBox(height: 16),
             TextField(
               controller: controller.customFacilityController,
               autofocus: true,
-              style: const TextStyle(color: Colors.white, fontSize: 15),
-              cursorColor: AppColors.accent,
+              style: const TextStyle(color: AppColors.textPrimary, fontSize: 15),
+              cursorColor: AppColors.primary,
               decoration: InputDecoration(
                 hintText: 'e.g. Gym, Rooftop, Study room',
-                hintStyle: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.4),
-                ),
+                hintStyle: const TextStyle(color: AppColors.textMuted),
                 filled: true,
-                fillColor: Colors.white.withValues(alpha: 0.1),
+                fillColor: AppColors.surfaceSoft,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(16),
-                  borderSide: BorderSide.none,
+                  borderSide: const BorderSide(color: AppColors.border),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: const BorderSide(color: AppColors.border),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: const BorderSide(
+                    color: AppColors.primary,
+                    width: 1.5,
+                  ),
                 ),
               ),
               onSubmitted: (_) {
@@ -949,6 +949,7 @@ class _StepFacilities extends StatelessWidget {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.accent,
                   foregroundColor: Colors.white,
+                  elevation: 0,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(24),
                   ),
@@ -967,10 +968,8 @@ class _StepFacilities extends StatelessWidget {
   }
 }
 
-/// Vertical high–low selector: selected card rises + glows.
 class _HostelTypeSelector extends StatelessWidget {
   const _HostelTypeSelector({required this.selected, required this.onSelect});
-
   final String selected;
   final ValueChanged<String> onSelect;
 
@@ -985,7 +984,7 @@ class _HostelTypeSelector extends StatelessWidget {
           selected: selected == 'Boys Hostel',
           onTap: () => onSelect('Boys Hostel'),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 10),
         _HostelTypeCard(
           label: 'Girls Hostel',
           subtitle: 'Female residents only',
@@ -1018,76 +1017,26 @@ class _HostelTypeCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 280),
-        curve: Curves.easeOutCubic,
-        transform: Matrix4.translationValues(0, selected ? -2 : 4, 0),
-        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          gradient: selected
-              ? LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    AppColors.accent.withValues(alpha: 0.95),
-                    AppColors.accentDark.withValues(alpha: 0.9),
-                  ],
-                )
-              : null,
-          color: selected ? null : Colors.white.withValues(alpha: 0.06),
+          borderRadius: BorderRadius.circular(16),
+          color: selected
+              ? AppColors.accent.withValues(alpha: 0.1)
+              : Colors.white,
           border: Border.all(
-            color: selected
-                ? AppColors.accentLight.withValues(alpha: 0.8)
-                : Colors.white.withValues(alpha: 0.12),
+            color: selected ? AppColors.accent : AppColors.border,
             width: selected ? 1.5 : 1,
           ),
-          boxShadow: selected
-              ? [
-                  BoxShadow(
-                    color: AppColors.accent.withValues(alpha: 0.4),
-                    blurRadius: 20,
-                    offset: const Offset(0, 8),
-                  ),
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.25),
-                    blurRadius: 12,
-                    offset: const Offset(0, 4),
-                  ),
-                ]
-              : [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.15),
-                    blurRadius: 6,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
         ),
         child: Row(
           children: [
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 250),
-              width: 48,
-              height: 48,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: selected
-                    ? Colors.white.withValues(alpha: 0.22)
-                    : Colors.white.withValues(alpha: 0.08),
-                border: Border.all(
-                  color: selected
-                      ? Colors.white.withValues(alpha: 0.35)
-                      : Colors.white.withValues(alpha: 0.1),
-                ),
-              ),
-              child: Icon(
-                icon,
-                size: 26,
-                color: selected
-                    ? Colors.white
-                    : Colors.white.withValues(alpha: 0.55),
-              ),
+            Icon(
+              icon,
+              size: 22,
+              color: selected ? AppColors.accent : AppColors.textMuted,
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: 12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -1095,50 +1044,29 @@ class _HostelTypeCard extends StatelessWidget {
                   Text(
                     label,
                     style: TextStyle(
-                      fontSize: 17,
+                      fontSize: 15,
                       fontWeight: FontWeight.w700,
-                      letterSpacing: -0.2,
                       color: selected
-                          ? Colors.white
-                          : Colors.white.withValues(alpha: 0.8),
+                          ? AppColors.accent
+                          : AppColors.textPrimary,
                     ),
                   ),
-                  const SizedBox(height: 3),
                   Text(
                     subtitle,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                      color: selected
-                          ? Colors.white.withValues(alpha: 0.75)
-                          : Colors.white.withValues(alpha: 0.4),
+                      color: AppColors.textSecondary,
                     ),
                   ),
                 ],
               ),
             ),
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 220),
-              width: 26,
-              height: 26,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: selected ? Colors.white : Colors.transparent,
-                border: Border.all(
-                  color: selected
-                      ? Colors.white
-                      : Colors.white.withValues(alpha: 0.3),
-                  width: 2,
-                ),
+            if (selected)
+              const Icon(
+                Icons.check_circle_rounded,
+                size: 22,
+                color: AppColors.accent,
               ),
-              child: selected
-                  ? const Icon(
-                      Icons.check_rounded,
-                      size: 16,
-                      color: AppColors.accentDark,
-                    )
-                  : null,
-            ),
           ],
         ),
       ),
@@ -1147,7 +1075,7 @@ class _HostelTypeCard extends StatelessWidget {
 }
 
 // ═══════════════════════════════════════════
-// Shared widgets
+// Shared
 // ═══════════════════════════════════════════
 
 class _FacilityChip extends StatelessWidget {
@@ -1170,38 +1098,30 @@ class _FacilityChip extends StatelessWidget {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         width: double.infinity,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
         decoration: BoxDecoration(
-          color: selected
-              ? AppColors.accent
-              : Colors.white.withValues(alpha: 0.08),
-          borderRadius: BorderRadius.circular(16),
+          color: selected ? AppColors.accent : Colors.white,
+          borderRadius: BorderRadius.circular(14),
           border: Border.all(
-            color: selected
-                ? AppColors.accent
-                : Colors.white.withValues(alpha: 0.15),
+            color: selected ? AppColors.accent : AppColors.border,
           ),
         ),
         child: Row(
           children: [
             Icon(
               icon,
-              size: 22,
-              color: selected
-                  ? Colors.white
-                  : Colors.white.withValues(alpha: 0.6),
+              size: 20,
+              color: selected ? Colors.white : AppColors.accent,
             ),
-            const SizedBox(width: 10),
+            const SizedBox(width: 8),
             Flexible(
               child: Text(
                 label,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
-                  fontSize: 15,
+                  fontSize: 14,
                   fontWeight: FontWeight.w600,
-                  color: selected
-                      ? Colors.white
-                      : Colors.white.withValues(alpha: 0.75),
+                  color: selected ? Colors.white : AppColors.textPrimary,
                 ),
               ),
             ),
@@ -1217,13 +1137,11 @@ class _SelectChip extends StatelessWidget {
     required this.label,
     required this.selected,
     required this.onTap,
-    this.showCheck = false,
   });
 
   final String label;
   final bool selected;
   final VoidCallback onTap;
-  final bool showCheck;
 
   @override
   Widget build(BuildContext context) {
@@ -1231,33 +1149,27 @@ class _SelectChip extends StatelessWidget {
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 11),
         decoration: BoxDecoration(
-          color: selected
-              ? AppColors.accent
-              : Colors.white.withValues(alpha: 0.08),
-          borderRadius: BorderRadius.circular(28),
+          color: selected ? AppColors.accent : Colors.white,
+          borderRadius: BorderRadius.circular(24),
           border: Border.all(
-            color: selected
-                ? AppColors.accent
-                : Colors.white.withValues(alpha: 0.18),
+            color: selected ? AppColors.accent : AppColors.border,
           ),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            if (showCheck && selected) ...[
+            if (selected) ...[
               const Icon(Icons.check_rounded, size: 16, color: Colors.white),
-              const SizedBox(width: 6),
+              const SizedBox(width: 5),
             ],
             Text(
               label,
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
-                color: selected
-                    ? Colors.white
-                    : Colors.white.withValues(alpha: 0.75),
+                color: selected ? Colors.white : AppColors.textPrimary,
               ),
             ),
           ],
@@ -1267,8 +1179,8 @@ class _SelectChip extends StatelessWidget {
   }
 }
 
-class _GlassField extends StatelessWidget {
-  const _GlassField({
+class _LightField extends StatelessWidget {
+  const _LightField({
     required this.controller,
     required this.label,
     required this.hint,
@@ -1297,10 +1209,10 @@ class _GlassField extends StatelessWidget {
           padding: const EdgeInsets.only(left: 2, bottom: 8),
           child: Text(
             label,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 13,
-              fontWeight: FontWeight.w500,
-              color: AppColors.textSecondary.withValues(alpha: 0.95),
+              fontWeight: FontWeight.w600,
+              color: AppColors.textSecondary,
             ),
           ),
         ),
@@ -1313,20 +1225,17 @@ class _GlassField extends StatelessWidget {
           style: const TextStyle(
             fontSize: 15,
             fontWeight: FontWeight.w500,
-            color: Colors.white,
+            color: AppColors.textPrimary,
           ),
-          cursorColor: AppColors.accent,
+          cursorColor: AppColors.primary,
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: TextStyle(
-              fontSize: 14,
-              color: AppColors.textSecondary.withValues(alpha: 0.65),
-            ),
+            hintStyle: const TextStyle(fontSize: 14, color: AppColors.textMuted),
             filled: true,
-            fillColor: Colors.white.withValues(alpha: 0.14),
+            fillColor: Colors.white,
             contentPadding: EdgeInsets.symmetric(
               horizontal: 16,
-              vertical: maxLines > 1 ? 14 : 16,
+              vertical: maxLines > 1 ? 14 : 15,
             ),
             prefixIcon: prefixIcon != null && maxLines == 1
                 ? Padding(
@@ -1334,20 +1243,18 @@ class _GlassField extends StatelessWidget {
                     child: Icon(prefixIcon, size: 20, color: AppColors.accent),
                   )
                 : null,
-            prefixIconConstraints: const BoxConstraints(
-              minWidth: 0,
-              minHeight: 0,
-            ),
+            prefixIconConstraints:
+                const BoxConstraints(minWidth: 0, minHeight: 0),
             isDense: true,
-            border: _border(Colors.white.withValues(alpha: 0.22)),
-            enabledBorder: _border(Colors.white.withValues(alpha: 0.22)),
-            focusedBorder: _border(AppColors.accent, width: 1.5),
+            border: _border(AppColors.border),
+            enabledBorder: _border(AppColors.border),
+            focusedBorder: _border(AppColors.primary, width: 1.5),
             errorBorder: _border(AppColors.error),
             focusedErrorBorder: _border(AppColors.error, width: 1.5),
             errorStyle: const TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w500,
-              color: Color(0xFFFF8A9A),
+              color: AppColors.error,
             ),
           ),
         ),
@@ -1403,27 +1310,10 @@ class _TealButton extends StatelessWidget {
                 label,
                 style: const TextStyle(
                   fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: 0.2,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
       ),
-    );
-  }
-}
-
-class _DecorCircle extends StatelessWidget {
-  const _DecorCircle({required this.size, required this.color});
-
-  final double size;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(shape: BoxShape.circle, color: color),
     );
   }
 }

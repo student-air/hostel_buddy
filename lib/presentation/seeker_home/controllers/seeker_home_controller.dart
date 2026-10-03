@@ -123,22 +123,24 @@ class SeekerHomeController extends GetxController {
   }
 
   void onNavTap(int index) {
-    selectedNavIndex.value = index;
-    switch (index) {
-      case 0:
-        break;
-      case 1:
-        Get.toNamed(AppRoutes.seekerBids);
-        break;
-      case 2:
-        Get.toNamed(AppRoutes.seekerSearch);
-        break;
-      case 3:
-        Get.toNamed(AppRoutes.profile);
-        break;
-    }
-  }
+  if (index == selectedNavIndex.value && index == 0) return;
 
+  selectedNavIndex.value = index;
+  switch (index) {
+    case 0:
+      break;
+    case 1:
+      Get.offAllNamed(AppRoutes.seekerBids);
+      break;
+    case 2:
+      Get.offAllNamed(AppRoutes.seekerSearch);
+      break;
+    case 3:
+      Get.toNamed(AppRoutes.profile);
+      selectedNavIndex.value = 0;
+      break;
+  }
+}
   void onOtherCities() {
   final cities = [
     'Islamabad',

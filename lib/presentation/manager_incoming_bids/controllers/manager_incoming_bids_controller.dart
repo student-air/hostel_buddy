@@ -128,258 +128,223 @@ class ManagerIncomingBidsController extends GetxController {
   /// Accept button → open confirmation dialog (same price or increase)
     /// Accept button → glassy confirmation dialog (same style as logout)
     void onAcceptTap(IncomingBid bid) {
-    final priceCtrl = TextEditingController(text: '${bid.offerAmount}');
-    final samePrice = true.obs;
+  final priceCtrl = TextEditingController(text: '${bid.offerAmount}');
+  final samePrice = true.obs;
 
-    Get.dialog(
-      barrierDismissible: false,
-      barrierColor: Colors.black.withValues(alpha: 0.55),
-      Dialog(
-        backgroundColor: Colors.transparent,
-        insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-        child: Obx(
-          () => ConstrainedBox(
-            constraints: BoxConstraints(
-              maxHeight: MediaQuery.of(Get.context!).size.height * 0.78,
-            ),
-            child: ClipRRect(
+  Get.dialog(
+    barrierDismissible: false,
+    barrierColor: Colors.black.withValues(alpha: 0.35),
+    Dialog(
+      backgroundColor: Colors.transparent,
+      insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+      child: Obx(
+        () => ConstrainedBox(
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.of(Get.context!).size.height * 0.78,
+          ),
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
               borderRadius: BorderRadius.circular(24),
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
-                child: Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        Colors.white.withValues(alpha: 0.14),
-                        Colors.white.withValues(alpha: 0.05),
-                      ],
+              border: Border.all(color: AppColors.border),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.primary.withValues(alpha: 0.1),
+                  blurRadius: 24,
+                  offset: const Offset(0, 8),
+                ),
+              ],
+            ),
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(20, 22, 20, 16),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 56,
+                    height: 56,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: AppColors.success.withValues(alpha: 0.12),
                     ),
-                    borderRadius: BorderRadius.circular(24),
-                    border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.18),
+                    child: const Icon(
+                      Icons.gavel_rounded,
+                      size: 26,
+                      color: AppColors.success,
                     ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.primary.withValues(alpha: 0.4),
-                        blurRadius: 28,
-                        spreadRadius: 2,
+                  ),
+                  const SizedBox(height: 12),
+                  const Text(
+                    'Confirm offer',
+                    style: TextStyle(
+                      color: AppColors.textPrimary,
+                      fontSize: 19,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: -0.3,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '${bid.seekerName} · ${bid.seater}',
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      color: AppColors.textSecondary,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Seeker offer: ${bid.offer}',
+                    style: const TextStyle(
+                      color: AppColors.accent,
+                      fontSize: 13.5,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  _LightOption(
+                    selected: samePrice.value,
+                    title: 'Accept at same price',
+                    subtitle: bid.offer,
+                    onTap: () {
+                      samePrice.value = true;
+                      priceCtrl.text = '${bid.offerAmount}';
+                    },
+                  ),
+                  const SizedBox(height: 8),
+                  _LightOption(
+                    selected: !samePrice.value,
+                    title: 'Increase price',
+                    subtitle: 'Set your counter offer',
+                    onTap: () => samePrice.value = false,
+                  ),
+                  if (!samePrice.value) ...[
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: priceCtrl,
+                      keyboardType: TextInputType.number,
+                      style: const TextStyle(
+                        color: AppColors.textPrimary,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                      ),
+                      cursorColor: AppColors.primary,
+                      decoration: InputDecoration(
+                        prefixText: 'Rs ',
+                        prefixStyle: const TextStyle(
+                          color: AppColors.textPrimary,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                        ),
+                        suffixText: '/mo',
+                        suffixStyle: const TextStyle(
+                          color: AppColors.textSecondary,
+                          fontSize: 13,
+                        ),
+                        hintText: 'Amount',
+                        hintStyle: const TextStyle(color: AppColors.textMuted),
+                        filled: true,
+                        fillColor: AppColors.surfaceSoft,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14),
+                          borderSide: const BorderSide(color: AppColors.border),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14),
+                          borderSide: const BorderSide(color: AppColors.border),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14),
+                          borderSide: const BorderSide(
+                            color: AppColors.primary,
+                            width: 1.5,
+                          ),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 12,
+                        ),
+                      ),
+                    ),
+                  ],
+                  const SizedBox(height: 18),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: SizedBox(
+                          height: 46,
+                          child: OutlinedButton(
+                            onPressed: () => Get.back(),
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: AppColors.textPrimary,
+                              side: const BorderSide(color: AppColors.border),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(24),
+                              ),
+                            ),
+                            child: const Text(
+                              'Cancel',
+                              style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: SizedBox(
+                          height: 46,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              final raw =
+                                  priceCtrl.text.replaceAll(',', '').trim();
+                              final amount = int.tryParse(raw) ?? 0;
+                              if (!samePrice.value &&
+                                  amount < bid.offerAmount) {
+                                AppSnackbar.error(
+                                  'Invalid',
+                                  'Price must be same or higher than seeker offer',
+                                );
+                                return;
+                              }
+                              final finalOffer = samePrice.value
+                                  ? bid.offer
+                                  : 'Rs ${_formatAmount(amount)}/mo';
+                              Get.back();
+                              _confirmOffer(bid, finalOffer);
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.success,
+                              foregroundColor: Colors.white,
+                              elevation: 0,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(24),
+                              ),
+                            ),
+                            child: const Text(
+                              'Confirm',
+                              style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                        ),
                       ),
                     ],
                   ),
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.fromLTRB(20, 22, 20, 16),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        // Icon
-                        Container(
-                          width: 56,
-                          height: 56,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: AppColors.success.withValues(alpha: 0.15),
-                            border: Border.all(
-                              color: AppColors.success.withValues(alpha: 0.4),
-                            ),
-                          ),
-                          child: const Icon(
-                            Icons.gavel_rounded,
-                            size: 26,
-                            color: AppColors.success,
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-
-                        const Text(
-                          'Confirm offer',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 19,
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: -0.3,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          '${bid.seekerName} · ${bid.seater}',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.55),
-                            fontSize: 13,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          'Seeker offer: ${bid.offer}',
-                          style: const TextStyle(
-                            color: AppColors.accentLight,
-                            fontSize: 13.5,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-
-                        _GlassOption(
-                          selected: samePrice.value,
-                          title: 'Accept at same price',
-                          subtitle: bid.offer,
-                          onTap: () {
-                            samePrice.value = true;
-                            priceCtrl.text = '${bid.offerAmount}';
-                          },
-                        ),
-                        const SizedBox(height: 8),
-
-                        _GlassOption(
-                          selected: !samePrice.value,
-                          title: 'Increase price',
-                          subtitle: 'Set your counter offer',
-                          onTap: () => samePrice.value = false,
-                        ),
-
-                        if (!samePrice.value) ...[
-                          const SizedBox(height: 12),
-                          TextField(
-                            controller: priceCtrl,
-                            keyboardType: TextInputType.number,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w700,
-                            ),
-                            cursorColor: AppColors.accentLight,
-                            decoration: InputDecoration(
-                              prefixText: 'Rs ',
-                              prefixStyle: TextStyle(
-                                color: Colors.white.withValues(alpha: 0.85),
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700,
-                              ),
-                              suffixText: '/mo',
-                              suffixStyle: TextStyle(
-                                color: Colors.white.withValues(alpha: 0.55),
-                                fontSize: 13,
-                              ),
-                              hintText: 'Amount',
-                              hintStyle: TextStyle(
-                                color: Colors.white.withValues(alpha: 0.35),
-                              ),
-                              filled: true,
-                              fillColor: Colors.white.withValues(alpha: 0.08),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(14),
-                                borderSide: BorderSide(
-                                  color: Colors.white.withValues(alpha: 0.15),
-                                ),
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(14),
-                                borderSide: BorderSide(
-                                  color: Colors.white.withValues(alpha: 0.15),
-                                ),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(14),
-                                borderSide: const BorderSide(
-                                  color: AppColors.accent,
-                                  width: 1.5,
-                                ),
-                              ),
-                              contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 14,
-                                vertical: 12,
-                              ),
-                            ),
-                          ),
-                        ],
-
-                        const SizedBox(height: 18),
-
-                        Row(
-                          children: [
-                            Expanded(
-                              child: SizedBox(
-                                height: 46,
-                                child: OutlinedButton(
-                                  onPressed: () => Get.back(),
-                                  style: OutlinedButton.styleFrom(
-                                    foregroundColor: Colors.white,
-                                    side: BorderSide(
-                                      color:
-                                          Colors.white.withValues(alpha: 0.25),
-                                    ),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(24),
-                                    ),
-                                  ),
-                                  child: const Text(
-                                    'Cancel',
-                                    style: TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: SizedBox(
-                                height: 46,
-                                child: ElevatedButton(
-                                  onPressed: () {
-                                    final raw = priceCtrl.text
-                                        .replaceAll(',', '')
-                                        .trim();
-                                    final amount = int.tryParse(raw) ?? 0;
-                                    if (!samePrice.value &&
-                                        amount < bid.offerAmount) {
-                                      AppSnackbar.error(
-                                        'Invalid',
-                                        'Price must be same or higher than seeker offer',
-                                      );
-                                      return;
-                                    }
-                                    final finalOffer = samePrice.value
-                                        ? bid.offer
-                                        : 'Rs ${_formatAmount(amount)}/mo';
-                                    Get.back();
-                                    _confirmOffer(bid, finalOffer);
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: AppColors.success,
-                                    foregroundColor: Colors.white,
-                                    elevation: 0,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(24),
-                                    ),
-                                  ),
-                                  child: const Text(
-                                    'Confirm',
-                                    style: TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
+                ],
               ),
             ),
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
   
   void _confirmOffer(IncomingBid bid, String finalOffer) {
     bid.status = 'offered';
@@ -402,26 +367,31 @@ class ManagerIncomingBidsController extends GetxController {
   }
 
   void onNavTap(int index) {
-    selectedNavIndex.value = index;
-    switch (index) {
-      case 0:
-        Get.offAllNamed(AppRoutes.managerHome);
-        break;
-      case 1:
-        break;
-      case 2:
-        AppSnackbar.info('Rooms', 'Room management coming next.');
-        break;
-      case 3:
-        Get.toNamed(AppRoutes.profile);
-        break;
-    }
+  if (index == selectedNavIndex.value) return;
+
+  selectedNavIndex.value = index;
+  switch (index) {
+    case 0:
+      Get.offAllNamed(AppRoutes.managerHome);
+      break;
+    case 1:
+      // Already on bids
+      break;
+    case 2:
+      AppSnackbar.info('Rooms', 'Room management coming next.');
+      selectedNavIndex.value = 1;
+      break;
+    case 3:
+      Get.toNamed(AppRoutes.profile);
+      selectedNavIndex.value = 1;
+      break;
   }
+}
 }
 
 /// Glass radio option inside the confirm dialog
-class _GlassOption extends StatelessWidget {
-  const _GlassOption({
+class _LightOption extends StatelessWidget {
+  const _LightOption({
     required this.selected,
     required this.title,
     required this.subtitle,
@@ -442,13 +412,11 @@ class _GlassOption extends StatelessWidget {
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           color: selected
-              ? AppColors.accent.withValues(alpha: 0.22)
-              : Colors.white.withValues(alpha: 0.06),
+              ? AppColors.accent.withValues(alpha: 0.1)
+              : AppColors.surfaceSoft,
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
-            color: selected
-                ? AppColors.accent.withValues(alpha: 0.7)
-                : Colors.white.withValues(alpha: 0.12),
+            color: selected ? AppColors.accent : AppColors.border,
             width: selected ? 1.5 : 1,
           ),
         ),
@@ -460,9 +428,7 @@ class _GlassOption extends StatelessWidget {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: selected
-                      ? AppColors.accentLight
-                      : Colors.white.withValues(alpha: 0.35),
+                  color: selected ? AppColors.accent : AppColors.textMuted,
                   width: 2,
                 ),
               ),
@@ -473,7 +439,7 @@ class _GlassOption extends StatelessWidget {
                         height: 12,
                         decoration: const BoxDecoration(
                           shape: BoxShape.circle,
-                          color: AppColors.accentLight,
+                          color: AppColors.accent,
                         ),
                       ),
                     )
@@ -487,7 +453,7 @@ class _GlassOption extends StatelessWidget {
                   Text(
                     title,
                     style: TextStyle(
-                      color: Colors.white,
+                      color: AppColors.textPrimary,
                       fontSize: 14,
                       fontWeight:
                           selected ? FontWeight.w700 : FontWeight.w600,
@@ -496,8 +462,8 @@ class _GlassOption extends StatelessWidget {
                   const SizedBox(height: 2),
                   Text(
                     subtitle,
-                    style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.5),
+                    style: const TextStyle(
+                      color: AppColors.textSecondary,
                       fontSize: 12,
                     ),
                   ),

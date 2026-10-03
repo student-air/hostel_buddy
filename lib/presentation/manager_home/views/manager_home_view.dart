@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -13,78 +11,52 @@ class ManagerHomeView extends GetView<ManagerHomeController> {
 
   @override
   Widget build(BuildContext context) {
-    final bottomPad = MediaQuery.of(context).padding.bottom;
-
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.light,
       child: Scaffold(
         key: controller.scaffoldKey,
+        backgroundColor: AppColors.scaffoldBackground,
         endDrawer: _ManagerDrawer(controller: controller),
+        resizeToAvoidBottomInset: false,
         body: Stack(
           children: [
-            Container(
-              width: double.infinity,
-              height: double.infinity,
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    Color(0xFF6B0E24),
-                    Color(0xFF4A0A1E),
-                    Color(0xFF2A0412),
-                  ],
-                ),
-              ),
-            ),
-            Positioned(
-              top: -60,
-              right: -40,
-              child: _Blob(
-                size: 220,
-                color: AppColors.accent.withValues(alpha: 0.08),
-              ),
-            ),
-            Positioned(
-              bottom: 120,
-              left: -50,
-              child: _Blob(
-                size: 180,
-                color: Colors.white.withValues(alpha: 0.03),
-              ),
-            ),
-            SafeArea(
-              bottom: false,
+            SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              padding: const EdgeInsets.only(bottom: 110),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(
-                    child: SingleChildScrollView(
-                      physics: const BouncingScrollPhysics(),
-                      padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
+                  _Header(controller: controller),
+                  Transform.translate(
+                    offset: const Offset(0, -28),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
                       child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          _Header(controller: controller),
-                          const SizedBox(height: 22),
                           _StatsGlance(controller: controller),
-                          const SizedBox(height: 18),
+                          const SizedBox(height: 12),
                           _OccupancyCard(controller: controller),
-                          const SizedBox(height: 18),
+                          const SizedBox(height: 14),
                           _QuickActions(controller: controller),
-                          const SizedBox(height: 26),
+                          const SizedBox(height: 22),
                           _BidsSection(controller: controller),
                         ],
                       ),
                     ),
                   ),
-                  Obx(
-                    () => AppBottomNavBar(
-                      selectedIndex: controller.selectedNavIndex.value,
-                      onTap: controller.onNavTap,
-                      items: AppBottomNavBar.managerItems,
-                    ),
-                  ),
                 ],
+              ),
+            ),
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: Obx(
+                () => AppBottomNavBar(
+                  selectedIndex: controller.selectedNavIndex.value,
+                  onTap: controller.onNavTap,
+                  items: AppBottomNavBar.managerItems,
+                ),
               ),
             ),
           ],
@@ -95,7 +67,7 @@ class ManagerHomeView extends GetView<ManagerHomeController> {
 }
 
 // ═══════════════════════════════════════════
-// HEADER (matches seeker: greeting + date card)
+// HEADER
 // ═══════════════════════════════════════════
 
 class _Header extends StatelessWidget {
@@ -104,45 +76,51 @@ class _Header extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Top: initials → profile | hostel name | bell | menu
-        Row(
-          children: [
-            GestureDetector(
-              onTap: controller.onProfile,
-              child: Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: AppColors.accent.withValues(alpha: 0.3),
-                  border: Border.all(
-                    color: AppColors.accent.withValues(alpha: 0.6),
-                  ),
-                ),
-                alignment: Alignment.center,
-                child: Obx(() {
-                  final _ = controller.userName.value;
-                  return Text(
-                    controller.initials,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w700,
-                      fontSize: 13,
+    final top = MediaQuery.of(context).padding.top;
+
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.fromLTRB(20, top + 4, 20, 40),
+      decoration: const BoxDecoration(
+        color: AppColors.primary,
+        borderRadius: BorderRadius.vertical(bottom: Radius.circular(32)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              GestureDetector(
+                onTap: controller.onProfile,
+                child: Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.white.withValues(alpha: 0.15),
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.25),
                     ),
-                  );
-                }),
+                  ),
+                  alignment: Alignment.center,
+                  child: Obx(() {
+                    final _ = controller.userName.value;
+                    return Text(
+                      controller.initials,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 13,
+                      ),
+                    );
+                  }),
+                ),
               ),
-            ),
-            const SizedBox(width: 10),
-                                    Expanded(
-              child: GestureDetector(
-                onTap: controller.onHostelDropdown,
-                child: Obx(
-                  () {
-                    // touch reactive fields so Obx rebuilds on switch
+              const SizedBox(width: 10),
+              Expanded(
+                child: GestureDetector(
+                  onTap: controller.onHostelDropdown,
+                  child: Obx(() {
                     final _ = controller.selectedHostelIndex.value;
                     final __ = controller.hostels.length;
                     return Column(
@@ -152,7 +130,7 @@ class _Header extends StatelessWidget {
                           children: [
                             Flexible(
                               child: Text(
-                                controller.hostelName, // ← no .value
+                                controller.hostelName,
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: const TextStyle(
@@ -162,7 +140,6 @@ class _Header extends StatelessWidget {
                                 ),
                               ),
                             ),
-                            const SizedBox(width: 4),
                             Icon(
                               Icons.keyboard_arrow_down_rounded,
                               color: Colors.white.withValues(alpha: 0.7),
@@ -171,214 +148,185 @@ class _Header extends StatelessWidget {
                           ],
                         ),
                         Text(
-                          controller.currentCity.value, // this one stays .value
+                          controller.currentCity.value,
                           style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.5),
+                            color: Colors.white.withValues(alpha: 0.55),
                             fontSize: 12,
                           ),
                         ),
                       ],
                     );
-                  },
+                  }),
                 ),
               ),
-            ),
-            // Notification
-            GestureDetector(
-              onTap: controller.onNotifications,
-              child: Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.white.withValues(alpha: 0.1),
-                      border: Border.all(
+              GestureDetector(
+                onTap: controller.onNotifications,
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
                         color: Colors.white.withValues(alpha: 0.12),
                       ),
-                    ),
-                    child: const Icon(
-                      Icons.notifications_none_rounded,
-                      color: Colors.white,
-                      size: 20,
-                    ),
-                  ),
-                  Positioned(
-                    top: 8,
-                    right: 9,
-                    child: Container(
-                      width: 7,
-                      height: 7,
-                      decoration: const BoxDecoration(
-                        color: AppColors.notificationDot,
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(width: 8),
-            // Menu → drawer
-            GestureDetector(
-              onTap: controller.openDrawer,
-              child: Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.white.withValues(alpha: 0.1),
-                  border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.12),
-                  ),
-                ),
-                child: const Icon(
-                  Icons.menu_rounded,
-                  color: Colors.white,
-                  size: 20,
-                ),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 22),
-
-        // Greeting + date card (same as seeker)
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    controller.greeting,
-                    style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.65),
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Obx(
-                    () => Text(
-                      '${controller.userName.value}.',
-                      style: const TextStyle(
+                      child: const Icon(
+                        Icons.notifications_none_rounded,
                         color: Colors.white,
-                        fontSize: 32,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: -0.8,
-                        height: 1.1,
+                        size: 20,
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 10),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 5,
-                    ),
-                    decoration: BoxDecoration(
-                      color: AppColors.accent.withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(
-                        color: AppColors.accent.withValues(alpha: 0.45),
-                      ),
-                    ),
-                    child: const Text(
-                      'Hostel manager',
-                      style: TextStyle(
-                        color: AppColors.accentLight,
-                        fontSize: 11.5,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(width: 12),
-            Container(
-              width: 118,
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.calendar_today_outlined,
-                        size: 12,
-                        color: Colors.white.withValues(alpha: 0.5),
-                      ),
-                      const SizedBox(width: 5),
-                      Text(
-                        "Today's Date",
-                        style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.5),
-                          fontSize: 10,
-                          fontWeight: FontWeight.w500,
+                    Positioned(
+                      top: 8,
+                      right: 9,
+                      child: Container(
+                        width: 7,
+                        height: 7,
+                        decoration: const BoxDecoration(
+                          color: AppColors.notificationDot,
+                          shape: BoxShape.circle,
                         ),
                       ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    controller.dateLabel,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w700,
                     ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              GestureDetector(
+                onTap: controller.openDrawer,
+                child: Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.white.withValues(alpha: 0.12),
                   ),
-                  Text(
-                    controller.weekdayLabel,
-                    style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.55),
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                    ),
+                  child: const Icon(
+                    Icons.menu_rounded,
+                    color: Colors.white,
+                    size: 20,
                   ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      Icon(
-                        controller.dayPart == 'Night'
-                            ? Icons.nightlight_round
-                            : Icons.wb_sunny_outlined,
-                        size: 13,
-                        color: AppColors.accentLight,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      controller.greeting,
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.75),
+                        fontSize: 15,
+                        fontWeight: FontWeight.w500,
                       ),
-                      const SizedBox(width: 4),
-                      Text(
-                        controller.dayPart,
+                    ),
+                    const SizedBox(height: 2),
+                    Obx(
+                      () => Text(
+                        '${controller.userName.value}.',
                         style: const TextStyle(
-                          color: AppColors.accentLight,
-                          fontSize: 11,
+                          color: Colors.white,
+                          fontSize: 28,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: -0.6,
+                          height: 1.15,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: Colors.white.withValues(alpha: 0.18),
+                        ),
+                      ),
+                      child: const Text(
+                        'Hostel manager',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-                    ],
-                  ),
-                ],
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
-        ),
-      ],
+              const SizedBox(width: 12),
+              Container(
+                width: 118,
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: Colors.white.withValues(alpha: 0.16),
+                  ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.calendar_today_outlined,
+                          size: 12,
+                          color: Colors.white.withValues(alpha: 0.55),
+                        ),
+                        const SizedBox(width: 5),
+                        Text(
+                          "Today's Date",
+                          style: TextStyle(
+                            color: Colors.white.withValues(alpha: 0.55),
+                            fontSize: 10,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      controller.dateLabel,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    Text(
+                      controller.weekdayLabel,
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.6),
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }
 
 // ═══════════════════════════════════════════
-// STATS GLANCE (glass — same as seeker bids glance)
+// STATS
 // ═══════════════════════════════════════════
 
 class _StatsGlance extends StatelessWidget {
@@ -387,91 +335,90 @@ class _StatsGlance extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(22),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
-        child: Container(
-          width: double.infinity,
-          padding: const EdgeInsets.fromLTRB(18, 16, 18, 18),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(22),
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Colors.white.withValues(alpha: 0.16),
-                Colors.white.withValues(alpha: 0.05),
-              ],
-            ),
-            border: Border.all(color: Colors.white.withValues(alpha: 0.22)),
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: AppColors.border),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.primary.withValues(alpha: 0.06),
+            blurRadius: 16,
+            offset: const Offset(0, 6),
           ),
-          child: Column(
+        ],
+      ),
+      child: Column(
+        children: [
+          Row(
             children: [
-              Row(
-                children: [
-                  const Expanded(
-                    child: Text(
-                      'Your hostel at a glance',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
+              const Expanded(
+                child: Text(
+                  'Your hostel at a glance',
+                  style: TextStyle(
+                    color: AppColors.textPrimary,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
                   ),
-                  GestureDetector(
-                    onTap: controller.onViewBids,
-                    child: const Text(
-                      'View bids',
-                      style: TextStyle(
-                        color: AppColors.accentLight,
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ],
+                ),
               ),
-              const SizedBox(height: 16),
-              Obx(
-                () => Row(
-                  children: [
-                    Expanded(
-                      child: _StatCell(
-                        value: '${controller.pendingBids.value}',
-                        label: 'Pending',
-                        valueColor: AppColors.warning,
-                      ),
-                    ),
-                    _VDivider(),
-                    Expanded(
-                      child: _StatCell(
-                        value: controller.monthlyRevenue.value,
-                        label: 'This month',
-                        valueColor: AppColors.success,
-                      ),
-                    ),
-                    _VDivider(),
-                    Expanded(
-                      child: _StatCell(
-                        value: '${controller.totalRooms.value}',
-                        label: 'Rooms',
-                      ),
-                    ),
-                  ],
+              GestureDetector(
+                onTap: controller.onViewBids,
+                child: const Text(
+                  'View bids',
+                  style: TextStyle(
+                    color: AppColors.accent,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
             ],
           ),
-        ),
+          const SizedBox(height: 16),
+          Obx(
+            () => Row(
+              children: [
+                Expanded(
+                  child: _StatCell(
+                    value: '${controller.pendingBids.value}',
+                    label: 'Pending',
+                    valueColor: AppColors.warning,
+                  ),
+                ),
+                _VDivider(),
+                Expanded(
+                  child: _StatCell(
+                    value: controller.monthlyRevenue.value,
+                    label: 'This month',
+                    valueColor: AppColors.textPrimary,
+                  ),
+                ),
+                _VDivider(),
+                Expanded(
+                  child: _StatCell(
+                    value: '${controller.totalRooms.value}',
+                    label: 'Rooms',
+                    valueColor: AppColors.textPrimary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
 }
 
 class _StatCell extends StatelessWidget {
-  const _StatCell({required this.value, required this.label, this.valueColor});
+  const _StatCell({
+    required this.value,
+    required this.label,
+    this.valueColor,
+  });
 
   final String value;
   final String label;
@@ -484,7 +431,7 @@ class _StatCell extends StatelessWidget {
         Text(
           value,
           style: TextStyle(
-            color: valueColor ?? Colors.white,
+            color: valueColor ?? AppColors.textPrimary,
             fontSize: 26,
             fontWeight: FontWeight.w700,
             letterSpacing: -0.5,
@@ -493,8 +440,8 @@ class _StatCell extends StatelessWidget {
         const SizedBox(height: 4),
         Text(
           label,
-          style: TextStyle(
-            color: Colors.white.withValues(alpha: 0.5),
+          style: const TextStyle(
+            color: AppColors.textSecondary,
             fontSize: 12,
             fontWeight: FontWeight.w500,
           ),
@@ -507,11 +454,7 @@ class _StatCell extends StatelessWidget {
 class _VDivider extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 1,
-      height: 36,
-      color: Colors.white.withValues(alpha: 0.12),
-    );
+    return Container(width: 1, height: 36, color: AppColors.divider);
   }
 }
 
@@ -525,74 +468,68 @@ class _OccupancyCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(18),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-        child: Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(18),
-            color: Colors.white.withValues(alpha: 0.08),
-            border: Border.all(color: Colors.white.withValues(alpha: 0.18)),
-          ),
-          child: Obx(() {
-            final rate = controller.occupancyRate;
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Obx(() {
+        final rate = controller.occupancyRate;
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
               children: [
-                Row(
-                  children: [
-                    const Expanded(
-                      child: Text(
-                        'Occupancy',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                    Text(
-                      controller.occupancyLabel,
-                      style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.6),
-                        fontSize: 13,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(6),
-                  child: LinearProgressIndicator(
-                    value: rate,
-                    minHeight: 8,
-                    backgroundColor: Colors.white.withValues(alpha: 0.12),
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                      rate >= 0.85
-                          ? AppColors.success
-                          : rate >= 0.5
-                          ? AppColors.accent
-                          : AppColors.warning,
+                const Expanded(
+                  child: Text(
+                    'Occupancy',
+                    style: TextStyle(
+                      color: AppColors.textPrimary,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                 ),
-                const SizedBox(height: 8),
                 Text(
-                  '${(rate * 100).round()}% filled',
-                  style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.5),
-                    fontSize: 12,
+                  controller.occupancyLabel,
+                  style: const TextStyle(
+                    color: AppColors.textSecondary,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
               ],
-            );
-          }),
-        ),
-      ),
+            ),
+            const SizedBox(height: 12),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(6),
+              child: LinearProgressIndicator(
+                value: rate,
+                minHeight: 8,
+                backgroundColor: AppColors.border,
+                valueColor: AlwaysStoppedAnimation<Color>(
+                  rate >= 0.85
+                      ? AppColors.success
+                      : rate >= 0.5
+                          ? AppColors.accent
+                          : AppColors.warning,
+                ),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              '${(rate * 100).round()}% filled',
+              style: const TextStyle(
+                color: AppColors.textMuted,
+                fontSize: 12,
+              ),
+            ),
+          ],
+        );
+      }),
     );
   }
 }
@@ -661,17 +598,13 @@ class _ActionTile extends StatelessWidget {
         height: 88,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(18),
-          color: filled
-              ? AppColors.accent
-              : Colors.white.withValues(alpha: 0.08),
-          border: filled
-              ? null
-              : Border.all(color: Colors.white.withValues(alpha: 0.1)),
+          color: filled ? AppColors.accent : Colors.white,
+          border: filled ? null : Border.all(color: AppColors.border),
           boxShadow: filled
               ? [
                   BoxShadow(
-                    color: AppColors.accent.withValues(alpha: 0.35),
-                    blurRadius: 16,
+                    color: AppColors.accent.withValues(alpha: 0.3),
+                    blurRadius: 14,
                     offset: const Offset(0, 6),
                   ),
                 ]
@@ -680,12 +613,16 @@ class _ActionTile extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, color: Colors.white, size: 26),
+            Icon(
+              icon,
+              color: filled ? Colors.white : AppColors.primary,
+              size: 26,
+            ),
             const SizedBox(height: 8),
             Text(
               label,
               style: TextStyle(
-                color: Colors.white.withValues(alpha: filled ? 1 : 0.85),
+                color: filled ? Colors.white : AppColors.textPrimary,
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
               ),
@@ -715,7 +652,7 @@ class _BidsSection extends StatelessWidget {
               child: Text(
                 'Recent bids',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: AppColors.textPrimary,
                   fontSize: 17,
                   fontWeight: FontWeight.w700,
                 ),
@@ -726,7 +663,7 @@ class _BidsSection extends StatelessWidget {
               child: const Text(
                 'See all',
                 style: TextStyle(
-                  color: AppColors.accentLight,
+                  color: AppColors.accent,
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
                 ),
@@ -740,7 +677,10 @@ class _BidsSection extends StatelessWidget {
             children: controller.recentBids.map((b) {
               return Padding(
                 padding: const EdgeInsets.only(bottom: 12),
-                child: _BidCard(bid: b, onTap: () => controller.onBidTap(b)),
+                child: _BidCard(
+                  bid: b,
+                  onTap: () => controller.onBidTap(b),
+                ),
               );
             }).toList(),
           ),
@@ -768,30 +708,31 @@ class _BidCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: AppColors.border),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.12),
-              blurRadius: 16,
-              offset: const Offset(0, 6),
+              color: AppColors.primary.withValues(alpha: 0.04),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
             ),
           ],
         ),
         child: Row(
           children: [
             Container(
-              width: 56,
-              height: 56,
+              width: 48,
+              height: 48,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(14),
-                color: AppColors.primary.withValues(alpha: 0.12),
+                color: AppColors.primary.withValues(alpha: 0.1),
               ),
               alignment: Alignment.center,
               child: Text(
-                name[0].toUpperCase(),
+                name.isNotEmpty ? name[0].toUpperCase() : '?',
                 style: const TextStyle(
                   color: AppColors.primary,
                   fontWeight: FontWeight.w700,
-                  fontSize: 20,
+                  fontSize: 18,
                 ),
               ),
             ),
@@ -814,16 +755,6 @@ class _BidCard extends StatelessWidget {
                     style: const TextStyle(
                       color: AppColors.textSecondary,
                       fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    bid['offer']?.toString() ?? '',
-                    style: const TextStyle(
-                      color: AppColors.primary,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w700,
                     ),
                   ),
                 ],
@@ -833,8 +764,8 @@ class _BidCard extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
               decoration: BoxDecoration(
                 color: isPending
-                    ? AppColors.warning.withValues(alpha: 0.15)
-                    : AppColors.success.withValues(alpha: 0.15),
+                    ? AppColors.warning.withValues(alpha: 0.12)
+                    : AppColors.success.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Text(
@@ -863,289 +794,198 @@ class _ManagerDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final top = MediaQuery.of(context).padding.top;
+
     return Drawer(
+      backgroundColor: AppColors.scaffoldBackground,
       width: MediaQuery.of(context).size.width * 0.82,
-      backgroundColor: const Color(0xFF2A0412),
-      child: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // Header
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 16, 16, 8),
-              child: Row(
-                children: [
-                  Container(
-                    width: 48,
-                    height: 48,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: AppColors.accent.withValues(alpha: 0.3),
-                      border: Border.all(
-                        color: AppColors.accent.withValues(alpha: 0.6),
-                      ),
-                    ),
-                    alignment: Alignment.center,
-                    child: Text(
-                      controller.initials,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w700,
-                        fontSize: 16,
-                      ),
+      child: Column(
+        children: [
+          Container(
+            width: double.infinity,
+            padding: EdgeInsets.fromLTRB(20, top + 16, 12, 22),
+            decoration: const BoxDecoration(
+              color: AppColors.primary,
+              borderRadius: BorderRadius.vertical(bottom: Radius.circular(28)),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 52,
+                  height: 52,
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.white,
+                  ),
+                  alignment: Alignment.center,
+                  child: Text(
+                    controller.initials,
+                    style: const TextStyle(
+                      color: AppColors.primary,
+                      fontWeight: FontWeight.w800,
+                      fontSize: 16,
                     ),
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Obx(() {
-                      final _ = controller.selectedHostelIndex.value;
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            controller.userName.value,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Obx(() {
+                    final _ = controller.selectedHostelIndex.value;
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          controller.userName.value,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          controller.hostelName,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: Colors.white.withValues(alpha: 0.7),
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
+                    );
+                  }),
+                ),
+                IconButton(
+                  onPressed: () => Get.back(),
+                  icon: const Icon(Icons.close_rounded, color: Colors.white70),
+                ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 14, 16, 8),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () {
+                  Navigator.of(context).pop();
+                  Future.microtask(() => controller.onSwitchHostel());
+                },
+                borderRadius: BorderRadius.circular(16),
+                child: Ink(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(16),
+                    color: AppColors.accent.withValues(alpha: 0.1),
+                    border: Border.all(
+                      color: AppColors.accent.withValues(alpha: 0.4),
+                    ),
+                  ),
+                  child: const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 14, vertical: 13),
+                    child: Row(
+                      children: [
+                        Icon(Icons.swap_horiz_rounded,
+                            color: AppColors.accent, size: 22),
+                        SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            'Switch hostel',
+                            style: TextStyle(
+                              color: AppColors.accent,
+                              fontSize: 14.5,
                               fontWeight: FontWeight.w700,
                             ),
                           ),
-                          const SizedBox(height: 2),
-                          Text(
-                            controller.hostelName, // no .value
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.55),
-                              fontSize: 12,
-                            ),
-                          ),
-                        ],
-                      );
-                    }),
-                  ),
-                  IconButton(
-                    onPressed: () => Get.back(),
-                    icon: Icon(
-                      Icons.close_rounded,
-                      color: Colors.white.withValues(alpha: 0.6),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            // Switch hostel button
-                        // Switch hostel — premium glass CTA
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
-              child: Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  onTap: () {
-                    Navigator.of(context).pop();
-                    Future.microtask(() => controller.onSwitchHostel());
-                  },
-                  borderRadius: BorderRadius.circular(16),
-                  child: Ink(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(16),
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          AppColors.accent.withValues(alpha: 0.35),
-                          AppColors.accent.withValues(alpha: 0.12),
-                        ],
-                      ),
-                      border: Border.all(
-                        color: AppColors.accent.withValues(alpha: 0.55),
-                        width: 1.2,
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.accent.withValues(alpha: 0.25),
-                          blurRadius: 16,
-                          offset: const Offset(0, 6),
                         ),
+                        Icon(Icons.arrow_forward_ios_rounded,
+                            color: AppColors.accent, size: 14),
                       ],
                     ),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 14,
-                        vertical: 13,
-                      ),
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 38,
-                            height: 38,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: AppColors.accent.withValues(alpha: 0.35),
-                              border: Border.all(
-                                color: AppColors.accentLight.withValues(
-                                  alpha: 0.5,
-                                ),
-                              ),
-                            ),
-                            child: const Icon(
-                              Icons.swap_horiz_rounded,
-                              color: Colors.white,
-                              size: 20,
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          const Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Switch hostel',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 14.5,
-                                    fontWeight: FontWeight.w800,
-                                    letterSpacing: -0.2,
-                                  ),
-                                ),
-                                SizedBox(height: 2),
-                                Text(
-                                  'Manage multiple listings',
-                                  style: TextStyle(
-                                    color: AppColors.accentLight,
-                                    fontSize: 11.5,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Container(
-                            width: 28,
-                            height: 28,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Colors.white.withValues(alpha: 0.12),
-                            ),
-                            child: const Icon(
-                              Icons.arrow_forward_ios_rounded,
-                              color: Colors.white,
-                              size: 12,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
                   ),
                 ),
               ),
             ),
-
-            Divider(color: Colors.white.withValues(alpha: 0.08)),
-
-            // Your existing tiles (View bids, Rooms, Edit listing, etc.)
-            Expanded(
-              child: ListView(
-                padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
-                children: [
-                  _DrawerTile(
-                    icon: Icons.gavel_rounded,
-                    label: 'View bids',
-                    onTap: () {
-                      Get.back();
-                      controller.onViewBids();
-                    },
-                  ),
-                  _DrawerTile(
-                    icon: Icons.meeting_room_outlined,
-                    label: 'Rooms',
-                    onTap: () {
-                      Get.back();
-                      controller.onManageRooms();
-                    },
-                  ),
-                  _DrawerTile(
-                    icon: Icons.edit_outlined,
-                    label: 'Edit listing',
-                    onTap: () {
-                      Get.back();
-                      controller.onEditListing();
-                    },
-                  ),
-                  _DrawerTile(
-                    icon: Icons.add_home_rounded,
-                    label: 'Add listing',
-                    onTap: () {
-                      Get.back();
-                      controller.onAddListing();
-                    },
-                  ),
-                  const SizedBox(height: 8),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 8, bottom: 8, top: 8),
-                    child: Text(
-                      'ACCOUNT',
-                      style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.4),
-                        fontSize: 11,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 1.1,
-                      ),
-                    ),
-                  ),
-                  _DrawerTile(
-                    icon: Icons.person_rounded,
-                    label: 'Profile',
-                    onTap: () {
-                      Get.back();
-                      controller.onProfile();
-                    },
-                  ),
-                  _DrawerTile(
-                    icon: Icons.notifications_rounded,
-                    label: 'Notifications',
-                    onTap: () {
-                      Get.back();
-                      controller.onNotifications();
-                    },
-                  ),
-                  _DrawerTile(
-                    icon: Icons.settings_rounded,
-                    label: 'Settings',
-                    onTap: () {
-                      Get.back();
-                      controller.onSettings();
-                    },
-                  ),
-                  const SizedBox(height: 8),
-                  _DrawerTile(
-                    icon: Icons.logout_rounded,
-                    label: 'Log out',
-                    color: AppColors.error,
-                    onTap: () {
-                      Get.back();
-                      controller.onLogout();
-                    },
-                  ),
-                ],
-              ),
+          ),
+          Expanded(
+            child: ListView(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              children: [
+                _DrawerTile(
+                  icon: Icons.gavel_rounded,
+                  label: 'View bids',
+                  onTap: () {
+                    Get.back();
+                    controller.onViewBids();
+                  },
+                ),
+                _DrawerTile(
+                  icon: Icons.meeting_room_outlined,
+                  label: 'Rooms',
+                  onTap: () {
+                    Get.back();
+                    controller.onManageRooms();
+                  },
+                ),
+                _DrawerTile(
+                  icon: Icons.edit_outlined,
+                  label: 'Edit listing',
+                  onTap: () {
+                    Get.back();
+                    controller.onEditListing();
+                  },
+                ),
+                _DrawerTile(
+                  icon: Icons.add_home_rounded,
+                  label: 'Add listing',
+                  onTap: () {
+                    Get.back();
+                    controller.onAddListing();
+                  },
+                ),
+                _DrawerTile(
+                  icon: Icons.person_outline_rounded,
+                  label: 'Profile',
+                  onTap: () {
+                    Get.back();
+                    controller.onProfile();
+                  },
+                ),
+              ],
             ),
-
-            Padding(
-              padding: const EdgeInsets.only(bottom: 16, top: 8),
-              child: Center(
-                child: Text(
-                  'Hostel Buddy v1.0.0',
-                  style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.3),
-                    fontSize: 11,
+          ),
+          Padding(
+            padding: EdgeInsets.fromLTRB(
+              16,
+              8,
+              16,
+              16 + MediaQuery.of(context).padding.bottom,
+            ),
+            child: SizedBox(
+              width: double.infinity,
+              height: 48,
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  Get.back();
+                  controller.onLogout();
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.error,
+                  foregroundColor: Colors.white,
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(24),
                   ),
+                ),
+                icon: const Icon(Icons.logout_rounded, size: 18),
+                label: const Text(
+                  'Log out',
+                  style: TextStyle(fontWeight: FontWeight.w700),
                 ),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -1156,19 +996,14 @@ class _DrawerTile extends StatelessWidget {
     required this.icon,
     required this.label,
     required this.onTap,
-    this.color,
   });
 
   final IconData icon;
   final String label;
   final VoidCallback onTap;
-  final Color? color;
 
   @override
   Widget build(BuildContext context) {
-    final c = color ?? AppColors.accentLight;
-    final textColor = color ?? Colors.white;
-
     return Padding(
       padding: const EdgeInsets.only(bottom: 4),
       child: Material(
@@ -1177,56 +1012,24 @@ class _DrawerTile extends StatelessWidget {
           onTap: onTap,
           borderRadius: BorderRadius.circular(14),
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
             child: Row(
               children: [
-                Container(
-                  width: 38,
-                  height: 38,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.07),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Icon(icon, color: c, size: 20),
-                ),
+                Icon(icon, size: 22, color: AppColors.accent),
                 const SizedBox(width: 14),
-                Expanded(
-                  child: Text(
-                    label,
-                    style: TextStyle(
-                      color: textColor,
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                    ),
+                Text(
+                  label,
+                  style: const TextStyle(
+                    color: AppColors.textPrimary,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
-                if (color == null)
-                  Icon(
-                    Icons.chevron_right_rounded,
-                    color: Colors.white.withValues(alpha: 0.25),
-                    size: 20,
-                  ),
               ],
             ),
           ),
         ),
       ),
-    );
-  }
-}
-
-
-class _Blob extends StatelessWidget {
-  const _Blob({required this.size, required this.color});
-  final double size;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(shape: BoxShape.circle, color: color),
     );
   }
 }

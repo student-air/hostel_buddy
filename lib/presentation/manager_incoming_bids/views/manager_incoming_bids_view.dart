@@ -14,45 +14,25 @@ class ManagerIncomingBidsView extends GetView<ManagerIncomingBidsController> {
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.light,
       child: Scaffold(
+        backgroundColor: AppColors.scaffoldBackground,
         body: Stack(
           children: [
-            Container(
-              width: double.infinity,
-              height: double.infinity,
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    Color(0xFF6B0E24),
-                    Color(0xFF4A0A1E),
-                    Color(0xFF2A0412),
-                  ],
+            Column(
+              children: [
+                _Header(),
+                Expanded(
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 14),
+                      _SearchBar(controller: controller),
+                      const SizedBox(height: 12),
+                      _Tabs(controller: controller),
+                      const SizedBox(height: 12),
+                      Expanded(child: _Body(controller: controller)),
+                    ],
+                  ),
                 ),
-              ),
-            ),
-            Positioned(
-              top: -60,
-              right: -40,
-              child: _Blob(
-                size: 220,
-                color: AppColors.accent.withValues(alpha: 0.08),
-              ),
-            ),
-            SafeArea(
-              bottom: false,
-              child: Column(
-                children: [
-                  const SizedBox(height: 8),
-                  _Header(),
-                  const SizedBox(height: 14),
-                  _SearchBar(controller: controller),
-                  const SizedBox(height: 12),
-                  _Tabs(controller: controller),
-                  const SizedBox(height: 12),
-                  Expanded(child: _Body(controller: controller)),
-                ],
-              ),
+              ],
             ),
             Positioned(
               left: 0,
@@ -76,19 +56,25 @@ class ManagerIncomingBidsView extends GetView<ManagerIncomingBidsController> {
 class _Header extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+    final top = MediaQuery.of(context).padding.top;
+
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.fromLTRB(16, top + 8, 20, 22),
+      decoration: const BoxDecoration(
+        color: AppColors.primary,
+        borderRadius: BorderRadius.vertical(bottom: Radius.circular(28)),
+      ),
       child: Row(
         children: [
           GestureDetector(
             onTap: () => Get.back(),
             child: Container(
-              width: 42,
-              height: 42,
+              width: 40,
+              height: 40,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.white.withValues(alpha: 0.1),
-                border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
+                color: Colors.white.withValues(alpha: 0.12),
               ),
               child: const Icon(
                 Icons.arrow_back_ios_new_rounded,
@@ -97,25 +83,25 @@ class _Header extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(width: 14),
-          Expanded(
+          const SizedBox(width: 12),
+          const Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   'Incoming Bids',
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 24,
+                    fontSize: 22,
                     fontWeight: FontWeight.w800,
-                    letterSpacing: -0.5,
+                    letterSpacing: -0.4,
                   ),
                 ),
-                const SizedBox(height: 2),
+                SizedBox(height: 2),
                 Text(
                   'Respond to seeker offers',
                   style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.55),
+                    color: Colors.white70,
                     fontSize: 13,
                     fontWeight: FontWeight.w500,
                   ),
@@ -140,27 +126,37 @@ class _SearchBar extends StatelessWidget {
       child: Container(
         height: 48,
         decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.08),
+          color: Colors.white,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
+          border: Border.all(color: AppColors.border),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.primary.withValues(alpha: 0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
         child: TextField(
           onChanged: controller.onSearchChanged,
-          style: const TextStyle(color: Colors.white, fontSize: 15),
-          cursorColor: AppColors.accentLight,
-          decoration: InputDecoration(
+          style: const TextStyle(
+            color: AppColors.textPrimary,
+            fontSize: 15,
+          ),
+          cursorColor: AppColors.primary,
+          decoration: const InputDecoration(
             hintText: 'Search bids...',
             hintStyle: TextStyle(
-              color: Colors.white.withValues(alpha: 0.4),
+              color: AppColors.textMuted,
               fontSize: 15,
             ),
             prefixIcon: Icon(
               Icons.search_rounded,
-              color: Colors.white.withValues(alpha: 0.45),
+              color: AppColors.accent,
               size: 22,
             ),
             border: InputBorder.none,
-            contentPadding: const EdgeInsets.symmetric(vertical: 14),
+            contentPadding: EdgeInsets.symmetric(vertical: 14),
           ),
         ),
       ),
@@ -183,9 +179,9 @@ class _Tabs extends StatelessWidget {
           height: 44,
           padding: const EdgeInsets.all(4),
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.08),
+            color: Colors.white,
             borderRadius: BorderRadius.circular(22),
-            border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+            border: Border.all(color: AppColors.border),
           ),
           child: Row(
             children: List.generate(labels.length, (i) {
@@ -197,15 +193,23 @@ class _Tabs extends StatelessWidget {
                     duration: const Duration(milliseconds: 200),
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
-                      color: sel ? AppColors.accent : Colors.transparent,
+                      color: sel ? AppColors.primary : Colors.transparent,
                       borderRadius: BorderRadius.circular(18),
+                      boxShadow: sel
+                          ? [
+                              BoxShadow(
+                                color:
+                                    AppColors.primary.withValues(alpha: 0.25),
+                                blurRadius: 8,
+                                offset: const Offset(0, 3),
+                              ),
+                            ]
+                          : null,
                     ),
                     child: Text(
                       labels[i],
                       style: TextStyle(
-                        color: sel
-                            ? Colors.white
-                            : Colors.white.withValues(alpha: 0.55),
+                        color: sel ? Colors.white : AppColors.textSecondary,
                         fontSize: 13,
                         fontWeight: sel ? FontWeight.w700 : FontWeight.w500,
                       ),
@@ -231,12 +235,32 @@ class _Body extends StatelessWidget {
       final list = controller.filtered;
       if (list.isEmpty) {
         return Center(
-          child: Text(
-            'No bids here',
-            style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.45),
-              fontSize: 15,
-            ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: 72,
+                height: 72,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: AppColors.primary.withValues(alpha: 0.08),
+                ),
+                child: const Icon(
+                  Icons.gavel_rounded,
+                  size: 36,
+                  color: AppColors.primary,
+                ),
+              ),
+              const SizedBox(height: 14),
+              const Text(
+                'No bids here',
+                style: TextStyle(
+                  color: AppColors.textSecondary,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
           ),
         );
       }
@@ -275,7 +299,7 @@ class _BidCard extends StatelessWidget {
       case 'accepted':
         return AppColors.success;
       default:
-        return Colors.white54;
+        return AppColors.textMuted;
     }
   }
 
@@ -301,11 +325,12 @@ class _BidCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: AppColors.border),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.12),
-            blurRadius: 16,
-            offset: const Offset(0, 6),
+            color: AppColors.primary.withValues(alpha: 0.05),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
@@ -319,9 +344,7 @@ class _BidCard extends StatelessWidget {
                 height: 48,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(14),
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF8B1538), Color(0xFF6B0E24)],
-                  ),
+                  color: AppColors.primary,
                 ),
                 alignment: Alignment.center,
                 child: Text(
@@ -376,7 +399,6 @@ class _BidCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
-          // Seeker offer
           Text(
             bid.offer,
             style: const TextStyle(
@@ -385,14 +407,13 @@ class _BidCard extends StatelessWidget {
               fontWeight: FontWeight.w800,
             ),
           ),
-          // Manager counter-offer (when offered / accepted)
           if (bid.managerOffer != null &&
               bid.managerOffer != bid.offer) ...[
             const SizedBox(height: 4),
             Text(
               'Your offer: ${bid.managerOffer}',
               style: const TextStyle(
-                color: AppColors.accentDark,
+                color: AppColors.accent,
                 fontSize: 13,
                 fontWeight: FontWeight.w700,
               ),
@@ -423,7 +444,6 @@ class _BidCard extends StatelessWidget {
               }).toList(),
             ),
           ],
-          // Actions only while pending
           if (isPending) ...[
             const SizedBox(height: 14),
             Row(
@@ -473,21 +493,6 @@ class _BidCard extends StatelessWidget {
           ],
         ],
       ),
-    );
-  }
-}
-
-class _Blob extends StatelessWidget {
-  const _Blob({required this.size, required this.color});
-  final double size;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(shape: BoxShape.circle, color: color),
     );
   }
 }

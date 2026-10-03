@@ -76,22 +76,23 @@ class SeekerSearchController extends GetxController {
   }
 
   void onNavTap(int index) {
-    selectedNavIndex.value = index;
-    switch (index) {
-      case 0:
-        Get.offAllNamed(AppRoutes.seekerHome);
-        break;
-      case 1:
-        Get.toNamed(AppRoutes.seekerBids);
-        break;
-      case 2:
-        break;
-      case 3:
-        Get.toNamed(AppRoutes.profile);
-        break;
-    }
+  if (index == selectedNavIndex.value) return;
+  selectedNavIndex.value = index;
+  switch (index) {
+    case 0:
+      Get.offAllNamed(AppRoutes.seekerHome);
+      break;
+    case 1:
+      Get.offAllNamed(AppRoutes.seekerBids);
+      break;
+    case 2:
+      break;
+    case 3:
+      Get.toNamed(AppRoutes.profile);
+      selectedNavIndex.value = 2;
+      break;
   }
-
+}
   void onHostelTap(Map<String, dynamic> hostel) {
   Get.toNamed(AppRoutes.hostelDetails, arguments: hostel);
 }
