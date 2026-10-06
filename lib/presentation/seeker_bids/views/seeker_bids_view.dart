@@ -5,8 +5,7 @@ import 'package:hostel_buddy/routes/app_routes.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/widgets/bottom_navbar.dart';
-import '../../seeker_my_bids/controllers/seeker_my_bids_controller.dart';
-import '../controllers/seeker_bids_controller.dart' hide MyBidItem;
+import '../controllers/seeker_bids_controller.dart';
 
 class SeekerBidsView extends GetView<SeekerBidsController> {
   const SeekerBidsView({super.key});
@@ -84,8 +83,11 @@ class _Header extends StatelessWidget {
                 shape: BoxShape.circle,
                 color: Colors.white.withValues(alpha: 0.12),
               ),
-              child: const Icon(Icons.arrow_back_ios_new_rounded,
-                  color: Colors.white, size: 18),
+              child: const Icon(
+                Icons.arrow_back_ios_new_rounded,
+                color: Colors.white,
+                size: 18,
+              ),
             ),
           ),
           const SizedBox(width: 12),
@@ -137,6 +139,7 @@ class _Header extends StatelessWidget {
     );
   }
 }
+
 /// Offered | My bids — active = green (accent)
 class _MainSections extends StatelessWidget {
   const _MainSections({required this.controller});
@@ -246,8 +249,11 @@ class _CoinsBar extends StatelessWidget {
                 shape: BoxShape.circle,
                 color: AppColors.accent.withValues(alpha: 0.12),
               ),
-              child: const Icon(Icons.monetization_on_rounded,
-                  color: AppColors.accent, size: 20),
+              child: const Icon(
+                Icons.monetization_on_rounded,
+                color: AppColors.accent,
+                size: 20,
+              ),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -387,8 +393,8 @@ class _OfferedBody extends StatelessWidget {
       final list = tab == 0
           ? controller.received
           : tab == 1
-              ? controller.pending
-              : controller.closed;
+          ? controller.pending
+          : controller.closed;
 
       if (list.isEmpty) {
         final labels = [
@@ -456,13 +462,15 @@ class _MyBidsBody extends StatelessWidget {
             ),
             child: TextField(
               onChanged: controller.onMyBidsSearchChanged,
-              style: const TextStyle(color: AppColors.textPrimary, fontSize: 15),
+              style: const TextStyle(
+                color: AppColors.textPrimary,
+                fontSize: 15,
+              ),
               cursorColor: AppColors.primary,
               decoration: const InputDecoration(
                 hintText: 'Search bids...',
                 hintStyle: TextStyle(color: AppColors.textMuted, fontSize: 15),
-                prefixIcon:
-                    Icon(Icons.search_rounded, color: AppColors.accent),
+                prefixIcon: Icon(Icons.search_rounded, color: AppColors.accent),
                 border: InputBorder.none,
                 contentPadding: EdgeInsets.symmetric(vertical: 14),
               ),
@@ -485,8 +493,11 @@ class _MyBidsBody extends StatelessWidget {
                         shape: BoxShape.circle,
                         color: AppColors.primary.withValues(alpha: 0.08),
                       ),
-                      child: const Icon(Icons.gavel_rounded,
-                          size: 36, color: AppColors.primary),
+                      child: const Icon(
+                        Icons.gavel_rounded,
+                        size: 36,
+                        color: AppColors.primary,
+                      ),
                     ),
                     const SizedBox(height: 14),
                     Text(
@@ -568,8 +579,11 @@ class _MyBidCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12),
                     color: AppColors.primary,
                   ),
-                  child: const Icon(Icons.edit_note_rounded,
-                      color: Colors.white, size: 22),
+                  child: const Icon(
+                    Icons.edit_note_rounded,
+                    color: Colors.white,
+                    size: 22,
+                  ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -597,8 +611,10 @@ class _MyBidCard extends StatelessWidget {
                   ),
                 ),
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 5,
+                  ),
                   decoration: BoxDecoration(
                     color: statusColor.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(20),
@@ -622,7 +638,9 @@ class _MyBidCard extends StatelessWidget {
                 children: item.amenities.take(4).map((a) {
                   return Container(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 10, vertical: 5),
+                      horizontal: 10,
+                      vertical: 5,
+                    ),
                     decoration: BoxDecoration(
                       color: AppColors.tagBackground,
                       borderRadius: BorderRadius.circular(12),
@@ -691,23 +709,28 @@ class _ReceivedCard extends StatelessWidget {
                     fontSize: 15,
                   ),
                 ),
-                Text(item.location,
-                    style: const TextStyle(
-                        color: AppColors.textSecondary, fontSize: 12)),
-                Text(item.offeredPrice,
-                    style: const TextStyle(
-                      color: AppColors.primary,
-                      fontWeight: FontWeight.w700,
-                      fontSize: 13,
-                    )),
+                Text(
+                  item.location,
+                  style: const TextStyle(
+                    color: AppColors.textSecondary,
+                    fontSize: 12,
+                  ),
+                ),
+                Text(
+                  item.offeredPrice,
+                  style: const TextStyle(
+                    color: AppColors.primary,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 13,
+                  ),
+                ),
               ],
             ),
           ),
           GestureDetector(
             onTap: onViewOffer,
             child: Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
                 color: AppColors.accent,
                 borderRadius: BorderRadius.circular(20),
@@ -762,24 +785,34 @@ class _PendingCard extends StatelessWidget {
                   color: AppColors.accent,
                 ),
                 alignment: Alignment.center,
-                child: Text(item.initials,
-                    style: const TextStyle(
-                        color: Colors.white, fontWeight: FontWeight.w700)),
+                child: Text(
+                  item.initials,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
               ),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(item.hostelName,
-                        style: const TextStyle(
-                          color: AppColors.textPrimary,
-                          fontWeight: FontWeight.w700,
-                          fontSize: 15,
-                        )),
-                    Text(item.location,
-                        style: const TextStyle(
-                            color: AppColors.textSecondary, fontSize: 12)),
+                    Text(
+                      item.hostelName,
+                      style: const TextStyle(
+                        color: AppColors.textPrimary,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 15,
+                      ),
+                    ),
+                    Text(
+                      item.location,
+                      style: const TextStyle(
+                        color: AppColors.textSecondary,
+                        fontSize: 12,
+                      ),
+                    ),
                     Text(
                       '${item.offeredPrice} · ${item.seater}',
                       style: const TextStyle(
@@ -810,8 +843,10 @@ class _PendingCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(20),
                     ),
                   ),
-                  child: const Text('Reject',
-                      style: TextStyle(fontWeight: FontWeight.w600)),
+                  child: const Text(
+                    'Reject',
+                    style: TextStyle(fontWeight: FontWeight.w600),
+                  ),
                 ),
               ),
               const SizedBox(width: 10),
@@ -826,8 +861,10 @@ class _PendingCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(20),
                     ),
                   ),
-                  child: const Text('Accept',
-                      style: TextStyle(fontWeight: FontWeight.w700)),
+                  child: const Text(
+                    'Accept',
+                    style: TextStyle(fontWeight: FontWeight.w700),
+                  ),
                 ),
               ),
             ],
@@ -872,24 +909,34 @@ class _ClosedCard extends StatelessWidget {
                   color: AppColors.primary,
                 ),
                 alignment: Alignment.center,
-                child: Text(item.initials,
-                    style: const TextStyle(
-                        color: Colors.white, fontWeight: FontWeight.w700)),
+                child: Text(
+                  item.initials,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
               ),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(item.hostelName,
-                        style: const TextStyle(
-                          color: AppColors.textPrimary,
-                          fontWeight: FontWeight.w700,
-                          fontSize: 15,
-                        )),
-                    Text(item.location,
-                        style: const TextStyle(
-                            color: AppColors.textSecondary, fontSize: 12)),
+                    Text(
+                      item.hostelName,
+                      style: const TextStyle(
+                        color: AppColors.textPrimary,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 15,
+                      ),
+                    ),
+                    Text(
+                      item.location,
+                      style: const TextStyle(
+                        color: AppColors.textSecondary,
+                        fontSize: 12,
+                      ),
+                    ),
                     if (hasReview)
                       Text(
                         '★ ${item.overallRating!.toStringAsFixed(1)}',
@@ -914,8 +961,10 @@ class _ClosedCard extends StatelessWidget {
               child: OutlinedButton.icon(
                 onPressed: onReview,
                 icon: const Icon(Icons.rate_review_rounded, size: 18),
-                label: const Text('Review Hostel',
-                    style: TextStyle(fontWeight: FontWeight.w700)),
+                label: const Text(
+                  'Review Hostel',
+                  style: TextStyle(fontWeight: FontWeight.w700),
+                ),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: AppColors.primary,
                   side: const BorderSide(color: AppColors.primary),
@@ -968,15 +1017,19 @@ void _openOfferSheet(BidItem item, SeekerBidsController controller) {
               borderRadius: BorderRadius.circular(2),
             ),
           ),
-          Text(item.hostelName,
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w800,
-                color: AppColors.textPrimary,
-              )),
+          Text(
+            item.hostelName,
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w800,
+              color: AppColors.textPrimary,
+            ),
+          ),
           const SizedBox(height: 8),
-          Text(item.location,
-              style: const TextStyle(color: AppColors.textSecondary)),
+          Text(
+            item.location,
+            style: const TextStyle(color: AppColors.textSecondary),
+          ),
           const SizedBox(height: 16),
           _sheetRow('Your bid', item.yourBid),
           _sheetRow('Hostel offer', item.offeredPrice),
@@ -1018,11 +1071,13 @@ Widget _sheetRow(String label, String value) {
       children: [
         Text(label, style: const TextStyle(color: AppColors.textSecondary)),
         const Spacer(),
-        Text(value,
-            style: const TextStyle(
-              color: AppColors.textPrimary,
-              fontWeight: FontWeight.w600,
-            )),
+        Text(
+          value,
+          style: const TextStyle(
+            color: AppColors.textPrimary,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
       ],
     ),
   );
@@ -1066,8 +1121,10 @@ void _openReviewSheet(BidItem item, SeekerBidsController controller) {
                 ),
                 IconButton(
                   onPressed: () => Get.back(),
-                  icon: const Icon(Icons.close_rounded,
-                      color: AppColors.textSecondary),
+                  icon: const Icon(
+                    Icons.close_rounded,
+                    color: AppColors.textSecondary,
+                  ),
                 ),
               ],
             ),
@@ -1079,8 +1136,10 @@ void _openReviewSheet(BidItem item, SeekerBidsController controller) {
               final overall = controller.overallRating;
               return Container(
                 width: double.infinity,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 16,
+                ),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
@@ -1118,14 +1177,14 @@ void _openReviewSheet(BidItem item, SeekerBidsController controller) {
                           Row(
                             children: List.generate(5, (i) {
                               final filled = overall >= (i + 1);
-                              final half = overall >= (i + 0.5) &&
-                                  overall < (i + 1);
+                              final half =
+                                  overall >= (i + 0.5) && overall < (i + 1);
                               return Icon(
                                 filled
                                     ? Icons.star_rounded
                                     : half
-                                        ? Icons.star_half_rounded
-                                        : Icons.star_outline_rounded,
+                                    ? Icons.star_half_rounded
+                                    : Icons.star_outline_rounded,
                                 size: 22,
                                 color: filled || half
                                     ? const Color(0xFFFFC107)
@@ -1197,8 +1256,7 @@ void _openReviewSheet(BidItem item, SeekerBidsController controller) {
                                 children: List.generate(5, (i) {
                                   final v = (i + 1).toDouble();
                                   return GestureDetector(
-                                    onTap: () =>
-                                        controller.setRating(cat, v),
+                                    onTap: () => controller.setRating(cat, v),
                                     child: Padding(
                                       padding: const EdgeInsets.only(left: 2),
                                       child: Icon(
