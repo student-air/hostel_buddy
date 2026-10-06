@@ -19,6 +19,7 @@ class ProfileController extends GetxController {
   final nameController = TextEditingController();
   final phoneController = TextEditingController();
   final cityController = TextEditingController();
+  final emailController = TextEditingController();
 
   final isEditing = false.obs;
   final isLoading = false.obs;
@@ -45,6 +46,7 @@ class ProfileController extends GetxController {
     final photo = _box.read('profile_photo')?.toString();
     final storedRole = _box.read('user_role')?.toString() ?? '';
     final occ = _box.read('profile_occupation')?.toString() ?? 'student';
+    
 
     nameController.text = name;
     phoneController.text = phone;
@@ -134,6 +136,7 @@ class ProfileController extends GetxController {
 
     final name = nameController.text.trim();
     await _box.write('profile_name', name);
+    await _box.write('profile_email', emailController.text.trim());
     await _box.write('profile_phone', phoneController.text.trim());
     await _box.write('profile_city', cityController.text.trim());
     if (photoPath.value != null) {
@@ -300,6 +303,7 @@ class ProfileController extends GetxController {
     nameController.dispose();
     phoneController.dispose();
     cityController.dispose();
+    emailController.dispose();
     super.onClose();
   }
 }

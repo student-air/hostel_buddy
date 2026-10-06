@@ -7,12 +7,12 @@ import '../../../core/utils/app_snackbar.dart';
 import '../../../routes/app_routes.dart';
 
 class PlaceBidController extends GetxController {
+  static const int minBid = 15000;
+
+  final selectedHostelType = 'Boys Hostel'.obs;
   final selectedSeater = '3 Seater'.obs;
   final selectedAmenities = <String>{'Wifi', 'AC', 'Laundry'}.obs;
-
-  final currentHighestBid = 12000.obs;
-  final bidsSoFar = 8.obs;
-  final yourOffer = 13000.obs;
+  final yourOffer = minBid.obs;
 
   final seaters = <String>[
     '1 Seater',
@@ -39,7 +39,12 @@ class PlaceBidController extends GetxController {
 
   final customSeaterController = TextEditingController();
 
-  bool get isHighest => yourOffer.value > currentHighestBid.value;
+  bool get canDecrease => yourOffer.value > minBid;
+  bool get canPlaceBid => yourOffer.value >= minBid;
+  bool get allAmenitiesSelected =>
+      selectedAmenities.length == amenities.length;
+
+  void selectHostelType(String value) => selectedHostelType.value = value;
 
   void selectSeater(String value) => selectedSeater.value = value;
 
@@ -52,45 +57,63 @@ class PlaceBidController extends GetxController {
     selectedAmenities.refresh();
   }
 
+  void toggleSelectAllAmenities() {
+    if (allAmenitiesSelected) {
+      selectedAmenities.clear();
+    } else {
+      selectedAmenities
+        ..clear()
+        ..addAll(amenities);
+    }
+    selectedAmenities.refresh();
+  }
+
   void decreaseOffer() {
-    if (yourOffer.value > 500) yourOffer.value -= 500;
+    if (yourOffer.value > minBid) {
+      yourOffer.value = (yourOffer.value - 500).clamp(minBid, 999999999);
+    }
   }
 
   void increaseOffer() => yourOffer.value += 500;
 
   void addAmount(int amount) => yourOffer.value += amount;
 
- void placeBid() {
-  if (!isHighest) {
-    AppSnackbar.warning(
-      'Bid too low',
-      'Bid must be higher than Rs ${formatAmount(currentHighestBid.value)}',
+  void placeBid() {
+    if (yourOffer.value < minBid) {
+      AppSnackbar.warning(
+        'Minimum bid',
+        'Offer must be at least Rs ${formatAmount(minBid)}',
+      );
+      return;
+    }
+
+    final box = GetStorage();
+    final bid = {
+      'id': DateTime.now().millisecondsSinceEpoch.toString(),
+      'hostelType': selectedHostelType.value,
+      'seater': selectedSeater.value,
+      'amenities': selectedAmenities.toList(),
+      'yourOffer': 'Rs ${formatAmount(yourOffer.value)}/mo',
+      'offerAmount': yourOffer.value,
+      'status': 'pending',
+      'createdAt': DateTime.now().toIso8601String(),
+      'location': '',
+    };
+
+    final existing = List<Map>.from(
+      (box.read('seeker_my_bids') as List?)?.map((e) => Map<String, dynamic>.from(e as Map)) ??
+          [],
     );
-    return;
+    existing.insert(0, bid);
+    box.write('seeker_my_bids', existing);
+
+    AppSnackbar.success(
+      'Bid placed',
+      'Your offer Rs ${formatAmount(yourOffer.value)} is live.',
+    );
+
+    Get.offNamed(AppRoutes.seekerBids);
   }
-
-  final box = GetStorage();
-  final bid = {
-    'id': DateTime.now().millisecondsSinceEpoch.toString(),
-    'seater': selectedSeater.value,
-    'amenities': selectedAmenities.toList(),
-    'yourOffer': 'Rs ${formatAmount(yourOffer.value)}/mo',
-    'status': 'pending',
-    'createdAt': DateTime.now().toIso8601String(),
-    'location': '',
-  };
-
-  final existing = (box.read('seeker_my_bids') as List?) ?? [];
-  existing.insert(0, bid);
-  box.write('seeker_my_bids', existing);
-
-  AppSnackbar.success(
-    'Bid placed',
-    'Your offer Rs ${formatAmount(yourOffer.value)} is live.',
-  );
-
-  Get.offNamed(AppRoutes.seekerMyBids);
-}
 
   String formatAmount(int amount) {
     final s = amount.toString();
@@ -112,9 +135,9 @@ class PlaceBidController extends GetxController {
         child: Container(
           padding: const EdgeInsets.fromLTRB(22, 22, 22, 18),
           decoration: BoxDecoration(
-            color: const Color(0xFF2A0412),
+            color: Colors.white,
             borderRadius: BorderRadius.circular(22),
-            border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
+            border: Border.all(color: AppColors.border),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -123,46 +146,35 @@ class PlaceBidController extends GetxController {
               const Text(
                 'Add custom seater',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: AppColors.textPrimary,
                   fontSize: 17,
                   fontWeight: FontWeight.w700,
-                ),
-              ),
-              const SizedBox(height: 6),
-              Text(
-                'e.g. 6 Seater, Studio, etc.',
-                style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.5),
-                  fontSize: 13,
                 ),
               ),
               const SizedBox(height: 16),
               TextField(
                 controller: customSeaterController,
-                style: const TextStyle(color: Colors.white, fontSize: 15),
-                cursorColor: AppColors.accentLight,
+                style: const TextStyle(
+                  color: AppColors.textPrimary,
+                  fontSize: 15,
+                ),
+                cursorColor: AppColors.primary,
                 decoration: InputDecoration(
-                  hintText: 'Enter seater type',
-                  hintStyle: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.35),
-                  ),
+                  hintText: 'e.g. 6 Seater, Studio',
+                  hintStyle: const TextStyle(color: AppColors.textMuted),
                   filled: true,
-                  fillColor: Colors.white.withValues(alpha: 0.06),
+                  fillColor: AppColors.surfaceSoft,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(14),
-                    borderSide: BorderSide(
-                      color: Colors.white.withValues(alpha: 0.12),
-                    ),
+                    borderSide: const BorderSide(color: AppColors.border),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(14),
-                    borderSide: BorderSide(
-                      color: Colors.white.withValues(alpha: 0.12),
-                    ),
+                    borderSide: const BorderSide(color: AppColors.border),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(14),
-                    borderSide: const BorderSide(color: AppColors.accent),
+                    borderSide: const BorderSide(color: AppColors.primary),
                   ),
                 ),
               ),
@@ -170,56 +182,44 @@ class PlaceBidController extends GetxController {
               Row(
                 children: [
                   Expanded(
-                    child: SizedBox(
-                      height: 46,
-                      child: OutlinedButton(
-                        onPressed: () => Get.back(),
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: Colors.white,
-                          side: BorderSide(
-                            color: Colors.white.withValues(alpha: 0.25),
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(24),
-                          ),
+                    child: OutlinedButton(
+                      onPressed: () => Get.back(),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppColors.textPrimary,
+                        side: const BorderSide(color: AppColors.border),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(24),
                         ),
-                        child: const Text(
-                          'Cancel',
-                          style: TextStyle(fontWeight: FontWeight.w600),
-                        ),
+                        minimumSize: const Size(0, 46),
                       ),
+                      child: const Text('Cancel',
+                          style: TextStyle(fontWeight: FontWeight.w600)),
                     ),
                   ),
                   const SizedBox(width: 10),
                   Expanded(
-                    child: SizedBox(
-                      height: 46,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          final text = customSeaterController.text.trim();
-                          if (text.isEmpty) {
-                            AppSnackbar.warning('Empty', 'Enter a seater type');
-                            return;
-                          }
-                          if (!seaters.contains(text)) {
-                            seaters.add(text);
-                          }
-                          selectedSeater.value = text;
-                          Get.back();
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.accent,
-                          foregroundColor: Colors.white,
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                        ),
-                        child: const Text(
-                          'Add',
-                          style: TextStyle(fontWeight: FontWeight.w700),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        final text = customSeaterController.text.trim();
+                        if (text.isEmpty) {
+                          AppSnackbar.warning('Empty', 'Enter a seater type');
+                          return;
+                        }
+                        if (!seaters.contains(text)) seaters.add(text);
+                        selectedSeater.value = text;
+                        Get.back();
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.accent,
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        minimumSize: const Size(0, 46),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
                         ),
                       ),
+                      child: const Text('Add',
+                          style: TextStyle(fontWeight: FontWeight.w700)),
                     ),
                   ),
                 ],

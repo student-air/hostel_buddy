@@ -24,21 +24,50 @@ class PlaceBidView extends GetView<PlaceBidController> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    const _SectionLabel('Hostel type'),
+                    const SizedBox(height: 10),
+                    _HostelTypeRow(controller: controller),
+                    const SizedBox(height: 22),
                     const _SectionLabel('Room type'),
                     const SizedBox(height: 10),
                     _RoomTypeChips(controller: controller),
                     const SizedBox(height: 22),
-                    const _SectionLabel('Amenities · pick any you need'),
+                    Row(
+                      children: [
+                        const Expanded(
+                          child: _SectionLabel('Amenities · pick any you need'),
+                        ),
+                        Obx(
+                          () => GestureDetector(
+                            onTap: controller.toggleSelectAllAmenities,
+                            child: Text(
+                              controller.allAmenitiesSelected
+                                  ? 'Deselect all'
+                                  : 'Select all',
+                              style: const TextStyle(
+                                color: AppColors.accent,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                     const SizedBox(height: 10),
                     _AmenityChips(controller: controller),
                     const SizedBox(height: 22),
-                    _HighestBidCard(controller: controller),
-                    const SizedBox(height: 22),
                     const _SectionLabel('Your offer'),
+                    const SizedBox(height: 6),
+                    Text(
+                      'Minimum Rs ${controller.formatAmount(PlaceBidController.minBid)}',
+                      style: const TextStyle(
+                        color: AppColors.textMuted,
+                        fontSize: 12,
+                      ),
+                    ),
                     const SizedBox(height: 10),
                     _OfferBox(controller: controller),
-                    const SizedBox(height: 14),
-                    _StatusLine(controller: controller),
                   ],
                 ),
               ),
@@ -63,7 +92,6 @@ class _Header extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final top = MediaQuery.of(context).padding.top;
-
     return Container(
       width: double.infinity,
       padding: EdgeInsets.fromLTRB(16, top + 8, 20, 22),
@@ -82,11 +110,8 @@ class _Header extends StatelessWidget {
                 shape: BoxShape.circle,
                 color: Colors.white.withValues(alpha: 0.12),
               ),
-              child: const Icon(
-                Icons.arrow_back_ios_new_rounded,
-                color: Colors.white,
-                size: 18,
-              ),
+              child: const Icon(Icons.arrow_back_ios_new_rounded,
+                  color: Colors.white, size: 18),
             ),
           ),
           const SizedBox(width: 12),
@@ -100,39 +125,12 @@ class _Header extends StatelessWidget {
                     color: Colors.white,
                     fontSize: 22,
                     fontWeight: FontWeight.w800,
-                    letterSpacing: -0.4,
                   ),
                 ),
                 SizedBox(height: 2),
                 Text(
                   'Set your offer & requirements',
-                  style: TextStyle(
-                    color: Colors.white70,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.14),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: const Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.gavel_rounded, size: 14, color: Colors.white),
-                SizedBox(width: 5),
-                Text(
-                  'New bid',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
-                  ),
+                  style: TextStyle(color: Colors.white70, fontSize: 13),
                 ),
               ],
             ),
@@ -160,6 +158,90 @@ class _SectionLabel extends StatelessWidget {
   }
 }
 
+class _HostelTypeRow extends StatelessWidget {
+  const _HostelTypeRow({required this.controller});
+  final PlaceBidController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    return Obx(() {
+      return Row(
+        children: [
+          Expanded(
+            child: _TypeCard(
+              label: 'Boys Hostel',
+              icon: Icons.male_rounded,
+              selected: controller.selectedHostelType.value == 'Boys Hostel',
+              onTap: () => controller.selectHostelType('Boys Hostel'),
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: _TypeCard(
+              label: 'Girls Hostel',
+              icon: Icons.female_rounded,
+              selected: controller.selectedHostelType.value == 'Girls Hostel',
+              onTap: () => controller.selectHostelType('Girls Hostel'),
+            ),
+          ),
+        ],
+      );
+    });
+  }
+}
+
+class _TypeCard extends StatelessWidget {
+  const _TypeCard({
+    required this.label,
+    required this.icon,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final String label;
+  final IconData icon;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
+        decoration: BoxDecoration(
+          color: selected
+              ? AppColors.accent.withValues(alpha: 0.1)
+              : AppColors.surfaceWhite,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: selected ? AppColors.accent : AppColors.border,
+            width: selected ? 1.5 : 1,
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon,
+                size: 20,
+                color: selected ? AppColors.accent : AppColors.textMuted),
+            const SizedBox(width: 8),
+            Text(
+              label,
+              style: TextStyle(
+                color: selected ? AppColors.accent : AppColors.textPrimary,
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class _RoomTypeChips extends StatelessWidget {
   const _RoomTypeChips({required this.controller});
   final PlaceBidController controller;
@@ -180,25 +262,18 @@ class _RoomTypeChips extends StatelessWidget {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                 decoration: BoxDecoration(
-                  color: selected
-                      ? AppColors.primary
-                      : AppColors.surfaceWhite,
+                  color: selected ? AppColors.primary : AppColors.surfaceWhite,
                   borderRadius: BorderRadius.circular(22),
                   border: Border.all(
-                    color: selected
-                        ? AppColors.primary
-                        : AppColors.border,
+                    color: selected ? AppColors.primary : AppColors.border,
                   ),
                 ),
                 child: Text(
                   s,
                   style: TextStyle(
-                    color: selected
-                        ? Colors.white
-                        : AppColors.textPrimary,
+                    color: selected ? Colors.white : AppColors.textPrimary,
                     fontSize: 13,
-                    fontWeight:
-                        selected ? FontWeight.w700 : FontWeight.w500,
+                    fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
                   ),
                 ),
               ),
@@ -256,19 +331,15 @@ class _AmenityChips extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   if (selected) ...[
-                    const Icon(
-                      Icons.check_rounded,
-                      size: 14,
-                      color: AppColors.accent,
-                    ),
+                    const Icon(Icons.check_rounded,
+                        size: 14, color: AppColors.accent),
                     const SizedBox(width: 4),
                   ],
                   Text(
                     a,
                     style: TextStyle(
-                      color: selected
-                          ? AppColors.accent
-                          : AppColors.textPrimary,
+                      color:
+                          selected ? AppColors.accent : AppColors.textPrimary,
                       fontSize: 13,
                       fontWeight:
                           selected ? FontWeight.w600 : FontWeight.w500,
@@ -281,77 +352,6 @@ class _AmenityChips extends StatelessWidget {
         }).toList(),
       );
     });
-  }
-}
-
-class _HighestBidCard extends StatelessWidget {
-  const _HighestBidCard({required this.controller});
-  final PlaceBidController controller;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceWhite,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppColors.border),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: AppColors.warning.withValues(alpha: 0.15),
-            ),
-            child: const Icon(
-              Icons.emoji_events_rounded,
-              color: AppColors.warning,
-              size: 22,
-            ),
-          ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Current highest bid',
-                  style: TextStyle(
-                    color: AppColors.textSecondary,
-                    fontSize: 12,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Obx(
-                  () => Text(
-                    'Rs ${controller.formatAmount(controller.currentHighestBid.value)}',
-                    style: const TextStyle(
-                      color: AppColors.textPrimary,
-                      fontSize: 22,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: -0.4,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Obx(
-            () => Text(
-              '${controller.bidsSoFar.value} bids so far',
-              style: const TextStyle(
-                color: AppColors.textMuted,
-                fontSize: 12,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
   }
 }
 
@@ -374,9 +374,12 @@ class _OfferBox extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              _RoundBtn(
-                icon: Icons.remove_rounded,
-                onTap: controller.decreaseOffer,
+              Obx(
+                () => _RoundBtn(
+                  icon: Icons.remove_rounded,
+                  enabled: controller.canDecrease,
+                  onTap: controller.decreaseOffer,
+                ),
               ),
               const SizedBox(width: 18),
               Obx(
@@ -386,13 +389,13 @@ class _OfferBox extends StatelessWidget {
                     color: AppColors.textPrimary,
                     fontSize: 28,
                     fontWeight: FontWeight.w800,
-                    letterSpacing: -0.6,
                   ),
                 ),
               ),
               const SizedBox(width: 18),
               _RoundBtn(
                 icon: Icons.add_rounded,
+                enabled: true,
                 onTap: controller.increaseOffer,
               ),
             ],
@@ -430,23 +433,32 @@ class _OfferBox extends StatelessWidget {
 }
 
 class _RoundBtn extends StatelessWidget {
-  const _RoundBtn({required this.icon, required this.onTap});
+  const _RoundBtn({
+    required this.icon,
+    required this.onTap,
+    required this.enabled,
+  });
+
   final IconData icon;
   final VoidCallback onTap;
+  final bool enabled;
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 40,
-        height: 40,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: AppColors.surfaceSoft,
-          border: Border.all(color: AppColors.border),
+      onTap: enabled ? onTap : null,
+      child: Opacity(
+        opacity: enabled ? 1 : 0.35,
+        child: Container(
+          width: 40,
+          height: 40,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: AppColors.surfaceSoft,
+            border: Border.all(color: AppColors.border),
+          ),
+          child: Icon(icon, color: AppColors.textPrimary, size: 20),
         ),
-        child: Icon(icon, color: AppColors.textPrimary, size: 20),
       ),
     );
   }
@@ -492,40 +504,6 @@ class _QuickAdd extends StatelessWidget {
   }
 }
 
-class _StatusLine extends StatelessWidget {
-  const _StatusLine({required this.controller});
-  final PlaceBidController controller;
-
-  @override
-  Widget build(BuildContext context) {
-    return Obx(() {
-      final ok = controller.isHighest;
-      return Row(
-        children: [
-          Icon(
-            ok ? Icons.check_circle_rounded : Icons.warning_amber_rounded,
-            size: 18,
-            color: ok ? AppColors.success : AppColors.error,
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              ok
-                  ? "You'd be the highest bid"
-                  : 'Bid must be higher than Rs ${controller.formatAmount(controller.currentHighestBid.value)}',
-              style: TextStyle(
-                color: ok ? AppColors.success : AppColors.error,
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ],
-      );
-    });
-  }
-}
-
 class _PlaceBidButton extends StatelessWidget {
   const _PlaceBidButton({required this.controller});
   final PlaceBidController controller;
@@ -533,7 +511,7 @@ class _PlaceBidButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-      final ok = controller.isHighest;
+      final ok = controller.canPlaceBid;
       return SizedBox(
         width: double.infinity,
         height: 54,
@@ -550,9 +528,7 @@ class _PlaceBidButton extends StatelessWidget {
             ),
           ),
           child: Text(
-            ok
-                ? 'Place bid · Rs ${controller.formatAmount(controller.yourOffer.value)}'
-                : 'Place bid',
+            'Place bid · Rs ${controller.formatAmount(controller.yourOffer.value)}',
             style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
           ),
         ),

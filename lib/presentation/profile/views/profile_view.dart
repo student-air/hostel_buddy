@@ -27,7 +27,7 @@ class ProfileView extends GetView<ProfileController> {
               Expanded(
                 child: SingleChildScrollView(
                   physics: const BouncingScrollPhysics(),
-                  padding: EdgeInsets.fromLTRB(20, 16, 20, 24 + bottomPad),
+                  padding: EdgeInsets.fromLTRB(20, 20, 20, 24 + bottomPad),
                   child: Form(
                     key: controller.formKey,
                     child: Obx(
@@ -46,9 +46,7 @@ class ProfileView extends GetView<ProfileController> {
   }
 }
 
-// ═══════════════════════════════════════════
-// HEADER — avatar + name + role inside maroon
-// ═══════════════════════════════════════════
+// ── Header like other screens (title only, no avatar / no edit) ──
 
 class _Header extends StatelessWidget {
   const _Header({required this.controller});
@@ -60,179 +58,72 @@ class _Header extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.fromLTRB(12, top + 4, 12, 28),
+      padding: EdgeInsets.fromLTRB(16, top + 8, 20, 22),
       decoration: const BoxDecoration(
         color: AppColors.primary,
-        borderRadius: BorderRadius.vertical(bottom: Radius.circular(32)),
+        borderRadius: BorderRadius.vertical(bottom: Radius.circular(28)),
       ),
-      child: Column(
+      child: Row(
         children: [
-          // Top row: back · title · edit
-          Row(
-            children: [
-              IconButton(
-                onPressed: controller.goBack,
-                icon: const Icon(
-                  Icons.arrow_back_ios_new_rounded,
-                  size: 18,
-                  color: Colors.white,
-                ),
+          GestureDetector(
+            onTap: controller.goBack,
+            child: Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white.withValues(alpha: 0.12),
               ),
-              const Expanded(
-                child: Text(
+              child: const Icon(
+                Icons.arrow_back_ios_new_rounded,
+                color: Colors.white,
+                size: 18,
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
                   'Profile',
-                  textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 17,
-                    fontWeight: FontWeight.w700,
+                    fontSize: 22,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: -0.4,
                   ),
                 ),
-              ),
-              Obx(
-                () => controller.isEditing.value
-                    ? TextButton(
-                        onPressed: controller.toggleEdit,
-                        child: const Text(
-                          'Cancel',
-                          style: TextStyle(
-                            color: Colors.white70,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      )
-                    : GestureDetector(
-                        onTap: controller.toggleEdit,
-                        child: Container(
-                          width: 36,
-                          height: 36,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: AppColors.accent.withValues(alpha: 0.25),
-                            border: Border.all(
-                              color: AppColors.accent.withValues(alpha: 0.6),
-                            ),
-                          ),
-                          child: const Icon(
-                            Icons.edit_rounded,
-                            size: 16,
-                            color: AppColors.accentLight,
-                          ),
-                        ),
-                      ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-
-          // Avatar
-          GestureDetector(
-            onTap: () {
-              if (controller.isEditing.value) controller.pickPhoto();
-            },
-            child: Stack(
-              clipBehavior: Clip.none,
-              children: [
-                Obx(() {
-                  final path = controller.photoPath.value;
-                  return Container(
-                    width: 96,
-                    height: 96,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.white,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.2),
-                          blurRadius: 16,
-                          offset: const Offset(0, 6),
-                        ),
-                      ],
-                      image: path != null
-                          ? DecorationImage(
-                              image: FileImage(File(path)),
-                              fit: BoxFit.cover,
-                            )
-                          : null,
-                    ),
-                    alignment: Alignment.center,
-                    child: path == null
-                        ? Text(
-                            controller.initials.value,
-                            style: const TextStyle(
-                              color: AppColors.primary,
-                              fontSize: 32,
-                              fontWeight: FontWeight.w800,
-                              letterSpacing: -0.5,
-                            ),
-                          )
-                        : null,
-                  );
-                }),
+                const SizedBox(height: 2),
                 Obx(
-                  () => controller.isEditing.value
-                      ? Positioned(
-                          right: 0,
-                          bottom: 0,
-                          child: Container(
-                            width: 30,
-                            height: 30,
-                            decoration: BoxDecoration(
-                              color: AppColors.accent,
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: AppColors.primary,
-                                width: 2.5,
-                              ),
-                            ),
-                            child: const Icon(
-                              Icons.camera_alt_rounded,
-                              size: 14,
-                              color: Colors.white,
-                            ),
-                          ),
-                        )
-                      : const SizedBox.shrink(),
+                  () => Text(
+                    controller.isEditing.value
+                        ? 'Update your details'
+                        : 'Your personal details',
+                    style: const TextStyle(
+                      color: Colors.white70,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 14),
-
-          // Name
           Obx(
-            () => Text(
-              controller.displayName.value,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 22,
-                fontWeight: FontWeight.w800,
-                letterSpacing: -0.3,
-              ),
-            ),
-          ),
-          const SizedBox(height: 10),
-
-          // Role chip
-          Obx(
-            () => Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(
-                  color: AppColors.accent.withValues(alpha: 0.7),
-                ),
-              ),
-              child: Text(
-                controller.roleLabel,
-                style: const TextStyle(
-                  color: AppColors.accentLight,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
+            () => controller.isEditing.value
+                ? TextButton(
+                    onPressed: controller.toggleEdit,
+                    child: const Text(
+                      'Cancel',
+                      style: TextStyle(
+                        color: Colors.white70,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  )
+                : const SizedBox.shrink(),
           ),
         ],
       ),
@@ -240,9 +131,7 @@ class _Header extends StatelessWidget {
   }
 }
 
-// ═══════════════════════════════════════════
-// VIEW MODE
-// ═══════════════════════════════════════════
+// ── View: photo + personal details + Edit profile + Logout ──
 
 class _ViewSection extends StatelessWidget {
   const _ViewSection({required this.controller});
@@ -252,7 +141,81 @@ class _ViewSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        // Personal info card
+        // Photo outside header
+        GestureDetector(
+          onTap: () {},
+          child: Obx(() {
+            final path = controller.photoPath.value;
+            return Container(
+              width: 110,
+              height: 110,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.surfaceWhite,
+                border: Border.all(color: AppColors.border, width: 3),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.primary.withValues(alpha: 0.1),
+                    blurRadius: 16,
+                    offset: const Offset(0, 6),
+                  ),
+                ],
+                image: path != null
+                    ? DecorationImage(
+                        image: FileImage(File(path)),
+                        fit: BoxFit.cover,
+                      )
+                    : null,
+              ),
+              alignment: Alignment.center,
+              child: path == null
+                  ? Text(
+                      controller.initials.value,
+                      style: const TextStyle(
+                        color: AppColors.primary,
+                        fontSize: 36,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    )
+                  : null,
+            );
+          }),
+        ),
+        const SizedBox(height: 14),
+        Obx(
+          () => Text(
+            controller.displayName.value,
+            style: const TextStyle(
+              color: AppColors.textPrimary,
+              fontSize: 22,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+        ),
+        const SizedBox(height: 6),
+        Obx(
+          () => Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+            decoration: BoxDecoration(
+              color: AppColors.accent.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: AppColors.accent.withValues(alpha: 0.35),
+              ),
+            ),
+            child: Text(
+              controller.roleLabel,
+              style: const TextStyle(
+                color: AppColors.accent,
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 22),
+
+        // Personal details only
         Container(
           width: double.infinity,
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
@@ -285,64 +248,50 @@ class _ViewSection extends StatelessWidget {
                       : controller.phoneController.text.trim(),
                 ),
                 _ViewRow(
-                  icon: Icons.location_on_outlined,
-                  label: 'City',
-                  value: controller.cityController.text.trim().isEmpty
-                      ? 'Not set'
-                      : controller.cityController.text.trim(),
-                  isLast: true,
-                ),
+  icon: Icons.email_outlined,
+  label: 'Email',
+  value: controller.emailController.text.trim().isEmpty
+      ? 'Not set'
+      : controller.emailController.text.trim(),
+),
+_ViewRow(
+  icon: Icons.location_on_outlined,
+  label: 'City',
+  value: controller.cityController.text.trim().isEmpty
+      ? 'Not set'
+      : controller.cityController.text.trim(),
+  isLast: true,
+),
               ],
             );
           }),
         ),
-        const SizedBox(height: 14),
 
-        // Menu card
-        Container(
+        const SizedBox(height: 24),
+
+        // Edit profile (above logout)
+        SizedBox(
           width: double.infinity,
-          padding: const EdgeInsets.symmetric(vertical: 4),
-          decoration: BoxDecoration(
-            color: AppColors.surfaceWhite,
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: AppColors.border),
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.primary.withValues(alpha: 0.05),
-                blurRadius: 12,
-                offset: const Offset(0, 4),
+          height: 52,
+          child: OutlinedButton.icon(
+            onPressed: controller.toggleEdit,
+            style: OutlinedButton.styleFrom(
+              foregroundColor: AppColors.accent,
+              side: const BorderSide(color: AppColors.accent, width: 1.4),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(28),
               ),
-            ],
-          ),
-          child: Column(
-            children: [
-              _MenuRow(
-                icon: Icons.notifications_none_rounded,
-                label: 'Notifications',
-                onTap: controller.onNotifications,
-              ),
-              _MenuRow(
-                icon: Icons.favorite_border_rounded,
-                label: 'Saved hostels',
-                onTap: controller.onSavedHostels,
-              ),
-              _MenuRow(
-                icon: Icons.account_balance_wallet_outlined,
-                label: 'Payment methods',
-                onTap: controller.onPaymentMethods,
-              ),
-              _MenuRow(
-                icon: Icons.shield_outlined,
-                label: 'Privacy and security',
-                onTap: controller.onPrivacy,
-                isLast: true,
-              ),
-            ],
+            ),
+            icon: const Icon(Icons.edit_rounded, size: 18),
+            label: const Text(
+              'Edit profile',
+              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+            ),
           ),
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 12),
 
-        // Log out
+        // Logout
         SizedBox(
           width: double.infinity,
           height: 52,
@@ -441,64 +390,7 @@ class _ViewRow extends StatelessWidget {
   }
 }
 
-class _MenuRow extends StatelessWidget {
-  const _MenuRow({
-    required this.icon,
-    required this.label,
-    required this.onTap,
-    this.isLast = false,
-  });
-
-  final IconData icon;
-  final String label;
-  final VoidCallback onTap;
-  final bool isLast;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(14),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-            child: Row(
-              children: [
-                Icon(icon, size: 22, color: AppColors.accent),
-                const SizedBox(width: 14),
-                Expanded(
-                  child: Text(
-                    label,
-                    style: const TextStyle(
-                      color: AppColors.textPrimary,
-                      fontSize: 15,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-                const Icon(
-                  Icons.chevron_right_rounded,
-                  size: 20,
-                  color: AppColors.textMuted,
-                ),
-              ],
-            ),
-          ),
-        ),
-        if (!isLast)
-          const Padding(
-            padding: EdgeInsets.only(left: 52),
-            child: Divider(color: AppColors.divider, height: 1),
-          ),
-      ],
-    );
-  }
-}
-
-// ═══════════════════════════════════════════
-// EDIT MODE
-// ═══════════════════════════════════════════
+// ── Edit mode ──
 
 class _EditSection extends StatelessWidget {
   const _EditSection({required this.controller});
@@ -508,6 +400,63 @@ class _EditSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
+        // Photo with camera (edit)
+        GestureDetector(
+          onTap: controller.pickPhoto,
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              Obx(() {
+                final path = controller.photoPath.value;
+                return Container(
+                  width: 110,
+                  height: 110,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: AppColors.surfaceWhite,
+                    border: Border.all(color: AppColors.border, width: 3),
+                    image: path != null
+                        ? DecorationImage(
+                            image: FileImage(File(path)),
+                            fit: BoxFit.cover,
+                          )
+                        : null,
+                  ),
+                  alignment: Alignment.center,
+                  child: path == null
+                      ? Text(
+                          controller.initials.value,
+                          style: const TextStyle(
+                            color: AppColors.primary,
+                            fontSize: 36,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        )
+                      : null,
+                );
+              }),
+              Positioned(
+                right: 2,
+                bottom: 2,
+                child: Container(
+                  width: 32,
+                  height: 32,
+                  decoration: BoxDecoration(
+                    color: AppColors.accent,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.white, width: 2),
+                  ),
+                  child: const Icon(
+                    Icons.camera_alt_rounded,
+                    size: 15,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 22),
         Container(
           width: double.infinity,
           padding: const EdgeInsets.fromLTRB(16, 18, 16, 18),
@@ -521,7 +470,7 @@ class _EditSection extends StatelessWidget {
               _EditField(
                 controller: controller.nameController,
                 label: 'Full name',
-                hint: 'Ayesha Raza',
+                hint: 'Your name',
                 icon: Icons.person_outline_rounded,
                 validator: Validators.name,
                 textCapitalization: TextCapitalization.words,
@@ -535,6 +484,14 @@ class _EditSection extends StatelessWidget {
                 validator: Validators.phone,
                 keyboardType: TextInputType.phone,
               ),
+              _EditField(
+  controller: controller.emailController,
+  label: 'Email',
+  hint: 'you@example.com',
+  icon: Icons.email_outlined,
+  validator: Validators.email,
+  keyboardType: TextInputType.emailAddress,
+),
               const SizedBox(height: 16),
               _EditField(
                 controller: controller.cityController,
@@ -556,10 +513,10 @@ class _EditSection extends StatelessWidget {
               onPressed:
                   controller.isLoading.value ? null : controller.saveProfile,
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
+                backgroundColor: AppColors.accent,
                 foregroundColor: Colors.white,
                 disabledBackgroundColor:
-                    AppColors.primary.withValues(alpha: 0.45),
+                    AppColors.accent.withValues(alpha: 0.45),
                 elevation: 0,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(28),

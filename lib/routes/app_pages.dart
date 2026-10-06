@@ -20,7 +20,7 @@ import '../presentation/seeker_bids/bindings/seeker_bids_binding.dart';
 import '../presentation/seeker_bids/views/seeker_bids_view.dart';
 import '../presentation/seeker_search/bindings/seeker_search_binding.dart';
 import '../presentation/seeker_search/views/seeker_search_view.dart';
-import '../presentation/seeker_search/views/details_view.dart';
+import '../presentation/seeker_bids/views/bid_detail_view.dart';
 import '../presentation/place_bid/bindings/place_bid_binding.dart';
 import '../presentation/place_bid/views/place_bid_view.dart';
 import '../presentation/seeker_map/bindings/seeker_map_binding.dart';
@@ -92,10 +92,6 @@ class AppPages {
       binding: SeekerSearchBinding(),
     ),
     GetPage(
-  name: AppRoutes.hostelDetails,
-  page: () => const DetailsView(),
-),
-    GetPage(
       name: AppRoutes.placeBid,
       page: () => const PlaceBidView(),
       binding: PlaceBidBinding(),
@@ -111,10 +107,7 @@ class AppPages {
       page: () => const SeekerMyBidsView(),
       binding: SeekerMyBidsBinding(),
     ),
-    GetPage(
-      name: AppRoutes.seekerMyBidDetail,
-      page: () => const BidDetailView(),
-    ),
+    
     GetPage(
   name: AppRoutes.notifications,
   page: () => const NotificationsView(),

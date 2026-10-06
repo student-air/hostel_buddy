@@ -430,7 +430,7 @@ class SeekerHomeController extends GetxController {
 
   void onCreateBid() => Get.toNamed(AppRoutes.placeBid);
 
-  void onMyBids() => Get.toNamed(AppRoutes.seekerMyBids);
+  void onMyBids() => Get.offAllNamed(AppRoutes.seekerBids);
 
   void onMapView() => Get.toNamed(AppRoutes.seekerMap);
 
@@ -438,9 +438,14 @@ class SeekerHomeController extends GetxController {
 
   void onNotifications() => Get.toNamed(AppRoutes.notifications);
 
-  void onViewAllBids() => Get.toNamed(AppRoutes.seekerBids);
+  void onPrivacy() =>
+    AppSnackbar.info('Privacy', 'Privacy and security coming next.');
 
-  void onSeeAllHostels() => Get.toNamed(AppRoutes.seekerMap);
+void onHelp() =>
+    AppSnackbar.info('Help', 'Help and support coming next.');
+
+void onTerms() =>
+    AppSnackbar.info('Terms', 'Terms of service coming next.');
 
   void onHostelTap(Map<String, dynamic> hostel) {
     Get.toNamed(AppRoutes.seekerMap);

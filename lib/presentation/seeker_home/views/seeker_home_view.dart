@@ -371,7 +371,7 @@ class _BidsGlance extends StatelessWidget {
                 ),
               ),
               GestureDetector(
-                onTap: controller.onViewAllBids,
+                onTap: controller.acceptedBids.value > 0 ? controller.onMyBids : null,
                 child: const Text(
                   'View all',
                   style: TextStyle(
@@ -656,7 +656,7 @@ class _HostelsSection extends StatelessWidget {
               ),
             ),
             GestureDetector(
-              onTap: controller.onSeeAllHostels,
+              onTap: controller.onMapView,
               child: const Text(
                 'See all',
                 style: TextStyle(
@@ -889,45 +889,108 @@ class _SeekerDrawer extends StatelessWidget {
             ),
           ),
           Expanded(
-            child: ListView(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-              children: [
-                _DrawerTile(
-                  icon: Icons.person_outline_rounded,
-                  label: 'Profile',
-                  onTap: () {
-                    Get.back();
-                    controller.onProfile();
-                  },
-                ),
-                _DrawerTile(
-                  icon: Icons.notifications_none_rounded,
-                  label: 'Notifications',
-                  onTap: () {
-                    Get.back();
-                    controller.onNotifications();
-                  },
-                ),
-                _DrawerTile(
-                  icon: Icons.bookmark_outline_rounded,
-                  label: 'My bids',
-                  onTap: () {
-                    Get.back();
-                    controller.onMyBids();
-                  },
-                ),
-                _DrawerTile(
-                  icon: Icons.settings_outlined,
-                  label: 'Settings',
-                  onTap: () {
-                    Get.back();
-                    controller.onSettings();
-                  },
-                ),
-              ],
-            ),
+  child: ListView(
+    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+    children: [
+      // ── Main ──
+      _DrawerTile(
+        icon: Icons.home_outlined,
+        label: 'Home',
+        onTap: () {
+          Get.back();
+          // already on home
+        },
+      ),
+      _DrawerTile(
+        icon: Icons.gavel_outlined,
+        label: 'My Bids',
+        onTap: () {
+          Get.back();
+          controller.onMyBids();
+        },
+      ),
+      _DrawerTile(
+        icon: Icons.search_rounded,
+        label: 'Search Hostel',
+        onTap: () {
+          Get.back();
+          controller.onSearch();
+        },
+      ),
+      _DrawerTile(
+        icon: Icons.add_circle_outline_rounded,
+        label: 'Create Bid',
+        onTap: () {
+          Get.back();
+          controller.onCreateBid();
+        },
+      ),
+      _DrawerTile(
+        icon: Icons.map_outlined,
+        label: 'Map View',
+        onTap: () {
+          Get.back();
+          controller.onMapView();
+        },
+      ),
+      _DrawerTile(
+        icon: Icons.person_outline_rounded,
+        label: 'Profile',
+        onTap: () {
+          Get.back();
+          controller.onProfile();
+        },
+      ),
+
+      const Padding(
+        padding: EdgeInsets.fromLTRB(12, 16, 12, 8),
+        child: Text(
+          'MORE',
+          style: TextStyle(
+            color: AppColors.textMuted,
+            fontSize: 11,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 1.0,
           ),
-          Padding(
+        ),
+      ),
+
+      // ── Secondary ──
+      _DrawerTile(
+        icon: Icons.notifications_none_rounded,
+        label: 'Notifications',
+        onTap: () {
+          Get.back();
+          controller.onNotifications();
+        },
+      ),
+      _DrawerTile(
+        icon: Icons.shield_outlined,
+        label: 'Privacy And Security',
+        onTap: () {
+          Get.back();
+          controller.onPrivacy();
+        },
+      ),
+      _DrawerTile(
+        icon: Icons.help_outline_rounded,
+        label: 'Help And Support',
+        onTap: () {
+          Get.back();
+          controller.onHelp();
+        },
+      ),
+      _DrawerTile(
+        icon: Icons.description_outlined,
+        label: 'Terms of Services',
+        onTap: () {
+          Get.back();
+          controller.onTerms();
+        },
+      ),
+    ],
+  ),
+),        Padding(
             padding: EdgeInsets.fromLTRB(
               16,
               8,

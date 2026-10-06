@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:hostel_buddy/core/utils/app_snackbar.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../routes/app_routes.dart';
@@ -347,40 +348,37 @@ class BidDetailView extends StatelessWidget {
     );
   }
 
-  void _openEditSheet(
-    BuildContext context,
-    MyBidItem item,
-    SeekerMyBidsController controller,
-  ) {
-    final offerCtrl = TextEditingController(
-      text: item.yourOffer
-          .replaceAll('Rs ', '')
-          .replaceAll('/mo', '')
-          .replaceAll(',', ''),
-    );
-    final seaterCtrl = TextEditingController(text: item.seater);
-    final selectedAmenities = item.amenities.toSet().obs;
+ void _openEditSheet(
+  BuildContext context,
+  MyBidItem item,
+  SeekerMyBidsController controller,
+) {
+  final offerCtrl = TextEditingController(
+    text: item.yourOffer
+        .replaceAll('Rs ', '')
+        .replaceAll('/mo', '')
+        .replaceAll(',', ''),
+  );
+  final seaterCtrl = TextEditingController(text: item.seater);
+  final selectedAmenities = item.amenities.toSet().obs;
 
-    final allAmenities = [
-      'Wifi',
-      'AC',
-      'Heater',
-      'Ironing',
-      'Laundry',
-      'Geyser',
-      'Parking',
-      'CCTV',
-      'Mess',
-      'Generator',
-      'Lift',
-      'Furnished',
-    ];
+  final allAmenities = [
+    'Wifi', 'AC', 'Heater', 'Ironing', 'Laundry', 'Geyser',
+    'Parking', 'CCTV', 'Mess', 'Generator', 'Lift', 'Furnished',
+  ];
 
-    Get.bottomSheet(
-      isScrollControlled: true,
-      Container(
+  Get.bottomSheet(
+    isScrollControlled: true,
+    enableDrag: true,
+    backgroundColor: Colors.transparent,
+    // Keyboard-safe — stops sheet closing when focusing price field
+    Padding(
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+      ),
+      child: Container(
         constraints: BoxConstraints(
-          maxHeight: MediaQuery.of(context).size.height * 0.85,
+          maxHeight: MediaQuery.of(context).size.height * 0.88,
         ),
         decoration: const BoxDecoration(
           color: AppColors.surfaceWhite,
@@ -401,23 +399,24 @@ class BidDetailView extends StatelessWidget {
             const SizedBox(height: 16),
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 22),
-              child: Row(
-                children: [
-                  Text(
-                    'Edit Bid',
-                    style: TextStyle(
-                      color: AppColors.textPrimary,
-                      fontSize: 20,
-                      fontWeight: FontWeight.w800,
-                    ),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'Edit Bid',
+                  style: TextStyle(
+                    color: AppColors.textPrimary,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w800,
                   ),
-                ],
+                ),
               ),
             ),
             const SizedBox(height: 20),
             Flexible(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.fromLTRB(22, 0, 22, 20),
+                keyboardDismissBehavior:
+                    ScrollViewKeyboardDismissBehavior.onDrag,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -457,7 +456,7 @@ class BidDetailView extends StatelessWidget {
                         fontSize: 15,
                       ),
                       cursorColor: AppColors.primary,
-                      decoration: _fieldDecoration('e.g. 13000'),
+                      decoration: _fieldDecoration('e.g. 15000'),
                     ),
                     const SizedBox(height: 18),
                     const Text(
@@ -526,7 +525,22 @@ class BidDetailView extends StatelessWidget {
                         onPressed: () {
                           final offer = offerCtrl.text.trim();
                           final seater = seaterCtrl.text.trim();
-                          if (offer.isEmpty || seater.isEmpty) return;
+                          if (offer.isEmpty || seater.isEmpty) {
+                            AppSnackbar.warning(
+                              'Missing',
+                              'Seater and offer are required',
+                            );
+                            return;
+                          }
+                          final amount =
+                              int.tryParse(offer.replaceAll(',', '')) ?? 0;
+                          if (amount < 15000) {
+                            AppSnackbar.warning(
+                              'Minimum',
+                              'Offer must be at least Rs 15,000',
+                            );
+                            return;
+                          }
 
                           controller.updateBid(
                             item.id,
@@ -535,10 +549,14 @@ class BidDetailView extends StatelessWidget {
                             amenities: selectedAmenities.toList(),
                           );
 
-                          if (Get.isBottomSheetOpen ?? false) {
-                            Get.back();
-                          }
-                          Get.offNamed(AppRoutes.seekerMyBids);
+                          Get.back(); // close sheet only
+
+                          final updated = controller.allBids
+                              .firstWhere((b) => b.id == item.id);
+                          Get.offNamed(
+                            AppRoutes.seekerMyBidDetail,
+                            arguments: updated,
+                          );
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.accent,
@@ -557,9 +575,7 @@ class BidDetailView extends StatelessWidget {
                         ),
                       ),
                     ),
-                    SizedBox(
-                      height: MediaQuery.of(context).viewInsets.bottom + 12,
-                    ),
+                    const SizedBox(height: 12),
                   ],
                 ),
               ),
@@ -567,9 +583,9 @@ class BidDetailView extends StatelessWidget {
           ],
         ),
       ),
-    );
-  }
-
+    ),
+  );
+}
   InputDecoration _fieldDecoration(String hint) {
     return InputDecoration(
       hintText: hint,
