@@ -11,8 +11,15 @@ class SeekerBidsView extends GetView<SeekerBidsController> {
   const SeekerBidsView({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return AnnotatedRegion<SystemUiOverlayStyle>(
+Widget build(BuildContext context) {
+  return PopScope(
+    canPop: false,
+    onPopInvokedWithResult: (didPop, result) {
+      if (didPop) return;
+      // Same as header back — go Home instead of leaving the app
+      Get.offAllNamed(AppRoutes.seekerHome);
+    },
+    child: AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.light,
       child: Scaffold(
         backgroundColor: AppColors.scaffoldBackground,
@@ -57,6 +64,7 @@ class SeekerBidsView extends GetView<SeekerBidsController> {
           ],
         ),
       ),
+    ),
     );
   }
 }

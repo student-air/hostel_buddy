@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:hostel_buddy/routes/app_routes.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/widgets/bottom_navbar.dart';
@@ -10,8 +11,15 @@ class SeekerSearchView extends GetView<SeekerSearchController> {
   const SeekerSearchView({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return AnnotatedRegion<SystemUiOverlayStyle>(
+Widget build(BuildContext context) {
+  return PopScope(
+    canPop: false,
+    onPopInvokedWithResult: (didPop, result) {
+      if (didPop) return;
+      // Same as header back — go Home instead of leaving the app
+      Get.offAllNamed(AppRoutes.seekerHome);
+    },
+    child: AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.light,
       child: Scaffold(
         backgroundColor: AppColors.scaffoldBackground,
@@ -49,6 +57,7 @@ class SeekerSearchView extends GetView<SeekerSearchController> {
           ],
         ),
       ),
+    ),
     );
   }
 }
@@ -72,7 +81,7 @@ class _Header extends StatelessWidget {
       child: Row(
         children: [
           GestureDetector(
-            onTap: () => Get.back(),
+            onTap: () => Get.offAllNamed(AppRoutes.seekerHome),
             child: Container(
               width: 40,
               height: 40,
@@ -84,7 +93,9 @@ class _Header extends StatelessWidget {
                 Icons.arrow_back_ios_new_rounded,
                 color: Colors.white,
                 size: 18,
+                
               ),
+              
             ),
           ),
           const SizedBox(width: 12),
