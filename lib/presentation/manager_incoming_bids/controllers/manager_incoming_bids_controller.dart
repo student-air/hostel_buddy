@@ -89,32 +89,53 @@ class ManagerIncomingBidsController extends GetxController {
       status: 'accepted',
       managerOffer: 'Rs 10,500/mo',
     ),
+    IncomingBid(
+  id: '5',
+  seekerName: 'Usman Malik',
+  seater: '4 Seater',
+  offer: 'Rs 8,500/mo',
+  amenities: ['Wifi', 'Mess', 'Laundry'],
+  time: '3h ago',
+  status: 'pending',
+),
+IncomingBid(
+  id: '6',
+  seekerName: 'Ayesha Siddiqui',
+  seater: '2 Seater',
+  offer: 'Rs 12,000/mo',
+  amenities: ['Wifi', 'AC', 'Security'],
+  time: '6h ago',
+  status: 'pending',
+),
   ].obs;
 
   List<IncomingBid> get filtered {
-    var list = bids.toList();
-    switch (selectedTab.value) {
-      case 1:
-        list = list.where((b) => b.status == 'offered').toList();
-        break;
-      case 2:
-        list = list.where((b) => b.status == 'accepted').toList();
-        break;
-    }
-    final q = searchQuery.value.trim().toLowerCase();
-    if (q.isNotEmpty) {
-      list = list
-          .where(
-            (b) =>
-                b.seekerName.toLowerCase().contains(q) ||
-                b.seater.toLowerCase().contains(q) ||
-                b.offer.toLowerCase().contains(q) ||
-                (b.managerOffer?.toLowerCase().contains(q) ?? false),
-          )
-          .toList();
-    }
-    return list;
+  var list = bids.toList();
+  switch (selectedTab.value) {
+    case 0: // All → only pending (accept / reject)
+      list = list.where((b) => b.status == 'pending').toList();
+      break;
+    case 1: // Offered
+      list = list.where((b) => b.status == 'offered').toList();
+      break;
+    case 2: // Accepted
+      list = list.where((b) => b.status == 'accepted').toList();
+      break;
   }
+  final q = searchQuery.value.trim().toLowerCase();
+  if (q.isNotEmpty) {
+    list = list
+        .where(
+          (b) =>
+              b.seekerName.toLowerCase().contains(q) ||
+              b.seater.toLowerCase().contains(q) ||
+              b.offer.toLowerCase().contains(q) ||
+              (b.managerOffer?.toLowerCase().contains(q) ?? false),
+        )
+        .toList();
+  }
+  return list;
+}
 
   void onTabChanged(int i) => selectedTab.value = i;
   void onSearchChanged(String q) => searchQuery.value = q;
@@ -385,6 +406,105 @@ class ManagerIncomingBidsController extends GetxController {
       selectedNavIndex.value = 1;
       break;
   }
+}
+void deleteOfferedBid(IncomingBid bid) {
+  Get.dialog(
+    barrierDismissible: false,
+    Dialog(
+      backgroundColor: Colors.transparent,
+      insetPadding: const EdgeInsets.symmetric(horizontal: 28),
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(22, 24, 22, 18),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: AppColors.border),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 56,
+              height: 56,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.error.withValues(alpha: 0.12),
+              ),
+              child: const Icon(
+                Icons.delete_outline_rounded,
+                color: AppColors.error,
+                size: 28,
+              ),
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'Delete this offer?',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w800,
+                color: AppColors.textPrimary,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Remove the offer for ${bid.seekerName}? This cannot be undone.',
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                color: AppColors.textSecondary,
+                fontSize: 14,
+                height: 1.4,
+              ),
+            ),
+            const SizedBox(height: 22),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () => Get.back(),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppColors.textPrimary,
+                      side: const BorderSide(color: AppColors.border),
+                      minimumSize: const Size(0, 46),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(24),
+                      ),
+                    ),
+                    child: const Text(
+                      'Cancel',
+                      style: TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Get.back();
+                      bids.removeWhere((b) => b.id == bid.id);
+                      AppSnackbar.info('Deleted', 'Offer removed.');
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.error,
+                      foregroundColor: Colors.white,
+                      elevation: 0,
+                      minimumSize: const Size(0, 46),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(24),
+                      ),
+                    ),
+                    child: const Text(
+                      'Delete',
+                      style: TextStyle(fontWeight: FontWeight.w700),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
 }
 }
 

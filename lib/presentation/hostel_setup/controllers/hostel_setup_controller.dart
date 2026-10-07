@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/utils/app_snackbar.dart';
 import '../../../routes/app_routes.dart';
@@ -20,6 +21,24 @@ class HostelSetupController extends GetxController {
   final contactController = TextEditingController();
   final descriptionController = TextEditingController();
   final photoPaths = <String>[].obs;
+
+  /// Selected city from dropdown
+  final selectedCity = ''.obs;
+
+  static const List<String> cities = [
+    'Islamabad',
+    'Rawalpindi',
+    'Lahore',
+    'Karachi',
+    'Peshawar',
+    'Multan',
+    'Faisalabad',
+    'Quetta',
+    'Gujranwala',
+    'Sialkot',
+    'Hyderabad',
+    'Abbottabad',
+  ];
 
   // ── Step 2: Rooms ──
   final totalRooms = 1.obs;
@@ -42,7 +61,10 @@ class HostelSetupController extends GetxController {
   /// Hostel type: 'Boys Hostel' | 'Girls Hostel' | ''
   final selectedHostelType = ''.obs;
 
-  static const List<String> hostelTypeOptions = ['Boys Hostel', 'Girls Hostel'];
+  static const List<String> hostelTypeOptions = [
+    'Boys Hostel',
+    'Girls Hostel',
+  ];
 
   static const List<Map<String, dynamic>> facilityOptions = [
     {'label': 'WiFi', 'icon': Icons.wifi_rounded},
@@ -61,6 +83,14 @@ class HostelSetupController extends GetxController {
   void onInit() {
     super.onInit();
     roomsTextController = TextEditingController(text: '1');
+
+    // Prefill city from profile if available
+    final storedCity =
+        GetStorage().read('profile_city')?.toString().trim() ?? '';
+    if (storedCity.isNotEmpty) {
+      selectedCity.value = storedCity;
+      cityController.text = storedCity;
+    }
   }
 
   void goToStep(int step) {
@@ -92,6 +122,17 @@ class HostelSetupController extends GetxController {
 
   bool _validateBasics() {
     if (!basicsFormKey.currentState!.validate()) return false;
+
+    final city = selectedCity.value.trim().isNotEmpty
+        ? selectedCity.value.trim()
+        : cityController.text.trim();
+
+    if (city.isEmpty) {
+      AppSnackbar.warning('City', 'Please select a city.');
+      return false;
+    }
+
+    cityController.text = city;
     return true;
   }
 
@@ -168,7 +209,8 @@ class HostelSetupController extends GetxController {
   }
 
   void toggleSelectAllFacilities() {
-    final allLabels = facilityOptions.map((e) => e['label'] as String).toSet();
+    final allLabels =
+        facilityOptions.map((e) => e['label'] as String).toSet();
     final allSelected = allLabels.every(selectedFacilities.contains);
     if (allSelected) {
       selectedFacilities.removeAll(allLabels);
@@ -178,8 +220,10 @@ class HostelSetupController extends GetxController {
   }
 
   bool get allFacilitiesSelected {
-    final allLabels = facilityOptions.map((e) => e['label'] as String).toSet();
-    return allLabels.isNotEmpty && allLabels.every(selectedFacilities.contains);
+    final allLabels =
+        facilityOptions.map((e) => e['label'] as String).toSet();
+    return allLabels.isNotEmpty &&
+        allLabels.every(selectedFacilities.contains);
   }
 
   void addCustomFacility() {
@@ -188,6 +232,90 @@ class HostelSetupController extends GetxController {
     selectedFacilities.add(text);
     customFacilityController.clear();
   }
+
+  // ── City dropdown ──
+
+  void openCityPicker() {
+    Get.bottomSheet(
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      Container(
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(Get.context!).size.height * 0.7,
+        ),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 12),
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: AppColors.border,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const Padding(
+              padding: EdgeInsets.fromLTRB(20, 16, 20, 8),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'Select city',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+              ),
+            ),
+            Flexible(
+              child: ListView.separated(
+                shrinkWrap: true,
+                padding: const EdgeInsets.fromLTRB(12, 0, 12, 24),
+                itemCount: cities.length,
+                separatorBuilder: (_, __) =>
+                    const Divider(height: 1, color: AppColors.divider),
+                itemBuilder: (_, i) {
+                  final c = cities[i];
+                  return Obx(() {
+                    final sel = selectedCity.value == c;
+                    return ListTile(
+                      title: Text(
+                        c,
+                        style: TextStyle(
+                          color: AppColors.textPrimary,
+                          fontWeight:
+                              sel ? FontWeight.w700 : FontWeight.w500,
+                        ),
+                      ),
+                      trailing: sel
+                          ? const Icon(
+                              Icons.check_circle_rounded,
+                              color: AppColors.accent,
+                            )
+                          : null,
+                      onTap: () {
+                        selectedCity.value = c;
+                        cityController.text = c;
+                        Get.back();
+                      },
+                    );
+                  });
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ── Photos (max AppConstants.maxHostelPhotos = 8) ──
 
   Future<void> pickPhotos() async {
     try {
@@ -219,7 +347,7 @@ class HostelSetupController extends GetxController {
     }
   }
 
-    Future<void> publishListing() async {
+  Future<void> publishListing() async {
     if (selectedHostelType.value.isEmpty) {
       AppSnackbar.warning('Hostel type', 'Select Boys or Girls hostel.');
       return;
@@ -231,24 +359,27 @@ class HostelSetupController extends GetxController {
 
     final box = GetStorage();
     final name = nameController.text.trim();
-    final city = cityController.text.trim().isNotEmpty
-        ? cityController.text.trim()
-        : (box.read('profile_city')?.toString() ?? 'Islamabad');
+    final city = selectedCity.value.trim().isNotEmpty
+        ? selectedCity.value.trim()
+        : (cityController.text.trim().isNotEmpty
+            ? cityController.text.trim()
+            : (box.read('profile_city')?.toString() ?? 'Islamabad'));
     final type = selectedHostelType.value;
     final area = areaController.text.trim();
     final contact = contactController.text.trim();
     final description = descriptionController.text.trim();
 
-    // Legacy single keys (used across app)
     await box.write('hostel_name', name);
     await box.write('hostel_type', type);
     await box.write('hostel_area', area);
     await box.write('hostel_description', description);
     await box.write('hostel_contact', contact);
     await box.write('hostel_rooms', totalRooms.value);
+    await box.write('hostel_photos', photoPaths.toList());
+    await box.write('hostel_facilities', selectedFacilities.toList());
+    await box.write('hostel_room_types', selectedRoomTypes.toList());
     if (city.isNotEmpty) await box.write('profile_city', city);
 
-    // Multi-hostel list used by Manager Home dropdown
     final existing = box.read('manager_hostels');
     final List<Map<String, dynamic>> list = [];
     if (existing is List) {
@@ -264,9 +395,9 @@ class HostelSetupController extends GetxController {
       'type': type,
     };
 
-    // If editing same name, replace; else append
     final sameIndex = list.indexWhere(
-      (h) => (h['name']?.toString() ?? '').toLowerCase() == name.toLowerCase(),
+      (h) =>
+          (h['name']?.toString() ?? '').toLowerCase() == name.toLowerCase(),
     );
     if (sameIndex >= 0) {
       list[sameIndex] = newHostel;

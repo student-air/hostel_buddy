@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/widgets/bottom_navbar.dart';
+import '../../../routes/app_routes.dart';
 import '../controllers/manager_incoming_bids_controller.dart';
 
 class ManagerIncomingBidsView extends GetView<ManagerIncomingBidsController> {
@@ -11,42 +12,50 @@ class ManagerIncomingBidsView extends GetView<ManagerIncomingBidsController> {
 
   @override
   Widget build(BuildContext context) {
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.light,
-      child: Scaffold(
-        backgroundColor: AppColors.scaffoldBackground,
-        body: Stack(
-          children: [
-            Column(
-              children: [
-                _Header(),
-                Expanded(
-                  child: Column(
-                    children: [
-                      const SizedBox(height: 14),
-                      _SearchBar(controller: controller),
-                      const SizedBox(height: 12),
-                      _Tabs(controller: controller),
-                      const SizedBox(height: 12),
-                      Expanded(child: _Body(controller: controller)),
-                    ],
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        // Android / system back → home
+        Get.offAllNamed(AppRoutes.managerHome);
+      },
+      child: AnnotatedRegion<SystemUiOverlayStyle>(
+        value: SystemUiOverlayStyle.light,
+        child: Scaffold(
+          backgroundColor: AppColors.scaffoldBackground,
+          body: Stack(
+            children: [
+              Column(
+                children: [
+                  _Header(controller: controller),
+                  Expanded(
+                    child: Column(
+                      children: [
+                        const SizedBox(height: 14),
+                        _SearchBar(controller: controller),
+                        const SizedBox(height: 12),
+                        _Tabs(controller: controller),
+                        const SizedBox(height: 12),
+                        Expanded(child: _Body(controller: controller)),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0,
+                child: Obx(
+                  () => AppBottomNavBar(
+                    selectedIndex: controller.selectedNavIndex.value,
+                    onTap: controller.onNavTap,
+                    items: AppBottomNavBar.managerItems,
                   ),
                 ),
-              ],
-            ),
-            Positioned(
-              left: 0,
-              right: 0,
-              bottom: 0,
-              child: Obx(
-                () => AppBottomNavBar(
-                  selectedIndex: controller.selectedNavIndex.value,
-                  onTap: controller.onNavTap,
-                  items: AppBottomNavBar.managerItems,
-                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -54,6 +63,9 @@ class ManagerIncomingBidsView extends GetView<ManagerIncomingBidsController> {
 }
 
 class _Header extends StatelessWidget {
+  const _Header({required this.controller});
+  final ManagerIncomingBidsController controller;
+
   @override
   Widget build(BuildContext context) {
     final top = MediaQuery.of(context).padding.top;
@@ -68,7 +80,14 @@ class _Header extends StatelessWidget {
       child: Row(
         children: [
           GestureDetector(
-            onTap: () => Get.back(),
+            // Header back → stack back (or home if no stack)
+            onTap: () {
+              if (Navigator.of(context).canPop()) {
+                Get.back();
+              } else {
+                Get.offAllNamed(AppRoutes.managerHome);
+              }
+            },
             child: Container(
               width: 40,
               height: 40,
@@ -273,6 +292,7 @@ class _Body extends StatelessWidget {
           bid: list[i],
           onAccept: () => controller.onAcceptTap(list[i]),
           onReject: () => controller.rejectBid(list[i]),
+          onDelete: () => controller.deleteOfferedBid(list[i]),
         ),
       );
     });
@@ -284,11 +304,13 @@ class _BidCard extends StatelessWidget {
     required this.bid,
     required this.onAccept,
     required this.onReject,
+    required this.onDelete,
   });
 
   final IncomingBid bid;
   final VoidCallback onAccept;
   final VoidCallback onReject;
+  final VoidCallback onDelete;
 
   Color get statusColor {
     switch (bid.status) {
@@ -319,6 +341,7 @@ class _BidCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isPending = bid.status == 'pending';
+    final isOffered = bid.status == 'offered';
 
     return Container(
       padding: const EdgeInsets.all(14),
@@ -419,31 +442,80 @@ class _BidCard extends StatelessWidget {
               ),
             ),
           ],
-          if (bid.amenities.isNotEmpty) ...[
+
+          // Amenities + Delete (offered) on the same row
+          if (bid.amenities.isNotEmpty || isOffered) ...[
             const SizedBox(height: 10),
-            Wrap(
-              spacing: 6,
-              runSpacing: 6,
-              children: bid.amenities.map((a) {
-                return Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                  decoration: BoxDecoration(
-                    color: AppColors.tagBackground,
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: bid.amenities.isEmpty
+                      ? const SizedBox.shrink()
+                      : Wrap(
+                          spacing: 6,
+                          runSpacing: 6,
+                          children: bid.amenities.map((a) {
+                            return Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 5,
+                              ),
+                              decoration: BoxDecoration(
+                                color: AppColors.tagBackground,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Text(
+                                a,
+                                style: const TextStyle(
+                                  color: AppColors.tagText,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                ),
+                if (isOffered) ...[
+                  const SizedBox(width: 8),
+                  Material(
+                    color: AppColors.error.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    a,
-                    style: const TextStyle(
-                      color: AppColors.tagText,
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
+                    child: InkWell(
+                      onTap: onDelete,
+                      borderRadius: BorderRadius.circular(12),
+                      child: const Padding(
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.delete_outline_rounded,
+                              size: 16,
+                              color: AppColors.error,
+                            ),
+                            SizedBox(width: 4),
+                            Text(
+                              'Delete',
+                              style: TextStyle(
+                                color: AppColors.error,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
-                );
-              }).toList(),
+                ],
+              ],
             ),
           ],
+
+          // Pending → Accept / Reject (All tab)
           if (isPending) ...[
             const SizedBox(height: 14),
             Row(
@@ -474,7 +546,7 @@ class _BidCard extends StatelessWidget {
                     child: ElevatedButton(
                       onPressed: onAccept,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.success,
+                        backgroundColor: AppColors.accent,
                         foregroundColor: Colors.white,
                         elevation: 0,
                         shape: RoundedRectangleBorder(

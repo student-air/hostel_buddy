@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
 import '../../../core/constants/app_colors.dart';
+import '../../../core/constants/app_constants.dart';
 import '../../../core/utils/validators.dart';
 import '../controllers/hostel_setup_controller.dart';
 
@@ -75,7 +76,7 @@ class HostelSetupView extends GetView<HostelSetupController> {
 }
 
 // ═══════════════════════════════════════════
-// HEADER — curved maroon (matches mockup)
+// HEADER
 // ═══════════════════════════════════════════
 
 class _Header extends StatelessWidget {
@@ -195,12 +196,14 @@ class _StepBasics extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Pictures',
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-                color: AppColors.textSecondary,
+            Obx(
+              () => Text(
+                'Pictures (${controller.photoPaths.length}/${AppConstants.maxHostelPhotos})',
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textSecondary,
+                ),
               ),
             ),
             const SizedBox(height: 12),
@@ -230,12 +233,63 @@ class _StepBasics extends StatelessWidget {
                 ),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: _LightField(
-                    controller: controller.cityController,
-                    label: 'City',
-                    hint: 'Islamabad',
-                    validator: Validators.city,
-                    textCapitalization: TextCapitalization.words,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Padding(
+                        padding: EdgeInsets.only(left: 2, bottom: 8),
+                        child: Text(
+                          'City',
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                      ),
+                      Obx(() {
+                        final city = controller.selectedCity.value;
+                        return GestureDetector(
+                          onTap: controller.openCityPicker,
+                          child: Container(
+                            height: 52,
+                            padding: const EdgeInsets.symmetric(horizontal: 14),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(28),
+                              border: Border.all(color: AppColors.border),
+                            ),
+                            child: Row(
+                              children: [
+                                const Icon(
+                                  Icons.location_on_outlined,
+                                  size: 20,
+                                  color: AppColors.accent,
+                                ),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: Text(
+                                    city.isEmpty ? 'Select city' : city,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      color: city.isEmpty
+                                          ? AppColors.textMuted
+                                          : AppColors.textPrimary,
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ),
+                                const Icon(
+                                  Icons.keyboard_arrow_down_rounded,
+                                  color: AppColors.textMuted,
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      }),
+                    ],
                   ),
                 ),
               ],
@@ -278,12 +332,13 @@ class _PhotoPickerSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Obx(() {
       final paths = controller.photoPaths;
+      final canAdd = paths.length < AppConstants.maxHostelPhotos;
+
       return SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         physics: const BouncingScrollPhysics(),
         child: Row(
           children: [
-            // Show up to 2 color placeholders when empty (mockup style)
             if (paths.isEmpty) ...[
               for (final c in _placeholderColors)
                 Padding(
@@ -339,36 +394,36 @@ class _PhotoPickerSection extends StatelessWidget {
                 ),
               );
             }),
-            // Add button (dashed)
-            GestureDetector(
-              onTap: controller.pickPhotos,
-              child: Container(
-                width: 72,
-                height: 72,
-                decoration: BoxDecoration(
-                  color: AppColors.surfaceWhite,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: AppColors.primary.withValues(alpha: 0.35),
-                    width: 1.5,
-                    strokeAlign: BorderSide.strokeAlignInside,
+            if (canAdd)
+              GestureDetector(
+                onTap: controller.pickPhotos,
+                child: Container(
+                  width: 72,
+                  height: 72,
+                  decoration: BoxDecoration(
+                    color: AppColors.surfaceWhite,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: AppColors.primary.withValues(alpha: 0.35),
+                      width: 1.5,
+                      strokeAlign: BorderSide.strokeAlignInside,
+                    ),
                   ),
-                ),
-                child: CustomPaint(
-                  painter: _DashedBorderPainter(
-                    color: AppColors.primary.withValues(alpha: 0.4),
-                    radius: 16,
-                  ),
-                  child: const Center(
-                    child: Icon(
-                      Icons.add_rounded,
-                      size: 28,
-                      color: AppColors.primary,
+                  child: CustomPaint(
+                    painter: _DashedBorderPainter(
+                      color: AppColors.primary.withValues(alpha: 0.4),
+                      radius: 16,
+                    ),
+                    child: const Center(
+                      child: Icon(
+                        Icons.add_rounded,
+                        size: 28,
+                        color: AppColors.primary,
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
           ],
         ),
       );
@@ -392,11 +447,10 @@ class _DashedBorderPainter extends CustomPainter {
       Radius.circular(radius),
     );
     final path = Path()..addRRect(rrect);
-    final dashWidth = 5.0;
-    final dashSpace = 4.0;
-    final pathMetrics = path.computeMetrics();
-    for (final metric in pathMetrics) {
-      double distance = 0;
+    const dashWidth = 5.0;
+    const dashSpace = 4.0;
+    for (final metric in path.computeMetrics()) {
+      var distance = 0.0;
       while (distance < metric.length) {
         final next = distance + dashWidth;
         canvas.drawPath(
@@ -485,10 +539,7 @@ class _StepRooms extends StatelessWidget {
           const Center(
             child: Text(
               'Tap the number to type',
-              style: TextStyle(
-                fontSize: 12,
-                color: AppColors.textMuted,
-              ),
+              style: TextStyle(fontSize: 12, color: AppColors.textMuted),
             ),
           ),
           const SizedBox(height: 28),
@@ -565,6 +616,7 @@ class _StepRooms extends StatelessWidget {
   void _showCustomSeaterSheet(BuildContext context) {
     controller.customRoomTypeController.clear();
     Get.bottomSheet(
+      isScrollControlled: true,
       Container(
         padding: EdgeInsets.fromLTRB(
           24,
@@ -646,7 +698,6 @@ class _StepRooms extends StatelessWidget {
           ],
         ),
       ),
-      isScrollControlled: true,
     );
   }
 }
@@ -746,7 +797,7 @@ class _StepFacilities extends StatelessWidget {
                     style: const TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
-                      color: AppColors.tagText
+                      color: AppColors.tagText,
                     ),
                   ),
                 );
@@ -883,6 +934,7 @@ class _StepFacilities extends StatelessWidget {
   void _showCustomFacilitySheet(BuildContext context) {
     controller.customFacilityController.clear();
     Get.bottomSheet(
+      isScrollControlled: true,
       Container(
         padding: EdgeInsets.fromLTRB(
           24,
@@ -963,11 +1015,11 @@ class _StepFacilities extends StatelessWidget {
           ],
         ),
       ),
-      isScrollControlled: true,
     );
   }
 }
 
+/// Boys / Girls — high beam (selected) vs low beam (idle)
 class _HostelTypeSelector extends StatelessWidget {
   const _HostelTypeSelector({required this.selected, required this.onSelect});
   final String selected;
@@ -1073,7 +1125,6 @@ class _HostelTypeCard extends StatelessWidget {
     );
   }
 }
-
 // ═══════════════════════════════════════════
 // Shared
 // ═══════════════════════════════════════════
@@ -1230,7 +1281,8 @@ class _LightField extends StatelessWidget {
           cursorColor: AppColors.primary,
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: const TextStyle(fontSize: 14, color: AppColors.textMuted),
+            hintStyle:
+                const TextStyle(fontSize: 14, color: AppColors.textMuted),
             filled: true,
             fillColor: Colors.white,
             contentPadding: EdgeInsets.symmetric(
@@ -1240,7 +1292,8 @@ class _LightField extends StatelessWidget {
             prefixIcon: prefixIcon != null && maxLines == 1
                 ? Padding(
                     padding: const EdgeInsets.only(left: 14, right: 10),
-                    child: Icon(prefixIcon, size: 20, color: AppColors.accent),
+                    child:
+                        Icon(prefixIcon, size: 20, color: AppColors.accent),
                   )
                 : null,
             prefixIconConstraints:

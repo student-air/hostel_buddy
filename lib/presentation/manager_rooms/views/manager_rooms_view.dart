@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:hostel_buddy/routes/app_routes.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/widgets/bottom_navbar.dart';
@@ -10,8 +11,14 @@ class ManagerRoomsView extends GetView<ManagerRoomsController> {
   const ManagerRoomsView({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return AnnotatedRegion<SystemUiOverlayStyle>(
+Widget build(BuildContext context) {
+  return PopScope(
+    canPop: false,
+    onPopInvokedWithResult: (didPop, result) {
+      if (didPop) return;
+      Get.offAllNamed(AppRoutes.managerHome);
+    },
+    child: AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.light,
       child: Scaffold(
         backgroundColor: AppColors.scaffoldBackground,
@@ -65,6 +72,7 @@ class ManagerRoomsView extends GetView<ManagerRoomsController> {
           ],
         ),
       ),
+    ),
     );
   }
 }
@@ -86,7 +94,7 @@ class _Header extends StatelessWidget {
       child: Row(
         children: [
           GestureDetector(
-            onTap: () => Get.offAllNamed('/manager-home'),
+            onTap: () => Get.offAllNamed(AppRoutes.managerHome),
             child: Container(
               width: 40,
               height: 40,
